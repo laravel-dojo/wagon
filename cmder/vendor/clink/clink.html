@@ -1,0 +1,561 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <link href="data:text/css,body%20%7B%0A%20%20%20%20width%3A%20600px%3B%0A%7D%0A%0Ah3%2C%20h2%20%7B%0A%20%20%20%20width%3A%20100%25%3B%0A%20%20%20%20border%2Dbottom%3A%201px%20black%20solid%3B%0A%7D%0A" rel="stylesheet" type="text/css" />
+</head>
+<body>
+
+<h2>Clink v0.4.2</h2>
+<div><a href="http://github.com/mridgers/clink">http://github.com/mridgers/clink</a></div>
+<div><a href="http://twitter.com/choddlander">Martin Ridgers</a></div>
+
+<div id="TOC">
+<ul>
+<li><a href="#what-is-clink">What is Clink?</a></li>
+<li><a href="#features">Features</a></li>
+<li><a href="#usage">Usage</a></li>
+<li><a href="#how-clink-works">How Clink Works</a></li>
+<li><a href="#configuring-clink">Configuring Clink</a></li>
+<li><a href="#extending-clink">Extending Clink</a></li>
+<li><a href="#the-clink-lua-api">The Clink Lua API</a></li>
+<li><a href="#miscellaneous-1">Miscellaneous</a></li>
+<li><a href="#changelog">Changelog</a></li>
+</ul>
+</div>
+<h3 id="what-is-clink">What is Clink?</h3>
+<p>Clink combines the native Windows shell cmd.exe with the powerful command line editing features of the GNU Readline library, which provides rich completion, history, and line-editing capabilities. Readline is best known for its use in the famous Unix shell Bash, the standard shell for Mac OS X and many Linux distributions.</p>
+<h3 id="features">Features</h3>
+<ul>
+<li>The same line editing as Bash (from GNU's Readline library).</li>
+<li>History persistence between sessions.</li>
+<li>Context sensitive completion;</li>
+<li>Executables (and aliases).</li>
+<li>Directory commands.</li>
+<li>Environment variables</li>
+<li>Thirdparty tools; Git, Mercurial, SVN, Go, and P4.</li>
+<li>New keyboard shortcuts;</li>
+<li>Paste from clipboard (<strong>Ctrl-V</strong>).</li>
+<li>Incremental history search (<strong>Ctrl-R/Ctrl-S</strong>).</li>
+<li>Powerful completion (<strong>TAB</strong>).</li>
+<li>Undo (<strong>Ctrl-Z</strong>).</li>
+<li>Automatic &quot;cd ..&quot; (<strong>Ctrl-Alt-U</strong>).</li>
+<li>Environment variable expansion (<strong>Ctrl-Alt-E</strong>).</li>
+<li>(press <strong>Alt-H</strong> for many more...)</li>
+<li>Scriptable completion with Lua.</li>
+<li>Coloured and scriptable prompt.</li>
+<li>Auto-answering of the &quot;Terminate batch job?&quot; prompt.</li>
+</ul>
+<p>By default Clink binds <strong>Alt-H</strong> to display the current key bindings. More features can also be found in GNU's <a href="http://tinyurl.com/oum26rp">Readline</a> and <a href="http://tinyurl.com/p92oq5d">History</a> libraries' manuals.</p>
+<h3 id="usage">Usage</h3>
+<p>There are three ways to use Clink the first of which is to add Clink to cmd.exe's autorun registry entry. This can be selected when installing Clink using the installer and Clink also provides the ability to manage this autorun entry from the command line. Running <strong>clink autorun --help</strong> has more information.</p>
+<p>The second alternative is to manually run Clink using the command <strong>clink inject</strong> from within a command prompt session to run Clink in that session.</p>
+<p>The last option is to use the Clink shortcut that the installer adds to Windows' start menu. This is in essence a shortcut to the command <strong>cmd.exe /k clink inject</strong>.</p>
+<h3 id="how-clink-works">How Clink Works</h3>
+<p>When running Clink via the methods above, Clink checks the parent process is supported and injects a DLL into it. The DLL then hooks the WriteConsole() and ReadConsole() Windows functions. The former is so that Clink can capture the current prompt, and the latter hook allows Clink to provide it's own Readline-powered command line editing.</p>
+<h3 id="configuring-clink">Configuring Clink</h3>
+<p>The easiest way to configure Clink is to use Clink's <strong>set</strong> command line option. This can list, query, and set Clink's settings. Run <strong>clink set --help</strong> from a Clink-installed cmd.exe process to learn more both about how to use it and to get descriptions for Clink's various options.</p>
+<p>Configuring Clink by and large involves configuring Readline by creating a <strong>clink_inputrc</strong> file. There is excellent documentation for all the options available to configure Readline in Readline's <a href="http://tinyurl.com/oum26rp">manual</a>.</p>
+<p>Where Clink looks for <strong>clink_inputrc</strong> (as well as .lua scripts and the settings file) depends on which distribution of Clink was used. If you installed Clink using the .exe installer then Clink uses the current user's non-roaming application data directory. This user directory is usually found in one of the following locations;</p>
+<ul>
+<li>c:and Settings&amp;lt;username&gt;SettingsData <em>(XP)</em></li>
+<li>c:&amp;lt;username&gt;(Vista onwards)*</li>
+</ul>
+<p>The .zip distribution of Clink creates and uses a directory called <strong>profile</strong> which is located in the same directory where Clink's core files are found.</p>
+<p>All of the above locations can be overriden using the <strong>--profile &lt;path&gt;</strong> command line option which is specified when injecting Clink into cmd.exe using <strong>clink inject</strong>.</p>
+<h4 id="settings">Settings</h4>
+<p>It is also possible to configure settings specific to Clink. These are stored in a file called <strong>settings</strong> which is found in one of the locations mentioned in the previous section. The settings file gets created the first time Clink is run.</p>
+<p>Settings loaded from the file can be overriden by setting environment variables matching the setting name and prefixed with &quot;clink.&quot;. For example, the command <strong>set clink.prompt_colour=10</strong> will turn the prompt green regardless of what is in the settings file. Overrides are not saved to disk.</p>
+<p>The following table describes the available settings;</p>
+<p>Name | Description ---- | ----------- <strong>ctrld_exits</strong> | Ctrl-D exits the process when it is pressed on an empty line. <strong>esc_clears_line</strong> | Clink clears the current line when Esc is pressed (unless Readline's Vi mode is enabled). <strong>exec_match_style</strong> | Changes how Clink will match executables when there is no path separator on the line. 0 = PATH only, 1 = PATH and CWD, 2 = PATH, CWD, and directories. In all cases both executables and directories are matched when there is a path separator present. <strong>match_colour</strong> | Colour to use when displaying matches. A value less than 0 will be the opposite brightness of the default colour. <strong>persist_history</strong> | Enable or disable the saving and loading of command history between sessions. <strong>prompt_colour</strong> | Surrounds the prompt in ANSI escape codes to set the prompt's colour (0..15). Disabled when the value is less than 0. <strong>space_prefix_match_files</strong> | If the line begins with whitespace then Clink bypasses executable matching and will match all files and directories instead. <strong>terminate_autoanswer</strong> | Automatically answers cmd.exe's <strong>Terminate batch job (Y/N)?</strong> prompts. 0 = disabled, 1 = answer Y, 2 = answer N. <strong>use_altgr_substitute</strong> | Windows provides Ctrl-Alt as a substitute for AltGr, historically to support keyboards with no AltGr key. This may collide with some of Readline's bindings.</p>
+<h3 id="extending-clink">Extending Clink</h3>
+<p>The Readline library allows clients to offer an alternative path for creating completion matches. Clink uses this to hook Lua into the completion process making it possible to script the generation of matches with Lua scripts. The following sections describe this in more detail and shows some examples.</p>
+<h4 id="the-location-of-lua-scripts">The Location of Lua Scripts</h4>
+<p>Clink looks for Lua scripts in the folders as described in the <strong>Configuring Clink</strong> section. By default <strong>Ctrl-Q</strong> is mapped to reload all Lua scripts which can be useful when developing and iterating on your own scripts.</p>
+<h4 id="match-generators">Match Generators</h4>
+<p>These are Lua functions that are registered with Clink and are called as part of Readline's completion process. Match generator functions take the following form;</p>
+<pre><code>function my_match_generator(text, first, last)
+    -- Use text/rl_state.line_buffer to create matches,
+    -- Submit matches to Clink using clink.add_match()
+    -- Return true/false.
+end</code></pre>
+<p><strong>Text</strong> is the word that is being completed, <strong>first</strong> and <strong>last</strong> and the indices into the complete line buffer for <strong>text</strong> (the full line buffer can be accessed using the variable <strong>rl_state.line_buffer</strong>). If no further match generators need to be called then the function should return true.</p>
+<p>Registering the match generation function is done as follows;</p>
+<pre><code>clink.register_match_generator(my_match_generator, sort_id)</code></pre>
+<p>The <strong>sort_id</strong> argument is used to sort the match generators such that generators with a lower sort ids are called first.</p>
+<p>Here is an simple example script that checks if <strong>text</strong> begins with a <strong>%</strong> character and then uses the remained of <strong>text</strong> to match the names of environment variables.</p>
+<pre><code>function env_vars_match_generator(text, first, last)
+    if not text:find(&quot;^%%&quot;) then
+        return false
+    end
+
+    text = clink.lower(text:sub(2))
+    local text_len = #text
+    for _, name in ipairs(clink.get_env_var_names()) do
+        if clink.lower(name:sub(1, text_len)) == text then
+            clink.add_match('%'..name..'%')
+        end
+    end
+
+    return true
+end
+
+clink.register_match_generator(env_vars_match_generator, 10)</code></pre>
+<h4 id="argument-completion">Argument Completion</h4>
+<p>Clink provides a framework for writing complex argument match generators in Lua. It works by creating a parser object that describes a command's arguments and flags and then registering the parser with Clink. When Clink detects the command is being entered on the current command line being editied, it uses the parser to generate matches.</p>
+<p>Here is an example of a simple parser for the command <strong>foobar</strong>;</p>
+<pre><code>my_parser = clink.arg.new_parser()
+my_parser:set_flags(&quot;-foo&quot;, &quot;-bar&quot;)
+my_parser:set_arguments(
+    { &quot;hello&quot;, &quot;hi&quot; },
+    { &quot;world&quot;, &quot;wombles&quot; }
+)
+
+clink.arg.register_parser(&quot;foobar&quot;, my_parser)</code></pre>
+<p>This parser describes a command that has two positional arguments each with two potential options. It also has two flags which the parser considers to be position independent meaning that provided the word being completed starts with a certain prefix the parser with attempt to match the from the set of flags.</p>
+<p>On the command line completion would look something like this;</p>
+<pre><code>C:\&gt;foobar hello -foo wo
+world   wombles
+C:\&gt;foobar hello -foo wo_</code></pre>
+<p>As an alternative to calling <strong>clink.arg.set_arguments()</strong> and <strong>clink.arg.set_flags()</strong> you can instead provide the parser's flags and positional arguments as arguments to <strong>clink.arg.new_parser()</strong> as follows;</p>
+<pre><code>some_parser = clink.arg.new_parser(
+    { &quot;arg1-1&quot;, &quot;arg1-2&quot; },
+    { &quot;arg2-1&quot;, &quot;arg2-2&quot; },
+    &quot;-flag1&quot;, &quot;-flag2&quot;
+)</code></pre>
+<h5 id="more-advanced-stuff">More Advanced Stuff</h5>
+<h6 id="linking-parsers">Linking Parsers</h6>
+<p>There are often situations where the parsing of a command's arguments is dependent on the previous words (<strong>git merge ...</strong> compared to <strong>git log ...</strong> for example). For these scenarios Clink allows you to link parsers to arguments' words using Lua's concatenation operator. Parsers can also be concatenated with flags too.</p>
+<pre><code>a_parser = clink.arg.new_parser():set_arguments({&quot;foo&quot;, &quot;bar&quot; })
+b_parser = clink.arg.new_parser():set_arguments({ &quot;abc&quot;, &quot;123&quot; })
+c_parser = clink.arg.new_parser()
+c_parser:set_arguments(
+    { &quot;foobar&quot; .. b_parser },
+    { c_parser }
+)</code></pre>
+<p>With syntax from preceeded section this converts into:</p>
+<pre><code>parser = clink.arg.new_parser
+a_parser = parser({&quot;foo&quot;, &quot;bar&quot; })
+c_parser = parser(
+    { &quot;foobar&quot; .. parser({ &quot;abc&quot;, &quot;123&quot; }) },
+    { c_parser }
+)</code></pre>
+<p>As the example above shows, it is also possible to use a parser without concatenating it to a word. When Clink follows a link to a parser it is permanent and it will not return to the previous parser.</p>
+<h6 id="functions-as-argument-options">Functions As Argument Options</h6>
+<p>Argument options are not limited solely to strings. Clink also accepts functions too so more context aware argument options can be used.</p>
+<pre><code>function rainbow_function(word)
+    return { &quot;red&quot;, &quot;white&quot;, &quot;blue&quot; }
+end
+
+the_parser = clink.arg.new_parser()
+the_parser:set_arguments(
+    { &quot;zippy&quot;, &quot;bungle&quot;, &quot;george&quot; },
+    { rainbow_function, &quot;yellow&quot;, &quot;green&quot; }
+)</code></pre>
+<p>The functions take a single argument which is a word from the command line being edited (or partial word if it is the one under the cursor). Functions should return a table of potential matches (or an empty table if it calls clink.add_match() directly itself).</p>
+<h4 id="filtering-the-match-display">Filtering The Match Display</h4>
+<p>In some instances it may be preferable to display potential matches in an alternative form than the generated matches passed to and used internally by Readline. This happens for example with Readline's standard file name matches, where the matches are the whole word being completed but only the last part of the path is shown (e.g. the match <strong>foo/bar</strong> is displayed as <strong>bar</strong>).</p>
+<p>To facilitate custom match generators that may wish to do this there is the <strong>clink.match_display_filter</strong> variable. This can be set to a function that will then be called before matches are to be displayed.</p>
+<pre><code>function my_display_filter(matches)
+    new_matches = {}
+
+    for _, m in ipairs(matches) do
+        local _, _, n = m:find(&quot;\\([^\\]+)$&quot;)
+        table.insert(new_matches, n)
+    end
+
+    return new_matches
+end
+
+function my_match_generator(text, first, last)
+    ...
+
+    clink.match_display_filter = my_display_filter
+    return true
+end</code></pre>
+<p>The function's single argument <strong>matches</strong> is a table containing what Clink is going to display. The return value is a table with the input matches filtered as required by the match generator. The value of <strong>clink.match_display_filter</strong> is reset every time match generation is invoked.</p>
+<h4 id="customising-the-prompt">Customising The Prompt</h4>
+<p>Before Clink displays the prompt it filters the prompt through Lua so that the prompt can be customised. This happens each and every time that the prompt is shown which allows for context sensitive customisations (such as showing the current branch of a git repository for example).</p>
+<p>Writing a prompt filter is straight forward and best illustrated with an example that displays the current git branch when the current directory is a git repository.</p>
+<pre><code>function git_prompt_filter()
+    for line in io.popen(&quot;git branch 2&gt;nul&quot;):lines() do
+        local m = line:match(&quot;%* (.+)$&quot;)
+        if m then
+            clink.prompt.value = &quot;[&quot;..m..&quot;] &quot;..clink.prompt.value
+            break
+        end
+    end
+
+    return false
+end
+
+clink.prompt.register_filter(git_prompt_filter, 50)</code></pre>
+<p>The filter function takes no arguments instead receiving and modifying the prompt through the <strong>clink.prompt.value</strong> variable. It returns true if the prompt filtering is finished, and false if it should continue on to the next registered filter.</p>
+<p>A filter function is registered into the filter chain by passing the function to <strong>clink.prompt.register_filter()</strong> along with a sort id which dictates the order in which filters are called. Lower sort ids are called first.</p>
+<h3 id="the-clink-lua-api">The Clink Lua API</h3>
+<h4 id="matches">Matches</h4>
+<h5 id="clink.add_matchtext">clink.add_match(text)</h5>
+<p>Outputs <strong>text</strong> as a match for the active completion.</p>
+<h5 id="clink.compute_lcdtext-matches">clink.compute_lcd(text, matches)</h5>
+<p>Returns the least-common-denominator of <strong>matches</strong>. It is assumed that <strong>text</strong> was the input to generate <strong>matches</strong>. As such it is expected that each match starts with <strong>text</strong>.</p>
+<h5 id="clink.get_matchindex">clink.get_match(index)</h5>
+<p>Returns a match by <strong>index</strong> from the matches output by clink.add_match().</p>
+<h5 id="clink.is_matchneedle-candidate">clink.is_match(needle, candidate)</h5>
+<p>Given a <strong>needle</strong> (such as the section of the current line buffer being completed), this function returns true or false if <strong>candidate</strong> begins with <strong>needle</strong>. Readline's -/_ case-mapping is respected if it is enabled.</p>
+<h5 id="clink.is_single_matchmatches">clink.is_single_match(matches)</h5>
+<p>Checks each match in the table <strong>matches</strong> and checks to see if they are all duplicates of each other.</p>
+<h5 id="clink.match_count">clink.match_count()</h5>
+<p>Returns the number of matches output by calls to clink.add_match().</p>
+<h5 id="clink.match_display_filter">clink.match_display_filter</h5>
+<p>This variable can be set to a function so that matches can be filtered before they are displayed. See <strong>Display Filtering</strong> section for more info.</p>
+<h5 id="clink.matches_are_files">clink.matches_are_files()</h5>
+<p>Tells Readline that the matches we are passing back to it are files. This will cause Readline to append the path separator character to the line if there's only one match, and mark directories when displaying multiple matches.</p>
+<h5 id="clink.register_match_generatorgenerator-sort_id">clink.register_match_generator(generator, sort_id)</h5>
+<p>Registers a match <strong>generator</strong> function that is called to generate matches when the complete keys is press (TAB by default).</p>
+<p>The generator function takes the form <strong>generator_function(text, first, last)</strong> where <strong>text</strong> is the portion of the line buffer that is to be completed, <strong>first</strong> and <strong>last</strong> are the start and end indices into the line buffer for <strong>text</strong>.</p>
+<h5 id="clink.set_matchindex-value">clink.set_match(index, value)</h5>
+<p>Explicitly sets match at <strong>index</strong> to <strong>value</strong>.</p>
+<h4 id="argument-framework">Argument Framework</h4>
+<h5 id="parseradd_argumentstable1-table2-...">parser:add_arguments(table1, table2, ...)</h5>
+<p>Adds more positional arguments to the parser. See <strong>parser:set_arguments()</strong>.</p>
+<h5 id="parseradd_flagsflag1-flag2-...">parser:add_flags(flag1, flag2, ...)</h5>
+<p>Adds more flags to the parser. See <strong>parser:set_flags()</strong>.</p>
+<h5 id="parserbe_precise">parser:be_precise()</h5>
+<p>Ordinarily Clink only loosely matches word as it traverses a parser. Calling this will make Clink only accept an exact matching word to consider moving onto the next one.</p>
+<h5 id="parserdisable_file_matching">parser:disable_file_matching()</h5>
+<p>If this is called then Clink will not default to matching the file system if parsing comes to an end or can not be completed.</p>
+<h5 id="parserdump">parser:dump()</h5>
+<p>Prints the parser to stdout.</p>
+<h5 id="parsergoparts">parser:go(parts)</h5>
+<p>This runs the parser for the table of words <strong>parts</strong>. It returns a table of argument options. It is this method that Clink uses internally.</p>
+<h5 id="parseris_flagword">parser:is_flag(word)</h5>
+<p>Returns true of <strong>word</strong> is a valid flag.</p>
+<h5 id="parserloopindex">parser:loop(index)</h5>
+<p>By default parsers do not loop and parsing comes to an end when there are no more arguments to traverse through. If loop() is called Clink will loop back to argument at <strong>index</strong> rather than terminating the parse.</p>
+<h5 id="parserset_argumentstable1-table2-...">parser:set_arguments(table1, table2, ...)</h5>
+<p>This method sets the parser's positional arguments. Each of the variable number of arguments to the method is a table of potential options for the argument at that position. Note that calling this method replaces any existing positional arguments the parser may already have. Use <strong>parser:add_arguments()</strong> to append more positional arguments.</p>
+<h5 id="parserset_flagsflag1-flag2-...">parser:set_flags(flag1, flag2, ...)</h5>
+<p>Sets the parser's flags (which can be thought of as position independent arguments). Each argument is a string and must start with the expected flag prefix (&quot;-&quot; by default). Be aware that calling <strong>set_flags()</strong> will replace the parser's existing flags. To add more use <strong>parser:add_flags()</strong>.</p>
+<h4 id="prompt-filtering">Prompt Filtering</h4>
+<h5 id="clink.prompt.register_filterfilter-sort_id">clink.prompt.register_filter(filter, sort_id)</h5>
+<p>Used to register a <strong>filter</strong> function to pre-process the prompt before use by Readline. Filters are called by <strong>sort_id</strong> where lower sort ids get called first. Filter functions will receive no arguments and return true if filtering is finished. Getting and setting the prompt value is done through the <strong>clink.prompt.value</strong> variable.</p>
+<h5 id="clink.prompt.value">clink.prompt.value</h5>
+<p>User-provided prompt filter functions can get and set the prompt value using this variable.</p>
+<h4 id="miscellaneous">Miscellaneous</h4>
+<h5 id="clink.chdirpath">clink.chdir(path)</h5>
+<p>Changes the current working directory to <strong>path</strong>. Clink caches and restores the working directory between calls to the match generation so that it does not interfere with the processes normal operation.</p>
+<h5 id="clink.find_dirsmask-case_map">clink.find_dirs(mask, case_map)</h5>
+<p>Returns a table (array) of directories that match the supplied <strong>mask</strong>. If <strong>case_map</strong> is <strong>true</strong> then Clink will adjust the last part of the mask's path so that returned matches respect Readline's case-mapping feature (if it is enabled). For example; <strong>.<em>foo</em>bar</strong>* becomes **._foo?bar***.</p>
+<p>There is no support for recursively traversing the path in <strong>mask</strong>.</p>
+<h5 id="clink.find_filesmask-case_map">clink.find_files(mask, case_map)</h5>
+<p>Returns a table (array) of files that match the supplied <strong>mask</strong>. See <strong>find_dirs</strong> for details on the <strong>case_map</strong> argument.</p>
+<p>There is no support for recursively traversing the path in <strong>mask</strong>.</p>
+<h5 id="clink.get_cwd">clink.get_cwd()</h5>
+<p>Returns the current working directory.</p>
+<h5 id="clink.get_console_aliases">clink.get_console_aliases()</h5>
+<p>Returns a table of all the registered console aliases. Windows' console alias API is exposed via <strong>doskey</strong> or progromatically via the AddConsoleAlias() function.</p>
+<h5 id="clink.get_envenv_var_name">clink.get_env(env_var_name)</h5>
+<p>Returns the value of the environment variable <strong>env_var_name</strong>. This is preferable to the built-in Lua function os.getenv() as the latter uses a cached version of the current process' environment which can result in incorrect results.</p>
+<h5 id="clink.get_env_var_names">clink.get_env_var_names()</h5>
+<p>Returns a table of the names of the current process' environment variables.</p>
+<h5 id="clink.get_host_process">clink.get_host_process()</h5>
+<p>Returns the name of the host process (the rl_readline_name variable).</p>
+<h5 id="clink.get_screen_info">clink.get_screen_info()</h5>
+<p>Returns a table describing the current console buffer's state with the following contents;</p>
+<pre><code>{
+    -- Dimensions of the console's buffer.
+    buffer_width
+    buffer_height
+
+    -- Dimensions of the visible area of the console buffer.
+    window_width
+    window_height
+}</code></pre>
+<h5 id="clink.get_setting_strname">clink.get_setting_str(name)</h5>
+<p>Retrieves the Clink setting <strong>name</strong>, returning it as a string. See <strong>Settings</strong> for more information on the available settings.</p>
+<h5 id="clink.get_setting_intname">clink.get_setting_int(name)</h5>
+<p>As <strong>clink.get_setting_str</strong> but returning a number instead.</p>
+<h5 id="clink.is_dirpath">clink.is_dir(path)</h5>
+<p>Returns true if <strong>path</strong> resolves to a directory.</p>
+<h5 id="clink.is_rl_variable_truereadline_var_name">clink.is_rl_variable_true(readline_var_name)</h5>
+<p>Returns the boolean value of a Readline variable. These can be set with the clink_inputrc file, more details of which can be found in the <a href="http://tinyurl.com/oum26rp">Readline manual</a>.</p>
+<h5 id="clink.lowertext">clink.lower(text)</h5>
+<p>Same as os.lower() but respects Readline's case-mapping feature which will consider - and _ as case insensitive.</p>
+<p>Care should be taken when using this to generate masks for file/dir find operations due to the -/_ giving different results (unless of course Readline's extended case-mapping is disabled).</p>
+<h5 id="clink.match_filespattern-full_path-find_func">clink.match_files(pattern, full_path, find_func)</h5>
+<p>Globs files using <strong>pattern</strong> and adds results as matches. If <strong>full_path</strong> is <strong>true</strong> then the path from <strong>pattern</strong> is prefixed to the results (otherwise only the file names are included). The last argument <strong>find_func</strong> is the function to use to do the globbing. If it's unspecified (or nil) Clink falls back to <strong>clink.find_files</strong>.</p>
+<h5 id="clink.match_wordstext-words">clink.match_words(text, words)</h5>
+<p>Calls clink.is_match() on each word in the table <strong>words</strong> and adds matches to Clink that match the needle <strong>text</strong>.</p>
+<h5 id="clink.quote_splitstr-ql-qr">clink.quote_split(str, ql, qr)</h5>
+<p>This function takes the string <strong>str</strong> which is quoted by <strong>ql</strong> (the opening quote character) and <strong>qr</strong> (the closing character) and splits it into parts as per the quotes. A table of these parts is returned.</p>
+<pre><code>clink.quote_split(&quot;pre(middle)post&quot;, &quot;(&quot;, &quot;)&quot;) = {
+    &quot;pre&quot;, &quot;middle&quot;, &quot;post&quot;
+}</code></pre>
+<h5 id="clink.slash_translationtype">clink.slash_translation(type)</h5>
+<p>Controls how Clink will translate the path separating slashes for the current path being completed. Values for <strong>type</strong> are;</p>
+<ul>
+<li>-1 - no translation</li>
+<li>0 - to backslashes</li>
+<li>1 - to forward slashes.</li>
+</ul>
+<h5 id="clink.splitstr-sep">clink.split(str, sep)</h5>
+<p>Splits the string <strong>str</strong> into pieces separated by <strong>sep</strong>, returning a table of the pieces.</p>
+<h5 id="clink.suppress_char_append">clink.suppress_char_append()</h5>
+<p>This stops Readline from adding a trailing character when completion is finished (usually when a single match is returned). The suffixing of a character is enabled before completion functions are called so a call to this will only apply for the current completion.</p>
+<p>By default Readline appends a space character (' ') when the is only a single match unless it is completing files where it will use the path separator instead.</p>
+<h5 id="clink.suppress_quoting">clink.suppress_quoting()</h5>
+<p>Suppress the prefixing and suffixing of quotes even if there is a character in the current word being completed that would ordinarily need surrounding in quotes.</p>
+<h4 id="readline-constants">Readline Constants</h4>
+<p>Clink exposes a small amount of state from Readline in the global <strong>rl_state</strong> table. Readline's nomenclature is maintained (minus the <em>rl</em> prefix) so Readline's manual can also be used as reference. This table should be considered read-only - changes to the table's members are not fed back to Readline.</p>
+<h5 id="rl_state.line_buffer">rl_state.line_buffer</h5>
+<p>This variable contains the current state of the whole line being edited.</p>
+<h5 id="rl_state.point">rl_state.point</h5>
+<p>The current cursor position within the line buffer.</p>
+<h3 id="miscellaneous-1">Miscellaneous</h3>
+<h4 id="binding-special-keys">Binding special keys</h4>
+<p>Due to differences between Windows and Linux, escape codes for keys like PageUp/Down and the arrow keys are different in Clink. Escape codes take the format <strong>`?</strong> where '?' is one of the characters from the following table;</p>
+<table>
+<thead>
+<tr class="header">
+<th align="center">Key</th>
+<th align="center">Normal</th>
+<th align="center">Shift</th>
+<th align="center">Ctrl</th>
+<th align="center">Ctrl-Shift</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">Home</td>
+<td align="center">G</td>
+<td align="center">a</td>
+<td align="center">w</td>
+<td align="center">!</td>
+</tr>
+<tr class="even">
+<td align="center">Up</td>
+<td align="center">H</td>
+<td align="center">b</td>
+<td align="center">T</td>
+<td align="center">&quot;</td>
+</tr>
+<tr class="odd">
+<td align="center">PageUp</td>
+<td align="center">I</td>
+<td align="center">c</td>
+<td align="center">U</td>
+<td align="center">#</td>
+</tr>
+<tr class="even">
+<td align="center">Left</td>
+<td align="center">K</td>
+<td align="center">d</td>
+<td align="center">s</td>
+<td align="center">$</td>
+</tr>
+<tr class="odd">
+<td align="center">Right</td>
+<td align="center">M</td>
+<td align="center">e</td>
+<td align="center">t</td>
+<td align="center">%</td>
+</tr>
+<tr class="even">
+<td align="center">End</td>
+<td align="center">O</td>
+<td align="center">f</td>
+<td align="center">u</td>
+<td align="center">&amp;</td>
+</tr>
+<tr class="odd">
+<td align="center">Down</td>
+<td align="center">P</td>
+<td align="center">g</td>
+<td align="center">V</td>
+<td align="center">'</td>
+</tr>
+<tr class="even">
+<td align="center">PageDown</td>
+<td align="center">Q</td>
+<td align="center">h</td>
+<td align="center">v</td>
+<td align="center">(</td>
+</tr>
+<tr class="odd">
+<td align="center">Insert</td>
+<td align="center">R</td>
+<td align="center">i</td>
+<td align="center">W</td>
+<td align="center">)</td>
+</tr>
+<tr class="even">
+<td align="center">Delete</td>
+<td align="center">S</td>
+<td align="center">j</td>
+<td align="center">X</td>
+<td align="center">*</td>
+</tr>
+</tbody>
+</table>
+<p>Here is an example line from a clink_inputrc file that binds Shift-End to the Readline function <strong>transpose-word</strong> function;</p>
+<pre><code>&quot;\e`f&quot;: transpose-word</code></pre>
+<h4 id="readlines-menu-complete">Readline's menu-complete</h4>
+<p>Clink supports Readline's menu-complete command (which is similar to vanilla cmd.exe completion that cycles through matches rather than displaying available ones). To use this menu-style completion Clink provides the alternative command <strong>clink-menu-completion-shim</strong>. Using this ensures that appropriate path separator translation takes place.</p>
+<h4 id="powershell">Powershell</h4>
+<p>Clink has basic support for Powershell. In order to show completion correctly Clink needs to parse Powershell's prompt to extract the current directory. If the prompt has been customized Clink is unlikely to work as expected.</p>
+<!-- vim: wrap nolist ft=markdown
+-->
+
+
+<h3 id="changelog">Changelog</h3>
+<h5 id="v0.4.2">v0.4.2</h5>
+<ul>
+<li>Prompt colouring no longer requires third party ANSI code utility.</li>
+<li>Override settings with environment variables prefixed with &quot;clink.&quot;</li>
+<li>Ctrl-PgUp goes up a directory.</li>
+<li>Updated Go completions (by matrixik).</li>
+<li>Arguments to clink.arg.new_parser() now initialise parser's flags/args (from vladimir-kotikov).</li>
+<li>New clink.arg.add_flags() and clink.arg.add_arguments() functions.</li>
+<li>Removed footer and Alt-H tip for more succinct stdout output.</li>
+<li>Bug fixes;
+<ul>
+<li>Windows XP works again.</li>
+<li>Fixed race condition in lua_execute().</li>
+</ul></li>
+</ul>
+<h5 id="v0.4.1">v0.4.1</h5>
+<ul>
+<li>Bug fixes;
+<ul>
+<li>Various Unicode fixes causing corrupt environment variables.</li>
+<li>Fixed thread resume/suspend causing rare system-wide deadlock.</li>
+<li>Fixed incorrect translation of suffixed slash when completing flags.</li>
+</ul></li>
+<li>Add --nolog argument to disable file logging. Fix #187 Fix #154</li>
+<li>Added missing escape sequences from doskey emulation.</li>
+<li>Reinstated unix-kill-line key binding.</li>
+<li>Mapped PgUp/Down to search history using line typed so far.</li>
+<li>Added documentation covering escape codes for special keys.</li>
+<li>Added support for Windows' AltGr substitute Ctrl-Alt.</li>
+<li>Support for Readline's 'menu' style completion (see docs).</li>
+</ul>
+<h5 id="v0.4">v0.4</h5>
+<ul>
+<li>New features;
+<ul>
+<li>Better 'clink.arg' API. Easier, more intuitive, and more powerful.</li>
+<li>Whitespace prefix skips exec matching.</li>
+<li>Added a 'set' verb to easily change settings from the command line.</li>
+<li>Basic support for a shells other than cmd.exe.</li>
+<li>Completion for Go (contributed by Dobroslaw Zybort).</li>
+<li>Setting 'exec_match_style' to -1 disables it entirely.</li>
+<li>Make history persistence optional.</li>
+<li>Alias/doskey completion.</li>
+<li>Very basic support for Powershell.</li>
+<li>View cmd.exe's autorun entry without needing admin rights.</li>
+</ul></li>
+<li>New key bindings;
+<ul>
+<li>Ctrl-Alt-C : Copy command line to the clipboard.</li>
+<li>Ctrl-Alt-E : Expand environment variable under cursor.</li>
+<li>Ctrl-Alt-U : 'up directory' (formerly Shift-Up).</li>
+<li>Ctrl-U : Adds '..' to the command line.</li>
+<li>Alt-H : Shows active keymap's key bindings.</li>
+</ul></li>
+<li>New Lua functions;
+<ul>
+<li>clink.execute().</li>
+<li>clink.get_host_process().</li>
+<li>clink.match_files().</li>
+<li>clink.match_words().</li>
+<li>clink.get_console_aliases().</li>
+</ul></li>
+<li>Lots of bug fixes, including;
+<ul>
+<li>Better command extraction.</li>
+<li>Fixed cmd.exe command paging and Ctrl-C/Ctrl-Break handling.</li>
+<li>Multiple locale fixes.</li>
+<li>Use localised text for 'Terminate batch job?' prompt.</li>
+</ul></li>
+</ul>
+<h5 id="v0.3">v0.3</h5>
+<ul>
+<li>Automatic answering of cmd.exe's 'Terminate batch script?' prompt.</li>
+<li>Coloured prompts (requires ANSICON or ConEmu).</li>
+<li>Added Shift-Up keyboard shortcut to automatically execute &quot;cd ..&quot;</li>
+<li>Mapped Ctrl-Z to undo, Microsoft style.</li>
+<li>Improved integration of Readline;
+<ul>
+<li>New input handling code (Ctrl-Alt combos now work).</li>
+<li>An implementation of the Termcap library.</li>
+<li>Fully functional Vi-mode support.</li>
+<li>Support for resizable consoles.</li>
+<li>Line wrapping now works correctly (issue 50).</li>
+</ul></li>
+<li>Adjustable executable match style (issue 65).</li>
+<li>Improved environment variable completion.</li>
+<li>Added settings file to customise Clink.</li>
+<li>New Lua features and functions;
+<ul>
+<li>Matches can now be filtered in Lua before they are display.</li>
+<li>clink.quote_split().</li>
+<li>clink.arg.node_merge().</li>
+<li>clink.get_screen_info() (issue 71).</li>
+<li>clink.split() (for splitting strings).</li>
+<li>clink.chdir().</li>
+<li>clink.get_cwd().</li>
+<li>Functions to query Clink's settings.</li>
+</ul></li>
+<li>New command line options;
+<ul>
+<li>'--profile
+<dir>
+' to override default profile directory.</li>
+<li>'--nohostcheck' disables verification that host is cmd.exe.</li>
+<li>'--pid' specifies the process to inject into.</li>
+</ul></li>
+<li>Update Mercurial completion (issue 73).</li>
+<li>Start menu shortcut starts in USERPROFILE, like cmd.exe</li>
+<li>Zip distribution is now portable.</li>
+</ul>
+<h5 id="v0.2.1">v0.2.1</h5>
+<ul>
+<li>The .history file now merges multiple sessions together.</li>
+<li>Fixed missing y/n, pause, and other prompts.</li>
+<li>Fixed segfault in loader executable.</li>
+<li>Better ConEmu compatibility.</li>
+</ul>
+<h5 id="v0.2">v0.2</h5>
+<ul>
+<li>Basic argument completion for 'git', 'hg', 'svn', and 'p4'.</li>
+<li>Traditional Bash clear screen ('Ctrl-L') and exit shortcuts ('Ctrl-D').</li>
+<li>Scrollable command window using 'PgUp'/'PgDown' keys.</li>
+<li>Doskey support.</li>
+<li>Automatic quoting of file names with spaces.</li>
+<li>Scriptable custom prompts.</li>
+<li>New argument framework to ease writing context-sensitive match generators.</li>
+<li>History and log file is now saved per-user rather than globally.</li>
+<li>Improved Clink's command line interface ('clink --help').</li>
+<li>More reliable handling of cmd.exe's autorun entry.</li>
+<li>General improvements to executable and directory-command completion.</li>
+<li>Symbolic link support.</li>
+<li>Documentation.</li>
+<li>Windows 8 support.</li>
+<li>Improved hooking so Clink can be shared with other thirdparty utilities that also hook cmd.exe (ConEmu, ANSICon, etc.).</li>
+</ul>
+<h5 id="v0.1.1">v0.1.1</h5>
+<ul>
+<li>Fixed AltGr+<key> on international keyboards.</li>
+<li>Fixed broken completion when directories have a '-' in their name (Mark Hammond)</li>
+<li>The check for single match scenarios now correctly handles case-insensitivity.</li>
+</ul>
+<h5 id="v0.1">v0.1</h5>
+<ul>
+<li>Initial release.</li>
+</ul>
+</body>
+</html>

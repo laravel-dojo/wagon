@@ -1,0 +1,412 @@
+ ConEmuBg
+
+ Timestamp is 53bc6295 (Wed Jul 09 01:28:53 2014)
+
+ Preferred load address is 10000000
+
+ Start         Length     Name                   Class
+ 0001:00000000 00005cb6H .text                   CODE
+ 0002:00000000 0000014cH .idata$5                DATA
+ 0002:00000150 00001090H .rdata                  DATA
+ 0002:000011e0 00000078H .idata$2                DATA
+ 0002:00001258 00000014H .idata$3                DATA
+ 0002:0000126c 0000014cH .idata$4                DATA
+ 0002:000013b8 000005a2H .idata$6                DATA
+ 0002:00001960 0000018bH .edata                  DATA
+ 0003:00000000 000000a0H .data                   DATA
+ 0003:000000a0 000009b8H .bss                    DATA
+ 0004:00000000 00000058H .rsrc$01                DATA
+ 0004:00000060 00000298H .rsrc$02                DATA
+
+  Address         Publics by Value              Rva+Base       Lib:Object
+
+ 0000:00000000       ___safe_se_handler_count   00000000     <absolute>
+ 0000:00000000       ___safe_se_handler_table   00000000     <absolute>
+ 0001:00000000       __alloca_probe             10001000     chkstk.obj
+ 0001:00000000       __chkstk                   10001000 f   chkstk.obj
+ 0001:000000aa       ??1MStream@@UAE@XZ         100010aa f i ConEmuBg.obj
+ 0001:000000e0       ?SetData@MStream@@QAEXPBXK@Z 100010e0 f i ConEmuBg.obj
+ 0001:0000011d       ?QueryInterface@MStream@@UAGJABU_GUID@@PAPAX@Z 1000111d f i ConEmuBg.obj
+ 0001:00000172       ?AddRef@MStream@@UAGKXZ    10001172 f i ConEmuBg.obj
+ 0001:00000183       ?Release@MStream@@UAGKXZ   10001183 f i ConEmuBg.obj
+ 0001:000001a7       ?Read@MStream@@UAGJPAXKPAK@Z 100011a7 f i ConEmuBg.obj
+ 0001:00000209       ?Write@MStream@@UAGJPBXKPAK@Z 10001209 f i ConEmuBg.obj
+ 0001:0000029c       ?Seek@MStream@@UAGJT_LARGE_INTEGER@@KPAT_ULARGE_INTEGER@@@Z 1000129c f i ConEmuBg.obj
+ 0001:0000031f       ?SetSize@MStream@@UAGJT_ULARGE_INTEGER@@@Z 1000131f f i ConEmuBg.obj
+ 0001:0000039e       ?Commit@MStream@@UAGJK@Z   1000139e f i ConEmuBg.obj
+ 0001:000003ad       ?Revert@MStream@@UAGJXZ    100013ad f i ConEmuBg.obj
+ 0001:000003b5       ?CopyTo@MStream@@UAGJPAUIStream@@T_ULARGE_INTEGER@@PAT3@2@Z 100013b5 f i ConEmuBg.obj
+ 0001:000003b5       ?UnlockRegion@MStream@@UAGJT_ULARGE_INTEGER@@0K@Z 100013b5 f i ConEmuBg.obj
+ 0001:000003b5       ?LockRegion@MStream@@UAGJT_ULARGE_INTEGER@@0K@Z 100013b5 f i ConEmuBg.obj
+ 0001:000003bd       ?Stat@MStream@@UAGJPAUtagSTATSTG@@K@Z 100013bd f i ConEmuBg.obj
+ 0001:00000421       ?Clone@MStream@@UAGJPAPAUIStream@@@Z 10001421 f i ConEmuBg.obj
+ 0001:00000429       ??_GMStream@@UAEPAXI@Z     10001429 f i ConEmuBg.obj
+ 0001:00000429       ??_EMStream@@UAEPAXI@Z     10001429 f i ConEmuBg.obj
+ 0001:000005e2       _GetMinFarVersionW@0       100015e2 f   ConEmuBg.obj
+ 0001:000005e8       ?GetPluginInfoWcmn@@YGXPAX@Z 100015e8 f   ConEmuBg.obj
+ 0001:00000742       ?LoadFarVersion@@YIHXZ     10001742 f   ConEmuBg.obj
+ 0001:0000078f       ?ReportFail@@YIXPB_W@Z     1000178f f   ConEmuBg.obj
+ 0001:000007cf       ?WasXmlLoaded@@YI_NXZ      100017cf f   ConEmuBg.obj
+ 0001:000007db       ?Close@CachedImage@@QAEXXZ 100017db f i ConEmuBg.obj
+ 0001:0000084d       ?Init@GDIPlusDecoder@@QAE_NXZ 1000184d f i ConEmuBg.obj
+ 0001:00000a9b       ?FreeThreadProc@GDIPlusDecoder@@SGKPAX@Z 10001a9b f i ConEmuBg.obj
+ 0001:00000ab6       ?Close@GDIPlusDecoder@@QAEXXZ 10001ab6 f i ConEmuBg.obj
+ 0001:00000b54       ?GdipDone@@YIXXZ           10001b54 f   ConEmuBg.obj
+ 0001:00000c31       ?ParseColors@@YIXPB_WHAAY0CA@KAAH@Z 10001c31 f   ConEmuBg.obj
+ 0001:00000ce2       ?RGB2HSV@@YIXABURGBColor@@AAUHSVColor@@@Z 10001ce2 f   ConEmuBg.obj
+ 0001:00000da5       ?ClrPart@@YIEH@Z           10001da5 f i ConEmuBg.obj
+ 0001:00000dc6       ?HSV2RGB@@YIXABUHSVColor@@AAURGBColor@@@Z 10001dc6 f   ConEmuBg.obj
+ 0001:00000f12       ?GetStatusLineCount@@YIHPAUPaintBackgroundArg@@H@Z 10001f12 f   ConEmuBg.obj
+ 0001:0000109c       ?FormatSize@@YIXT_ULARGE_INTEGER@@PA_W@Z 1000209c f   ConEmuBg.obj
+ 0001:0000116a       ?SettingsLoad@@YIXXZ       1000216a f   ConEmuBg.obj
+ 0001:000011cc       ?SettingsLoadReg@@YIXPB_W@Z 100021cc f   ConEmuBg.obj
+ 0001:000012f2       ?SettingsSave@@YIXXZ       100022f2 f   ConEmuBg.obj
+ 0001:0000132a       ?SettingsSaveReg@@YIXPB_W@Z 1000232a f   ConEmuBg.obj
+ 0001:000013c3       ?ExitPlugin@@YIXXZ         100023c3 f   ConEmuBg.obj
+ 0001:00001409       _ExitFARW@0                10002409 f   ConEmuBg.obj
+ 0001:00001430       ?ExitFARW3@@YGXPAX@Z       10002430 f   ConEmuBg.obj
+ 0001:0000145e       ?GetMsgW@@YIPB_WH@Z        1000245e f   ConEmuBg.obj
+ 0001:00001497       ?OpenW@@YGPAXPBX@Z         10002497 f   ConEmuBg.obj
+ 0001:000014bc       _ConfigureW@4              100024bc f   ConEmuBg.obj
+ 0001:000014fe       ?ConfigureW3@@YGHPAX@Z     100024fe f   ConEmuBg.obj
+ 0001:0000153e       ?OpenPluginWcmn@@YIPAXHH@Z 1000253e f   ConEmuBg.obj
+ 0001:0000156a       ?FMatch@@YI_NPB_WPA_W@Z    1000256a f   ConEmuBg.obj
+ 0001:00001679       ?StringCchCopyW@@YGJPA_WIPB_W@Z 10002679 f i ConEmuBg.obj
+ 0001:000016ab       ?StringCchCatW@@YGJPA_WIPB_W@Z 100026ab f i ConEmuBg.obj
+ 0001:000016fe       _DllMain@12                100026fe f   ConEmuBg.obj
+ 0001:0000174f       __DllMainCRTStartup@12     1000274f f   ConEmuBg.obj
+ 0001:00001766       ?CheckXmlFile@@YI_N_N@Z    10002766 f   ConEmuBg.obj
+ 0001:00001b58       ?GdipInit@@YI_NXZ          10002b58 f   ConEmuBg.obj
+ 0001:00001bf8       ?CompareNames@@YI_NPB_WPA_W@Z 10002bf8 f   ConEmuBg.obj
+ 0001:00001ce4       ?Init@CachedImage@@QAE_NPB_WPAUHDC__@@IIQAU2@@Z 10002ce4 f i ConEmuBg.obj
+ 0001:00001dcb       ?GetImage@GDIPlusDecoder@@QAEPAUCachedImage@@PB_W@Z 10002dcb f i ConEmuBg.obj
+ 0001:00002188       ??0MStream@@QAE@XZ         10003188 f i ConEmuBg.obj
+ 0001:000021a8       ?FillPanelParams@@YIHPAUPaintBackgroundArg@@PAUtag_BkPanelInfo@1@PAUDrawInfo@@@Z 100031a8 f   ConEmuBg.obj
+ 0001:00002bfb       ?PaintPanel@@YIHPAUPaintBackgroundArg@@HAAKAAH@Z 10003bfb f   ConEmuBg.obj
+ 0001:000038e6       ?PaintConEmuBackground@@YGHPAUPaintBackgroundArg@@@Z 100048e6 f   ConEmuBg.obj
+ 0001:000039e9       ?StartPlugin@@YIXH@Z       100049e9 f   ConEmuBg.obj
+ 0001:00003adf       _SetStartupInfoW@4         10004adf f   ConEmuBg.obj
+ 0001:00003b35       ?OnConEmuLoaded@@YGXPAUConEmuLoadedArg@@@Z 10004b35 f   ConEmuBg.obj
+ 0001:00003b61       ?GetPluginInfoW995@@YIXPAX@Z 10004b61 f   ConEmuBg995.obj
+ 0001:00003ba9       ?SetStartupInfoW995@@YIXPAX@Z 10004ba9 f   ConEmuBg995.obj
+ 0001:00003cee       _OpenPluginW@8             10004cee f   ConEmuBg995.obj
+ 0001:00003d0c       ?ExitFARW995@@YIXXZ        10004d0c f   ConEmuBg995.obj
+ 0001:00003d52       ?GetMsgW995@@YIPB_WH@Z     10004d52 f   ConEmuBg995.obj
+ 0001:000040ea       ?ConfigureW995@@YIHH@Z     100050ea f   ConEmuBg995.obj
+ 0001:000040fb       ?SettingsLoadW995@@YIXXZ   100050fb f   ConEmuBg995.obj
+ 0001:00004106       ?SettingsSaveW995@@YIXXZ   10005106 f   ConEmuBg995.obj
+ 0001:00004111       ?FMatchW995@@YI_NPB_WPA_W@Z 10005111 f   ConEmuBg995.obj
+ 0001:00004129       ?GetPluginInfoW1900@@YIXPAX@Z 10005129 f   ConEmuBg1900.obj
+ 0001:00004179       ?SetStartupInfoW1900@@YIXPAX@Z 10005179 f   ConEmuBg1900.obj
+ 0001:00004267       ?OpenW2800@@YGPAXPBX@Z     10005267 f   ConEmuBg2800.obj
+ 0001:00004267       ?OpenW1900@@YGPAXPBX@Z     10005267 f   ConEmuBg1900.obj
+ 0001:00004286       ?ExitFARW1900@@YIXXZ       10005286 f   ConEmuBg1900.obj
+ 0001:000042b5       ?GetMsgW1900@@YIPB_WH@Z    100052b5 f   ConEmuBg1900.obj
+ 0001:000046a5       ?ConfigureW1900@@YIHH@Z    100056a5 f   ConEmuBg1900.obj
+ 0001:000046b6       ?SettingsLoadW1900@@YIXXZ  100056b6 f   ConEmuBg1900.obj
+ 0001:000047f3       ?SettingsSaveW1900@@YIXXZ  100057f3 f   ConEmuBg1900.obj
+ 0001:000048d7       ?FMatchW1900@@YI_NPB_WPA_W@Z 100058d7 f   ConEmuBg1900.obj
+ 0001:000048f0       _GetGlobalInfoW@4          100058f0 f   ConEmuBg2800.obj
+ 0001:0000497e       ?GetPluginInfoW2800@@YIXPAX@Z 1000597e f   ConEmuBg2800.obj
+ 0001:000049ce       ?SetStartupInfoW2800@@YIXPAX@Z 100059ce f   ConEmuBg2800.obj
+ 0001:00004abc       ?ExitFARW2800@@YIXXZ       10005abc f   ConEmuBg2800.obj
+ 0001:00004aeb       ?GetMsgW2800@@YIPB_WH@Z    10005aeb f   ConEmuBg2800.obj
+ 0001:00004eed       ?ConfigureW2800@@YIHH@Z    10005eed f   ConEmuBg2800.obj
+ 0001:00004efe       ?SettingsLoadW2800@@YIXXZ  10005efe f   ConEmuBg2800.obj
+ 0001:00005027       ?SettingsSaveW2800@@YIXXZ  10006027 f   ConEmuBg2800.obj
+ 0001:00005101       ?FMatchW2800@@YI_NPB_WPA_W@Z 10006101 f   ConEmuBg2800.obj
+ 0001:0000511a       _GetMinFarVersion@0        1000611a f   ConEmuBgA.obj
+ 0001:00005149       _SetStartupInfo@4          10006149 f   ConEmuBgA.obj
+ 0001:000052bb       _GetPluginInfo@4           100062bb f   ConEmuBgA.obj
+ 0001:0000531b       _ExitFAR@0                 1000631b f   ConEmuBgA.obj
+ 0001:000057b5       _Configure@4               100067b5 f   ConEmuBgA.obj
+ 0001:000057ca       _OpenPlugin@8              100067ca f   ConEmuBgA.obj
+ 0001:000057e0       ?SettingsLoadA@@YIXXZ      100067e0 f   ConEmuBgA.obj
+ 0001:000057eb       ?SettingsSaveA@@YIXXZ      100067eb f   ConEmuBgA.obj
+ 0001:000057f6       ?FMatchA@@YI_NPBDPAD@Z     100067f6 f   ConEmuBgA.obj
+ 0001:0000580c       ?HeapInitialize@@YI_NXZ    1000680c f   Memory.obj
+ 0001:00005832       ?HeapDeinitialize@@YIXXZ   10006832 f   Memory.obj
+ 0001:0000584a       ?xf_malloc@@YAPAXI@Z       1000684a f   Memory.obj
+ 0001:0000585d       ?xf_calloc@@YAPAXII@Z      1000685d f   Memory.obj
+ 0001:00005876       ?xf_free@@YAXPAX@Z         10006876 f   Memory.obj
+ 0001:00005894       ??3@YAXPAX@Z               10006894 f   Memory.obj
+ 0001:00005899       ?lstrdup@@YIPA_WPB_WI@Z    10006899 f   Memory.obj
+ 0001:000058e0       _wcschr                    100068e0 f   libCRT:strchr.obj
+ 0001:00005910       _wcsrchr                   10006910 f   libCRT:strrchr.obj
+ 0001:00005940       _wcsstr                    10006940 f   libCRT:strstr.obj
+ 0001:000059a0       _memmove                   100069a0 f   libCRT:memmove.obj
+ 0001:00005ba0       _wcstoul                   10006ba0 f   libCRT:strtol.obj
+ 0001:00005bc0       __aulldiv                  10006bc0 f   libCRT:vc_ulldiv.obj
+ 0001:00005c30       _memset                    10006c30 f   libCRT:memset.obj
+ 0001:00005c70       __allmul                   10006c70 f   libCRT:vc_llmul.obj
+ 0001:00005ca4       _VerQueryValueW@16         10006ca4 f   version:VERSION.dll
+ 0001:00005caa       _GetFileVersionInfoW@16    10006caa f   version:VERSION.dll
+ 0001:00005cb0       _GetFileVersionInfoSizeW@8 10006cb0 f   version:VERSION.dll
+ 0002:00000000       __imp__RegSetValueExW@24   10007000     advapi32:ADVAPI32.dll
+ 0002:00000004       __imp__RegOpenKeyExW@20    10007004     advapi32:ADVAPI32.dll
+ 0002:00000008       __imp__RegQueryValueExW@24 10007008     advapi32:ADVAPI32.dll
+ 0002:0000000c       __imp__RegCloseKey@4       1000700c     advapi32:ADVAPI32.dll
+ 0002:00000010       __imp__RegCreateKeyExW@36  10007010     advapi32:ADVAPI32.dll
+ 0002:00000014       \177ADVAPI32_NULL_THUNK_DATA 10007014     advapi32:ADVAPI32.dll
+ 0002:00000018       __imp__DeleteDC@4          10007018     gdi32:GDI32.dll
+ 0002:0000001c       __imp__DeleteObject@4      1000701c     gdi32:GDI32.dll
+ 0002:00000020       __imp__SelectObject@8      10007020     gdi32:GDI32.dll
+ 0002:00000024       __imp__CreateSolidBrush@4  10007024     gdi32:GDI32.dll
+ 0002:00000028       __imp__BitBlt@36           10007028     gdi32:GDI32.dll
+ 0002:0000002c       __imp__CreateCompatibleBitmap@12 1000702c     gdi32:GDI32.dll
+ 0002:00000030       __imp__CreateCompatibleDC@4 10007030     gdi32:GDI32.dll
+ 0002:00000034       __imp__SetTextColor@8      10007034     gdi32:GDI32.dll
+ 0002:00000038       __imp__CreateFontIndirectW@4 10007038     gdi32:GDI32.dll
+ 0002:0000003c       __imp__StretchBlt@44       1000703c     gdi32:GDI32.dll
+ 0002:00000040       __imp__SetBkMode@8         10007040     gdi32:GDI32.dll
+ 0002:00000044       \177GDI32_NULL_THUNK_DATA  10007044     gdi32:GDI32.dll
+ 0002:00000048       __imp__WaitForSingleObject@8 10007048     kernel32:KERNEL32.dll
+ 0002:0000004c       __imp__CreateThread@24     1000704c     kernel32:KERNEL32.dll
+ 0002:00000050       __imp__DeleteCriticalSection@4 10007050     kernel32:KERNEL32.dll
+ 0002:00000054       __imp__LeaveCriticalSection@4 10007054     kernel32:KERNEL32.dll
+ 0002:00000058       __imp__FindCloseChangeNotification@4 10007058     kernel32:KERNEL32.dll
+ 0002:0000005c       __imp__EnterCriticalSection@4 1000705c     kernel32:KERNEL32.dll
+ 0002:00000060       __imp__ReadConsoleOutputW@20 10007060     kernel32:KERNEL32.dll
+ 0002:00000064       __imp__GetConsoleScreenBufferInfo@8 10007064     kernel32:KERNEL32.dll
+ 0002:00000068       __imp__GetStdHandle@4      10007068     kernel32:KERNEL32.dll
+ 0002:0000006c       __imp__lstrcpynW@12        1000706c     kernel32:KERNEL32.dll
+ 0002:00000070       __imp__WideCharToMultiByte@32 10007070     kernel32:KERNEL32.dll
+ 0002:00000074       __imp__FindNextChangeNotification@4 10007074     kernel32:KERNEL32.dll
+ 0002:00000078       __imp__ReadFile@20         10007078     kernel32:KERNEL32.dll
+ 0002:0000007c       __imp__GetFileInformationByHandle@8 1000707c     kernel32:KERNEL32.dll
+ 0002:00000080       __imp__CreateFileW@28      10007080     kernel32:KERNEL32.dll
+ 0002:00000084       __imp__TerminateThread@8   10007084     kernel32:KERNEL32.dll
+ 0002:00000088       __imp__ExpandEnvironmentStringsW@12 10007088     kernel32:KERNEL32.dll
+ 0002:0000008c       __imp__lstrcmpW@8          1000708c     kernel32:KERNEL32.dll
+ 0002:00000090       __imp__lstrcmpiW@8         10007090     kernel32:KERNEL32.dll
+ 0002:00000094       __imp__GetTempPathW@8      10007094     kernel32:KERNEL32.dll
+ 0002:00000098       __imp__OutputDebugStringW@4 10007098     kernel32:KERNEL32.dll
+ 0002:0000009c       __imp__GetDriveTypeW@4     1000709c     kernel32:KERNEL32.dll
+ 0002:000000a0       __imp__GetDiskFreeSpaceExW@16 100070a0     kernel32:KERNEL32.dll
+ 0002:000000a4       __imp__InitializeCriticalSection@4 100070a4     kernel32:KERNEL32.dll
+ 0002:000000a8       __imp__MultiByteToWideChar@24 100070a8     kernel32:KERNEL32.dll
+ 0002:000000ac       __imp__lstrlenA@4          100070ac     kernel32:KERNEL32.dll
+ 0002:000000b0       __imp__lstrcpynA@12        100070b0     kernel32:KERNEL32.dll
+ 0002:000000b4       __imp__lstrcpyA@8          100070b4     kernel32:KERNEL32.dll
+ 0002:000000b8       __imp__HeapCreate@12       100070b8     kernel32:KERNEL32.dll
+ 0002:000000bc       __imp__HeapDestroy@4       100070bc     kernel32:KERNEL32.dll
+ 0002:000000c0       __imp__CloseHandle@4       100070c0     kernel32:KERNEL32.dll
+ 0002:000000c4       __imp__LoadLibraryW@4      100070c4     kernel32:KERNEL32.dll
+ 0002:000000c8       __imp__GetProcAddress@8    100070c8     kernel32:KERNEL32.dll
+ 0002:000000cc       __imp__FreeLibrary@4       100070cc     kernel32:KERNEL32.dll
+ 0002:000000d0       __imp__GetCurrentProcessId@0 100070d0     kernel32:KERNEL32.dll
+ 0002:000000d4       __imp__VirtualProtect@16   100070d4     kernel32:KERNEL32.dll
+ 0002:000000d8       __imp__GetModuleFileNameW@12 100070d8     kernel32:KERNEL32.dll
+ 0002:000000dc       __imp__lstrcpyW@8          100070dc     kernel32:KERNEL32.dll
+ 0002:000000e0       __imp__GetLastError@0      100070e0     kernel32:KERNEL32.dll
+ 0002:000000e4       __imp__lstrcatW@8          100070e4     kernel32:KERNEL32.dll
+ 0002:000000e8       __imp__lstrlenW@4          100070e8     kernel32:KERNEL32.dll
+ 0002:000000ec       __imp__GetLocalTime@4      100070ec     kernel32:KERNEL32.dll
+ 0002:000000f0       __imp__SystemTimeToFileTime@8 100070f0     kernel32:KERNEL32.dll
+ 0002:000000f4       __imp__HeapReAlloc@16      100070f4     kernel32:KERNEL32.dll
+ 0002:000000f8       __imp__HeapAlloc@12        100070f8     kernel32:KERNEL32.dll
+ 0002:000000fc       __imp__GetProcessHeap@0    100070fc     kernel32:KERNEL32.dll
+ 0002:00000100       __imp__FindFirstChangeNotificationW@12 10007100     kernel32:KERNEL32.dll
+ 0002:00000104       __imp__HeapFree@12         10007104     kernel32:KERNEL32.dll
+ 0002:00000108       \177KERNEL32_NULL_THUNK_DATA 10007108     kernel32:KERNEL32.dll
+ 0002:0000010c       __imp__FillRect@12         1000710c     user32:USER32.dll
+ 0002:00000110       __imp__DrawTextW@20        10007110     user32:USER32.dll
+ 0002:00000114       __imp__CharUpperBuffW@8    10007114     user32:USER32.dll
+ 0002:00000118       __imp__GetDC@4             10007118     user32:USER32.dll
+ 0002:0000011c       __imp__CharLowerBuffW@8    1000711c     user32:USER32.dll
+ 0002:00000120       __imp__ReleaseDC@8         10007120     user32:USER32.dll
+ 0002:00000124       __imp__MessageBoxW@16      10007124     user32:USER32.dll
+ 0002:00000128       __imp__wsprintfW           10007128     user32:USER32.dll
+ 0002:0000012c       \177USER32_NULL_THUNK_DATA 1000712c     user32:USER32.dll
+ 0002:00000130       __imp__GetFileVersionInfoSizeW@8 10007130     version:VERSION.dll
+ 0002:00000134       __imp__GetFileVersionInfoW@16 10007134     version:VERSION.dll
+ 0002:00000138       __imp__VerQueryValueW@16   10007138     version:VERSION.dll
+ 0002:0000013c       \177VERSION_NULL_THUNK_DATA 1000713c     version:VERSION.dll
+ 0002:00000140       __imp__CoUninitialize@0    10007140     ole32:ole32.dll
+ 0002:00000144       __imp__CoInitialize@4      10007144     ole32:ole32.dll
+ 0002:00000148       \177ole32_NULL_THUNK_DATA  10007148     ole32:ole32.dll
+ 0002:00000150       ??_C@_1BO@DPOJIDLN@?$AAB?$AAa?$AAc?$AAk?$AAg?$AAr?$AAo?$AAu?$AAn?$AAd?$AA?4?$AAx?$AAm?$AAl?$AA?$AA@ 10007150     ConEmuBg.obj
+ 0002:00000170       ??_C@_0L@DJCGGOCO@ConfigureW?$AA@ 10007170     ConEmuBg.obj
+ 0002:0000017c       ??_C@_08BCACMCCB@ExitFARW?$AA@ 1000717c     ConEmuBg.obj
+ 0002:00000188       ??_C@_1BM@NBLKFLKP@?$AAX?$AAm?$AAl?$AAC?$AAo?$AAn?$AAf?$AAi?$AAg?$AAF?$AAi?$AAl?$AAe?$AA?$AA@ 10007188     ConEmuBg.obj
+ 0002:000001a4       ??_C@_1BM@GCLEPEKO@?$AAP?$AAl?$AAu?$AAg?$AAi?$AAn?$AAE?$AAn?$AAa?$AAb?$AAl?$AAe?$AAd?$AA?$AA@ 100071a4     ConEmuBg.obj
+ 0002:000001c0       ??_7MStream@@6B@           100071c0     ConEmuBg.obj
+ 0002:000001fc       ??_C@_1CA@GGFPMHLH@?$AA?6?$AAE?$AAr?$AAr?$AAC?$AAo?$AAd?$AAe?$AA?$DN?$AA0?$AAx?$AA?$CF?$AA0?$AA8?$AAX?$AA?$AA@ 100071fc     ConEmuBg.obj
+ 0002:00000220       ??_C@_1FG@LNADFPCE@?$AAL?$AAo?$AAa?$AAd?$AAF?$AAa?$AAr?$AAV?$AAe?$AAr?$AAs?$AAi?$AAo?$AAn?$AA?4?$AAG?$AAe?$AAt?$AAM?$AAo?$AAd?$AAu?$AAl?$AAe?$AAF?$AAi?$AAl?$AAe?$AAN?$AAa?$AAm?$AAe@ 10007220     ConEmuBg.obj
+ 0002:00000278       ??_C@_1GC@COKOAMPP@?$AAL?$AAo?$AAa?$AAd?$AAF?$AAa?$AAr?$AAV?$AAe?$AAr?$AAs?$AAi?$AAo?$AAn?$AA?4?$AAG?$AAe?$AAt?$AAF?$AAi?$AAl?$AAe?$AAV?$AAe?$AAr?$AAs?$AAi?$AAo?$AAn?$AAI?$AAn?$AAf@ 10007278     ConEmuBg.obj
+ 0002:000002e0       ??_C@_1GC@BJIMIHFH@?$AAL?$AAo?$AAa?$AAd?$AAF?$AAa?$AAr?$AAV?$AAe?$AAr?$AAs?$AAi?$AAo?$AAn?$AA?5?$AAf?$AAa?$AAi?$AAl?$AAe?$AAd?$AA?$CB?$AA?5?$AAC?$AAa?$AAn?$AA?8?$AAt?$AA?5?$AAa?$AAl?$AAl@ 100072e0     ConEmuBg.obj
+ 0002:00000348       ??_C@_1FK@EOBKNMNM@?$AAL?$AAo?$AAa?$AAd?$AAF?$AAa?$AAr?$AAV?$AAe?$AAr?$AAs?$AAi?$AAo?$AAn?$AA?4?$AAG?$AAe?$AAt?$AAF?$AAi?$AAl?$AAe?$AAV?$AAe?$AAr?$AAs?$AAi?$AAo?$AAn?$AAI?$AAn?$AAf@ 10007348     ConEmuBg.obj
+ 0002:000003a8       ??_C@_1FG@LALGGOEO@?$AAL?$AAo?$AAa?$AAd?$AAF?$AAa?$AAr?$AAV?$AAe?$AAr?$AAs?$AAi?$AAo?$AAn?$AA?4?$AAV?$AAe?$AAr?$AAQ?$AAu?$AAe?$AAr?$AAy?$AAV?$AAa?$AAl?$AAu?$AAe?$AA?$CI?$AA?$CC?$AA?2?$AA?$CC@ 100073a8     ConEmuBg.obj
+ 0002:00000400       ??_C@_13FPGAJAPJ@?$AA?2?$AA?$AA@ 10007400     ConEmuBg.obj
+ 0002:00000404       ??_C@_1CC@JLFNPNCD@?$AAC?$AAo?$AAn?$AAE?$AAm?$AAu?$AAB?$AAg?$AA?0?$AA?5?$AAP?$AAI?$AAD?$AA?$DN?$AA?$CF?$AAu?$AA?$AA@ 10007404     ConEmuBg.obj
+ 0002:00000428       ??_C@_1EG@ENHOOKPB@?$AAF?$AAu?$AAn?$AAc?$AAt?$AAi?$AAo?$AAn?$AAs?$AA?5?$AAn?$AAo?$AAt?$AA?5?$AAf?$AAo?$AAu?$AAn?$AAd?$AA?5?$AAi?$AAn?$AA?5?$AAG?$AAd?$AAi?$AAP?$AAl?$AAu?$AAs?$AA?4?$AAd@ 10007428     ConEmuBg.obj
+ 0002:00000470       ??_C@_1CM@JMKADHIE@?$AAG?$AAd?$AAi?$AAp?$AAl?$AAu?$AAs?$AAS?$AAt?$AAa?$AAr?$AAt?$AAu?$AAp?$AA?5?$AAf?$AAa?$AAi?$AAl?$AAe?$AAd?$AA?$AA@ 10007470     ConEmuBg.obj
+ 0002:0000049c       ??_C@_0BI@GEKGFIAG@GdipBitmapConvertFormat?$AA@ 1000749c     ConEmuBg.obj
+ 0002:000004b4       ??_C@_0BM@MMIJHLFD@GdipGetImageGraphicsContext?$AA@ 100074b4     ConEmuBg.obj
+ 0002:000004d0       ??_C@_0O@KHJJFDII@GdipReleaseDC?$AA@ 100074d0     ConEmuBg.obj
+ 0002:000004e0       ??_C@_09EJEFPMLL@GdipGetDC?$AA@ 100074e0     ConEmuBg.obj
+ 0002:000004ec       ??_C@_0BD@MFGJCODH@GdipDeleteGraphics?$AA@ 100074ec     ConEmuBg.obj
+ 0002:00000500       ??_C@_0BC@PACDIGJN@GdipCreateFromHDC?$AA@ 10007500     ConEmuBg.obj
+ 0002:00000514       ??_C@_0P@DANGKLEH@GdipDrawImageI?$AA@ 10007514     ConEmuBg.obj
+ 0002:00000524       ??_C@_0BB@MGCHKKMH@GdipDisposeImage?$AA@ 10007524     ConEmuBg.obj
+ 0002:00000538       ??_C@_0BD@JIGBIPOH@GdipGetImageHeight?$AA@ 10007538     ConEmuBg.obj
+ 0002:0000054c       ??_C@_0BC@DPLNHGNM@GdipGetImageWidth?$AA@ 1000754c     ConEmuBg.obj
+ 0002:00000560       ??_C@_0BJ@IPKMAACN@GdipCreateBitmapFromFile?$AA@ 10007560     ConEmuBg.obj
+ 0002:0000057c       ??_C@_0BA@OMKIAPCJ@GdiplusShutdown?$AA@ 1000757c     ConEmuBg.obj
+ 0002:0000058c       ??_C@_0P@NIGHOHPH@GdiplusStartup?$AA@ 1000758c     ConEmuBg.obj
+ 0002:0000059c       ??_C@_1CO@CNEBCEFN@?$AAG?$AAd?$AAi?$AAP?$AAl?$AAu?$AAs?$AA?4?$AAd?$AAl?$AAl?$AA?5?$AAn?$AAo?$AAt?$AA?5?$AAf?$AAo?$AAu?$AAn?$AAd?$AA?$CB?$AA?$AA@ 1000759c     ConEmuBg.obj
+ 0002:000005cc       ??_C@_1BI@LOJECBFD@?$AAG?$AAd?$AAi?$AAP?$AAl?$AAu?$AAs?$AA?4?$AAd?$AAl?$AAl?$AA?$AA@ 100075cc     ConEmuBg.obj
+ 0002:000005e8       ??_C@_1GC@KCIBPHOM@?$AAG?$AAe?$AAt?$AAM?$AAo?$AAd?$AAu?$AAl?$AAe?$AAF?$AAi?$AAl?$AAe?$AAN?$AAa?$AAm?$AAe?$AA?5?$AAf?$AAa?$AAi?$AAl?$AAe?$AAd?$AA?5?$AAi?$AAn?$AA?5?$AAG?$AAD?$AAI?$AAP@ 100075e8     ConEmuBg.obj
+ 0002:0000064c       ??_C@_1M@MDEFCCAF@?$AA?$CF?$AAu?$AA?5?$AA?$CF?$AAs?$AA?$AA@ 1000764c     ConEmuBg.obj
+ 0002:00000658       ??_C@_1BC@MFPHLBKH@?$AA?$CF?$AAu?$AA?4?$AA?$CF?$AAu?$AA?5?$AA?$CF?$AAs?$AA?$AA@ 10007658     ConEmuBg.obj
+ 0002:0000066c       ??_C@_15HDKOMGBN@?$AAP?$AAB?$AA?$AA@ 1000766c     ConEmuBg.obj
+ 0002:00000674       ??_C@_15OIDPIEAL@?$AAT?$AAB?$AA?$AA@ 10007674     ConEmuBg.obj
+ 0002:0000067c       ??_C@_15GNHNPEDO@?$AAG?$AAB?$AA?$AA@ 1000767c     ConEmuBg.obj
+ 0002:00000684       ??_C@_15MMOGNHFI@?$AAM?$AAB?$AA?$AA@ 10007684     ConEmuBg.obj
+ 0002:0000068c       ??_C@_15BKLPDEEF@?$AAK?$AAB?$AA?$AA@ 1000768c     ConEmuBg.obj
+ 0002:00000694       ??_C@_13OPKGLAFF@?$AAB?$AA?$AA@ 10007694     ConEmuBg.obj
+ 0002:00000698       ??_C@_11LOCGONAA@?$AA?$AA@ 10007698     ConEmuBg.obj
+ 0002:000006a0       ??_C@_1EE@FAACFJFL@?$AA?$CF?$AAs?$AA?5?$AAn?$AAo?$AAt?$AA?5?$AAf?$AAo?$AAu?$AAn?$AAd?$AA?5?$AAi?$AAn?$AA?5?$AAt?$AAh?$AAe?$AA?5?$AAp?$AAl?$AAu?$AAg?$AAi?$AAn?$AA?5?$AAf?$AAo?$AAl?$AAd?$AAe@ 100076a0     ConEmuBg.obj
+ 0002:000006e4       ??_C@_1DI@GHPFDGCO@?$AAC?$AAa?$AAn?$AA?8?$AAt?$AA?5?$AAr?$AAe?$AAa?$AAd?$AA?5?$AA?$CF?$AAu?$AA?5?$AAb?$AAy?$AAt?$AAe?$AAs?$AA?5?$AAf?$AAr?$AAo?$AAm?$AA?5?$AA?$CF?$AAs?$AA?$AA@ 100076e4     ConEmuBg.obj
+ 0002:0000071c       ??_C@_1DO@FEGEOJKO@?$AAC?$AAa?$AAn?$AA?8?$AAt?$AA?5?$AAa?$AAl?$AAl?$AAo?$AAc?$AAa?$AAt?$AAe?$AA?5?$AA?$CF?$AAu?$AA?5?$AAb?$AAy?$AAt?$AAe?$AAs?$AA?5?$AAf?$AAo?$AAr?$AA?5?$AA?$CF?$AAs?$AA?$AA@ 1000771c     ConEmuBg.obj
+ 0002:00000760       ??_C@_1EM@KNLHNKFN@?$AA?$CF?$AAs?$AA?5?$AAf?$AAi?$AAl?$AAe?$AA?5?$AAi?$AAn?$AA?5?$AAt?$AAh?$AAe?$AA?5?$AAp?$AAl?$AAu?$AAg?$AAi?$AAn?$AA?5?$AAf?$AAo?$AAl?$AAd?$AAe?$AAr?$AA?5?$AAi?$AAs?$AA?5@ 10007760     ConEmuBg.obj
+ 0002:000007b0       ??_C@_1EE@OPEIBADO@?$AAC?$AAa?$AAn?$AA?8?$AAt?$AA?5?$AAi?$AAn?$AAi?$AAt?$AAi?$AAa?$AAl?$AAi?$AAz?$AAe?$AA?5?$AAn?$AAa?$AAm?$AAe?$AA?5?$AAo?$AAf?$AA?5?$AAx?$AAm?$AAl?$AA?5?$AAf?$AAi?$AAl@ 100077b0     ConEmuBg.obj
+ 0002:000007f8       ??_C@_1GC@JKFCNIDB@?$AAT?$AAo?$AAo?$AA?5?$AAl?$AAo?$AAn?$AAg?$AA?5?$AAx?$AAm?$AAl?$AA?5?$AAp?$AAa?$AAt?$AAh?$AA?5?$AAa?$AAf?$AAt?$AAe?$AAr?$AA?5?$AAE?$AAx?$AAp?$AAa?$AAn?$AAd?$AAE?$AAn@ 100077f8     ConEmuBg.obj
+ 0002:00000860       ??_C@_1GM@NPCBAKPP@?$AAf?$AAu?$AAn?$AAc?$AAt?$AAi?$AAo?$AAn?$AA?5?$AAC?$AAr?$AAe?$AAa?$AAt?$AAe?$AAX?$AAm?$AAl?$AAR?$AAe?$AAa?$AAd?$AAe?$AAr?$AA?5?$AAi?$AAn?$AA?5?$AAt?$AAh?$AAe?$AA?5@ 10007860     ConEmuBg.obj
+ 0002:000008cc       ??_C@_0BA@EICHKACL@CreateXmlReader?$AA@ 100078cc     ConEmuBg.obj
+ 0002:000008dc       ??_C@_1CM@BLKKKOJI@?$AAx?$AAm?$AAl?$AAl?$AAi?$AAt?$AAe?$AA?4?$AAd?$AAl?$AAl?$AA?5?$AAn?$AAo?$AAt?$AA?5?$AAf?$AAo?$AAu?$AAn?$AAd?$AA?$AA@ 100078dc     ConEmuBg.obj
+ 0002:00000908       ??_C@_1BI@DCLCNAFM@?$AAx?$AAm?$AAl?$AAl?$AAi?$AAt?$AAe?$AA?4?$AAd?$AAl?$AAl?$AA?$AA@ 10007908     ConEmuBg.obj
+ 0002:00000920       ??_C@_1HA@MHONNEJA@?$AAC?$AAr?$AAe?$AAa?$AAt?$AAe?$AAC?$AAo?$AAm?$AAp?$AAa?$AAt?$AAi?$AAb?$AAl?$AAe?$AA?$FL?$AAD?$AAC?$AA?$HM?$AAB?$AAi?$AAt?$AAm?$AAa?$AAp?$AA?$FN?$AA?5?$AAf?$AAa?$AAi?$AAl@ 10007920     ConEmuBg.obj
+ 0002:00000990       ??_C@_1EK@HIHBLDLC@?$AAC?$AAa?$AAn?$AA?8?$AAt?$AA?5?$AAa?$AAl?$AAl?$AAo?$AAc?$AAa?$AAt?$AAe?$AA?5?$AAm?$AAe?$AAm?$AAo?$AAr?$AAy?$AA?5?$AAf?$AAo?$AAr?$AA?5?$AAs?$AAz?$AAF?$AAu?$AAl?$AAl@ 10007990     ConEmuBg.obj
+ 0002:000009dc       ??_C@_1DO@BMBIALGO@?$AAG?$AAe?$AAt?$AAI?$AAm?$AAa?$AAg?$AAe?$AAS?$AAi?$AAz?$AAe?$AA?5?$AAf?$AAa?$AAi?$AAl?$AAe?$AAd?$AA?0?$AA?5?$AAE?$AAr?$AAr?$AA?$DN?$AA?$CF?$AAi?$AA?6?$AA?$CF?$AAs?$AA?$AA@ 100079dc     ConEmuBg.obj
+ 0002:00000a20       ??_C@_1EG@KBBKNBAB@?$AAC?$AAr?$AAe?$AAa?$AAt?$AAe?$AAC?$AAo?$AAm?$AAp?$AAa?$AAt?$AAi?$AAb?$AAl?$AAe?$AA?$FL?$AAD?$AAC?$AA?$HM?$AAB?$AAi?$AAt?$AAm?$AAa?$AAp?$AA?$FN?$AA?5?$AAf?$AAa?$AAi?$AAl@ 10007a20     ConEmuBg.obj
+ 0002:00000a68       ??_C@_1DI@COJKFCDM@?$AAG?$AAd?$AAi?$AAp?$AAG?$AAe?$AAt?$AAD?$AAC?$AA?5?$AAf?$AAa?$AAi?$AAl?$AAe?$AAd?$AA?0?$AA?5?$AAE?$AAr?$AAr?$AA?$DN?$AA?$CF?$AAi?$AA?6?$AA?$CF?$AAs?$AA?$AA@ 10007a68     ConEmuBg.obj
+ 0002:00000aa0       ??_C@_1EM@FGINKPEA@?$AAC?$AAa?$AAn?$AA?8?$AAt?$AA?5?$AAa?$AAl?$AAl?$AAo?$AAc?$AAa?$AAt?$AAe?$AA?5?$AAm?$AAe?$AAm?$AAo?$AAr?$AAy?$AA?5?$AAf?$AAo?$AAr?$AA?5?$AAC?$AAa?$AAc?$AAh?$AAe?$AAd@ 10007aa0     ConEmuBg.obj
+ 0002:00000af0       ??_C@_1EC@FCMECJAF@?$AAG?$AAd?$AAi?$AAp?$AAD?$AAr?$AAa?$AAw?$AAI?$AAm?$AAa?$AAg?$AAe?$AAI?$AA?5?$AAf?$AAa?$AAi?$AAl?$AAe?$AAd?$AA?0?$AA?5?$AAE?$AAr?$AAr?$AA?$DN?$AA?$CF?$AAi?$AA?6?$AA?$CF?$AAs@ 10007af0     ConEmuBg.obj
+ 0002:00000b38       ??_C@_1EI@MNPBDJFF@?$AAG?$AAd?$AAi?$AAp?$AAC?$AAr?$AAe?$AAa?$AAt?$AAe?$AAF?$AAr?$AAo?$AAm?$AAH?$AAD?$AAC?$AA?5?$AAf?$AAa?$AAi?$AAl?$AAe?$AAd?$AA?0?$AA?5?$AAE?$AAr?$AAr?$AA?$DN?$AA?$CF?$AAi@ 10007b38     ConEmuBg.obj
+ 0002:00000b80       ??_C@_1DI@MGMDCCIK@?$AAC?$AAa?$AAn?$AA?8?$AAt?$AA?5?$AAl?$AAo?$AAa?$AAd?$AA?5?$AAi?$AAm?$AAa?$AAg?$AAe?$AA?0?$AA?5?$AAE?$AAr?$AAr?$AA?$DN?$AA?$CF?$AAi?$AA?6?$AA?$CF?$AAs?$AA?$AA@ 10007b80     ConEmuBg.obj
+ 0002:00000bb8       ??_C@_17DCNMIAEN@?$AAr?$AAe?$AAf?$AA?$AA@ 10007bb8     ConEmuBg.obj
+ 0002:00000bc0       ??_C@_17EHOCEIDI@?$AAi?$AAm?$AAg?$AA?$AA@ 10007bc0     ConEmuBg.obj
+ 0002:00000bc8       ??_C@_1BI@FHFKHMCH@?$AAP?$AAA?$AAN?$AAE?$AAL?$AAF?$AAO?$AAR?$AAM?$AAA?$AAT?$AA?$AA@ 10007bc8     ConEmuBg.obj
+ 0002:00000be0       ??_C@_1BG@DCPGEGPA@?$AAV?$AAO?$AAL?$AAU?$AAM?$AAE?$AAF?$AAR?$AAE?$AAE?$AA?$AA@ 10007be0     ConEmuBg.obj
+ 0002:00000bf8       ??_C@_1BG@CACAJBGP@?$AAV?$AAO?$AAL?$AAU?$AAM?$AAE?$AAS?$AAI?$AAZ?$AAE?$AA?$AA@ 10007bf8     ConEmuBg.obj
+ 0002:00000c10       ??_C@_1O@DFDGIFKD@?$AAV?$AAO?$AAL?$AAU?$AAM?$AAE?$AA?$AA@ 10007c10     ConEmuBg.obj
+ 0002:00000c20       ??_C@_1M@CNKDNHCK@?$AA?5?$AA?7?$AA?$AN?$AA?6?$AA?$CL?$AA?$AA@ 10007c20     ConEmuBg.obj
+ 0002:00000c2c       ??_C@_1M@NFEAPLNL@?$AAt?$AAi?$AAt?$AAl?$AAe?$AA?$AA@ 10007c2c     ConEmuBg.obj
+ 0002:00000c38       ??_C@_17FDPGNGBJ@?$AAo?$AAf?$AAf?$AA?$AA@ 10007c38     ConEmuBg.obj
+ 0002:00000c40       ??_C@_1M@GACLNJGJ@?$AAl?$AAa?$AAr?$AAg?$AAe?$AA?$AA@ 10007c40     ConEmuBg.obj
+ 0002:00000c4c       ??_C@_1M@LPGODFOM@?$AAs?$AAp?$AAa?$AAc?$AAe?$AA?$AA@ 10007c4c     ConEmuBg.obj
+ 0002:00000c58       ??_C@_17IHBDLLG@?$AAy?$AAe?$AAs?$AA?$AA@ 10007c58     ConEmuBg.obj
+ 0002:00000c60       ??_C@_1M@OAJKEOAM@?$AAs?$AAh?$AAi?$AAf?$AAt?$AA?$AA@ 10007c60     ConEmuBg.obj
+ 0002:00000c6c       ??_C@_1BE@OACCNEKL@?$AAb?$AAg?$AAr?$AA_?$AAl?$AAi?$AAg?$AAh?$AAt?$AA?$AA@ 10007c6c     ConEmuBg.obj
+ 0002:00000c80       ??_C@_1BC@JFCNIMOB@?$AAb?$AAg?$AAr?$AA_?$AAd?$AAa?$AAr?$AAk?$AA?$AA@ 10007c80     ConEmuBg.obj
+ 0002:00000c94       ??_C@_17NMNENAKF@?$AAb?$AAg?$AAr?$AA?$AA@ 10007c94     ConEmuBg.obj
+ 0002:00000c9c       ??_C@_1BE@OGMDEBBA@?$AAr?$AAg?$AAb?$AA_?$AAl?$AAi?$AAg?$AAh?$AAt?$AA?$AA@ 10007c9c     ConEmuBg.obj
+ 0002:00000cb0       ??_C@_1BC@NNDMOMJF@?$AAr?$AAg?$AAb?$AA_?$AAd?$AAa?$AAr?$AAk?$AA?$AA@ 10007cb0     ConEmuBg.obj
+ 0002:00000cc4       ??_C@_17PAHGLGBB@?$AAr?$AAg?$AAb?$AA?$AA@ 10007cc4     ConEmuBg.obj
+ 0002:00000ccc       ??_C@_1M@EENKLIPJ@?$AAc?$AAo?$AAl?$AAo?$AAr?$AA?$AA@ 10007ccc     ConEmuBg.obj
+ 0002:00000cd8       ??_C@_1BC@LGPIFEA@?$AAd?$AAi?$AAs?$AAa?$AAb?$AAl?$AAe?$AAd?$AA?$AA@ 10007cd8     ConEmuBg.obj
+ 0002:00000cec       ??_C@_1O@JODKLKCF@?$AAf?$AAo?$AAr?$AAm?$AAa?$AAt?$AA?$AA@ 10007cec     ConEmuBg.obj
+ 0002:00000cfc       ??_C@_1BE@FDJCBAKA@?$AAp?$AAa?$AAt?$AAh?$AAm?$AAa?$AAt?$AAc?$AAh?$AA?$AA@ 10007cfc     ConEmuBg.obj
+ 0002:00000d10       ??_C@_19LFDMGLCC@?$AAT?$AAE?$AAM?$AAP?$AA?$AA@ 10007d10     ConEmuBg.obj
+ 0002:00000d1c       ??_C@_1BC@FAFPDLON@?$AAp?$AAa?$AAt?$AAh?$AAt?$AAy?$AAp?$AAe?$AA?$AA@ 10007d1c     ConEmuBg.obj
+ 0002:00000d30       ??_C@_1BA@EJELCCEN@?$AAR?$AAA?$AAM?$AAD?$AAI?$AAS?$AAK?$AA?$AA@ 10007d30     ConEmuBg.obj
+ 0002:00000d40       ??_C@_1M@NEPFDHKI@?$AAC?$AAD?$AAR?$AAO?$AAM?$AA?$AA@ 10007d40     ConEmuBg.obj
+ 0002:00000d4c       ??_C@_1O@OAMNPHFH@?$AAR?$AAE?$AAM?$AAO?$AAT?$AAE?$AA?$AA@ 10007d4c     ConEmuBg.obj
+ 0002:00000d5c       ??_C@_1M@PEPLLLCM@?$AAF?$AAI?$AAX?$AAE?$AAD?$AA?$AA@ 10007d5c     ConEmuBg.obj
+ 0002:00000d68       ??_C@_1BE@JMGCMLBE@?$AAR?$AAE?$AAM?$AAO?$AAV?$AAA?$AAB?$AAL?$AAE?$AA?$AA@ 10007d68     ConEmuBg.obj
+ 0002:00000d7c       ??_C@_1BI@BCACJIAB@?$AAN?$AAO?$AA_?$AAR?$AAO?$AAO?$AAT?$AA_?$AAD?$AAI?$AAR?$AA?$AA@ 10007d7c     ConEmuBg.obj
+ 0002:00000d94       ??_C@_1BE@FAHOEFOG@?$AAd?$AAr?$AAi?$AAv?$AAe?$AAt?$AAy?$AAp?$AAe?$AA?$AA@ 10007d94     ConEmuBg.obj
+ 0002:00000da8       ??_C@_19FILLMKCG@?$AAI?$AAN?$AAF?$AAO?$AA?$AA@ 10007da8     ConEmuBg.obj
+ 0002:00000db4       ??_C@_1M@KIGDKMPO@?$AAQ?$AAV?$AAI?$AAE?$AAW?$AA?$AA@ 10007db4     ConEmuBg.obj
+ 0002:00000dc0       ??_C@_19EINGHGNA@?$AAT?$AAR?$AAE?$AAE?$AA?$AA@ 10007dc0     ConEmuBg.obj
+ 0002:00000dcc       ??_C@_1O@BDNPEFIG@?$AAP?$AAL?$AAU?$AAG?$AAI?$AAN?$AA?$AA@ 10007dcc     ConEmuBg.obj
+ 0002:00000ddc       ??_C@_1M@EKGBHJEJ@?$AAD?$AAR?$AAI?$AAV?$AAE?$AA?$AA@ 10007ddc     ConEmuBg.obj
+ 0002:00000de8       ??_C@_1O@EFKGOBLP@?$AAV?$AAI?$AAE?$AAW?$AAE?$AAR?$AA?$AA@ 10007de8     ConEmuBg.obj
+ 0002:00000df8       ??_C@_1O@PEPCDNON@?$AAE?$AAD?$AAI?$AAT?$AAO?$AAR?$AA?$AA@ 10007df8     ConEmuBg.obj
+ 0002:00000e08       ??_C@_1M@HLGJKDIH@?$AAP?$AAA?$AAN?$AAE?$AAL?$AA?$AA@ 10007e08     ConEmuBg.obj
+ 0002:00000e14       ??_C@_1O@OCKFCHPL@?$AAP?$AAA?$AAN?$AAE?$AAL?$AAS?$AA?$AA@ 10007e14     ConEmuBg.obj
+ 0002:00000e24       ??_C@_19FHBCDCCA@?$AAt?$AAy?$AAp?$AAe?$AA?$AA@ 10007e24     ConEmuBg.obj
+ 0002:00000e30       ??_C@_1M@HCONLDPB@?$AAp?$AAa?$AAn?$AAe?$AAl?$AA?$AA@ 10007e30     ConEmuBg.obj
+ 0002:00000e3c       ??_C@_1O@IANIHGAM@?$AAw?$AAi?$AAn?$AAd?$AAo?$AAw?$AA?$AA@ 10007e3c     ConEmuBg.obj
+ 0002:00000e4c       __GUID_7279fc81_709d_4095_b63d_69fe4b0d9030 10007e4c     ConEmuBg.obj
+ 0002:00000e5c       ??_C@_1O@FLJJBOMO@?$AA?2?$AAT?$AAE?$AAM?$AAP?$AA?2?$AA?$AA@ 10007e5c     ConEmuBg.obj
+ 0002:00000e6c       ??_C@_1M@KAKMLIHO@?$AAA?$AAr?$AAi?$AAa?$AAl?$AA?$AA@ 10007e6c     ConEmuBg.obj
+ 0002:00000e78       ??_C@_1EI@KDEPAOIE@?$AAC?$AAo?$AAn?$AAE?$AAm?$AAu?$AAB?$AAk?$AA?3?$AA?5?$AA?$CF?$AAs?$AA?5?$AA?9?$AA?5?$AA?$HL?$AA?$CF?$AAi?$AA?0?$AA?$CF?$AAi?$AA?0?$AA?$CF?$AAi?$AA?0?$AA?$CF?$AAi?$AA?$CJ?$AA?5?$AA?$CD?$AA?$CF?$AA0@ 10007e78     ConEmuBg.obj
+ 0002:00000ec0       ??_C@_1DA@JALAODAO@?$AAi?$AAm?$AAg?$AA?1?$AAd?$AAr?$AAi?$AAv?$AAe?$AA_?$AAr?$AAe?$AAm?$AAo?$AAv?$AAa?$AAb?$AAl?$AAe?$AA?4?$AAp?$AAn?$AAg?$AA?$AA@ 10007ec0     ConEmuBg.obj
+ 0002:00000ef0       ??_C@_1CM@FDAGABBA@?$AAi?$AAm?$AAg?$AA?1?$AAd?$AAr?$AAi?$AAv?$AAe?$AA_?$AAn?$AAe?$AAt?$AAw?$AAo?$AAr?$AAk?$AA?4?$AAp?$AAn?$AAg?$AA?$AA@ 10007ef0     ConEmuBg.obj
+ 0002:00000f1c       ??_C@_1CI@DLJJCGCI@?$AAi?$AAm?$AAg?$AA?1?$AAd?$AAr?$AAi?$AAv?$AAe?$AA_?$AAc?$AAd?$AAr?$AAo?$AAm?$AA?4?$AAp?$AAn?$AAg?$AA?$AA@ 10007f1c     ConEmuBg.obj
+ 0002:00000f44       ??_C@_1CM@NJAGAAPF@?$AAi?$AAm?$AAg?$AA?1?$AAd?$AAr?$AAi?$AAv?$AAe?$AA_?$AAr?$AAa?$AAm?$AAd?$AAi?$AAs?$AAk?$AA?4?$AAp?$AAn?$AAg?$AA?$AA@ 10007f44     ConEmuBg.obj
+ 0002:00000f70       ??_C@_1CI@FIJFGDPK@?$AAi?$AAm?$AAg?$AA?1?$AAd?$AAr?$AAi?$AAv?$AAe?$AA_?$AAf?$AAi?$AAx?$AAe?$AAd?$AA?4?$AAp?$AAn?$AAg?$AA?$AA@ 10007f70     ConEmuBg.obj
+ 0002:00000f98       ??_C@_1BO@KJOLJEJK@?$AAi?$AAm?$AAg?$AA?1?$AAp?$AAl?$AAu?$AAg?$AAi?$AAn?$AA?4?$AAp?$AAn?$AAg?$AA?$AA@ 10007f98     ConEmuBg.obj
+ 0002:00000fb8       ??_C@_1FK@LJOGCJPM@?$AAC?$AAo?$AAn?$AAE?$AAm?$AAu?$AAB?$AAk?$AA?3?$AA?5?$AAD?$AAi?$AAs?$AAa?$AAb?$AAl?$AAe?$AAd?$AA?5?$AA?$CF?$AAs?$AA?5?$AA?9?$AA?5?$AA?$HL?$AA?$CF?$AAi?$AA?0?$AA?$CF?$AAi?$AA?0?$AA?$CF@ 10007fb8     ConEmuBg.obj
+ 0002:00001014       ??_C@_1M@KDEMMBOH@?$AAR?$AAi?$AAg?$AAh?$AAt?$AA?$AA@ 10008014     ConEmuBg.obj
+ 0002:00001020       ??_C@_19DKAIAFPE@?$AAL?$AAe?$AAf?$AAt?$AA?$AA@ 10008020     ConEmuBg.obj
+ 0002:00001030       ??_C@_1FG@IGPHDCHD@?$AAC?$AAo?$AAn?$AAE?$AAm?$AAu?$AAB?$AAk?$AA?3?$AA?5?$AAI?$AAn?$AAv?$AAi?$AAs?$AAi?$AAb?$AAl?$AAe?$AA?5?$AAR?$AAi?$AAg?$AAh?$AAt?$AA?5?$AA?9?$AA?5?$AA?$HL?$AA?$CF?$AAi?$AA?0@ 10008030     ConEmuBg.obj
+ 0002:00001088       ??_C@_1FE@OJCEMPCK@?$AAC?$AAo?$AAn?$AAE?$AAm?$AAu?$AAB?$AAk?$AA?3?$AA?5?$AAI?$AAn?$AAv?$AAi?$AAs?$AAi?$AAb?$AAl?$AAe?$AA?5?$AAL?$AAe?$AAf?$AAt?$AA?5?$AA?9?$AA?5?$AA?$HL?$AA?$CF?$AAi?$AA?0?$AA?$CF@ 10008088     ConEmuBg.obj
+ 0002:000010dc       ??_C@_1BE@POBJGOHE@?$AAC?$AAo?$AAn?$AAE?$AAm?$AAu?$AAB?$AAg?$AA?2?$AA?$AA@ 100080dc     ConEmuBg995.obj
+ 0002:000010f0       ??_C@_1DE@DJEAMLPH@?$AAC?$AAo?$AAn?$AAE?$AAm?$AAu?$AA?4?$AAM?$AAa?$AAx?$AAi?$AAm?$AAu?$AAs?$AA5?$AA?$EA?$AAg?$AAm?$AAa?$AAi?$AAl?$AA?4?$AAc?$AAo?$AAm?$AA?$AA@ 100080f0     ConEmuBg2800.obj
+ 0002:00001128       ??_C@_1GC@GCGDBDMO@?$AAP?$AAa?$AAi?$AAn?$AAt?$AA?5?$AAF?$AAa?$AAr?$AA?5?$AAp?$AAa?$AAn?$AAe?$AAl?$AAs?$AA?5?$AAb?$AAa?$AAc?$AAk?$AAg?$AAr?$AAo?$AAu?$AAn?$AAd?$AA?5?$AAi?$AAn?$AA?5?$AAt@ 10008128     ConEmuBg2800.obj
+ 0002:0000118c       ??_C@_1CE@PJKCDLK@?$AAC?$AAo?$AAn?$AAE?$AAm?$AAu?$AA?5?$AAB?$AAa?$AAc?$AAk?$AAg?$AAr?$AAo?$AAu?$AAn?$AAd?$AA?$AA@ 1000818c     ConEmuBg2800.obj
+ 0002:000011b0       _IID_IUnknown              100081b0     uuid:unknwn_i.obj
+ 0002:000011c0       _IID_ISequentialStream     100081c0     uuid:objidl_i.obj
+ 0002:000011d0       _IID_IStream               100081d0     uuid:objidl_i.obj
+ 0002:000011e0       __IMPORT_DESCRIPTOR_KERNEL32 100081e0     kernel32:KERNEL32.dll
+ 0002:000011f4       __IMPORT_DESCRIPTOR_USER32 100081f4     user32:USER32.dll
+ 0002:00001208       __IMPORT_DESCRIPTOR_GDI32  10008208     gdi32:GDI32.dll
+ 0002:0000121c       __IMPORT_DESCRIPTOR_ADVAPI32 1000821c     advapi32:ADVAPI32.dll
+ 0002:00001230       __IMPORT_DESCRIPTOR_ole32  10008230     ole32:ole32.dll
+ 0002:00001244       __IMPORT_DESCRIPTOR_VERSION 10008244     version:VERSION.dll
+ 0002:00001258       __NULL_IMPORT_DESCRIPTOR   10008258     kernel32:KERNEL32.dll
+ 0003:00000000       ?gSettings@@3PAUConEmuBgSettings@@A 10009000     ConEmuBg.obj
+ 0003:00000030       ?Far3Func@@3PAUExportFunc@@A 10009030     ConEmuBg.obj
+ 0003:00000054       ?szDefaultXmlName@@3PB_WB  10009054     ConEmuBg.obj
+ 0003:00000058       ?guid_ConEmuBg@@3U_GUID@@A 10009058     ConEmuBg2800.obj
+ 0003:00000068       ?guid_ConEmuBgCfgDlg@@3U_GUID@@A 10009068     ConEmuBg2800.obj
+ 0003:00000078       ?guid_ConEmuBgPluginMenu@@3U_GUID@@A 10009078     ConEmuBg2800.obj
+ 0003:00000088       ?guid_ConEmuBgPluginConfig@@3U_GUID@@A 10009088     ConEmuBg2800.obj
+ 0003:000000a0       ?ghPluginModule@@3PAUHINSTANCE__@@A 100090a0     ConEmuBg.obj
+ 0003:000000a4       ?gFarVersion@@3UFarVersion@@A 100090a4     ConEmuBg.obj
+ 0003:000000b0       ?gbInStartPlugin@@3_NA     100090b0     ConEmuBg.obj
+ 0003:000000b1       ?gbSetStartupInfoOk@@3_NA  100090b1     ConEmuBg.obj
+ 0003:000000b2       ?gbGdiPlusInitialized@@3_NA 100090b2     ConEmuBg.obj
+ 0003:000000b4       ?gbBackgroundEnabled@@3HA  100090b4     ConEmuBg.obj
+ 0003:000000b8       ?gsXmlConfigFile@@3PA_WA   100090b8     ConEmuBg.obj
+ 0003:000002c0       ?gbMonitorFileChange@@3HA  100092c0     ConEmuBg.obj
+ 0003:000002c4       ?gbInfoW_OK@@3HA           100092c4     ConEmuBg.obj
+ 0003:000002c8       ?gfCreateXmlReader@@3P6GJABU_GUID@@PAPAXPAX@ZA 100092c8     ConEmuBg.obj
+ 0003:000002cc       ?ghXmlLite@@3PAUHINSTANCE__@@A 100092cc     ConEmuBg.obj
+ 0003:000002d0       ?XmlFile@@3UXmlConfigFile@@A 100092d0     ConEmuBg.obj
+ 0003:000002fc       ?gpszXmlFile@@3PA_WA       100092fc     ConEmuBg.obj
+ 0003:00000300       ?gpszXmlFolder@@3PA_WA     10009300     ConEmuBg.obj
+ 0003:00000304       ?ghXmlNotification@@3PAXA  10009304     ConEmuBg.obj
+ 0003:00000308       ?gpDecoder@@3PAUGDIPlusDecoder@@A 10009308     ConEmuBg.obj
+ 0003:00000310       ?InfoW995@@3PAUPluginStartupInfo@@A 10009310     ConEmuBg995.obj
+ 0003:00000314       ?FSFW995@@3PAUFarStandardFunctions@@A 10009314     ConEmuBg995.obj
+ 0003:00000520       ?InfoW1900@@3PAUPluginStartupInfo@@A 10009520     ConEmuBg1900.obj
+ 0003:00000524       ?FSFW1900@@3PAUFarStandardFunctions@@A 10009524     ConEmuBg1900.obj
+ 0003:00000730       ?InfoW2800@@3PAUPluginStartupInfo@@A 10009730     ConEmuBg2800.obj
+ 0003:00000734       ?FSFW2800@@3PAUFarStandardFunctions@@A 10009734     ConEmuBg2800.obj
+ 0003:00000940       ?InfoA@@3PAUPluginStartupInfo@@A 10009940     ConEmuBgA.obj
+ 0003:00000944       ?FSFA@@3PAUFarStandardFunctions@@A 10009944     ConEmuBgA.obj
+ 0003:00000a50       ?AssertMsgBox@@3P6IHPB_WI0PAUHWND__@@_N@ZA 10009a50     MAssert.obj
+ 0003:00000a54       ?ghHeap@@3PAXA             10009a54     Memory.obj
+
+ entry point at        0001:0000174f
+
+ Static symbols
+
+ 0001:0000002b       ?StringLengthWorkerW@@YGJPB_WIPAI@Z 1000102b f   ConEmuBg.obj
+ 0001:0000005b       ?StringCopyWorkerW@@YGJPA_WIPAIPB_WI@Z 1000105b f   ConEmuBg.obj
+ 0001:00000445       ?LoadFarVersion@@YI_NAAUFarVersion@@AAY0CAA@_W@Z 10001445 f   ConEmuBg.obj
+ 0001:00000615       ?ChangeExports@@YI_NPBUExportFunc@@PAUHINSTANCE__@@@Z 10001615 f   ConEmuBg.obj
+ 0001:00003d6f       ?ConfigDlgProc@@YGJPAXHHJ@Z 10004d6f f   ConEmuBg995.obj
+ 0001:00003e03       ?ConfigureProc@@YIHH@Z     10004e03 f   ConEmuBg995.obj
+ 0001:000042d4       ?ConfigDlgProc@@YGHPAXHH0@Z 100052d4 f   ConEmuBg1900.obj
+ 0001:00004368       ?ConfigureProc@@YIHH@Z     10005368 f   ConEmuBg1900.obj
+ 0001:00004b0a       ?ConfigDlgProc@@YGHPAXHH0@Z 10005b0a f   ConEmuBg2800.obj
+ 0001:00004b9e       ?ConfigureProc@@YIHH@Z     10005b9e f   ConEmuBg2800.obj
+ 0001:00005366       ?GetMsg@@YIPADH@Z          10006366 f   ConEmuBgA.obj
+ 0001:0000537e       ?ConfigDlgProc@@YGJPAXHHJ@Z 1000637e f   ConEmuBgA.obj
+ 0001:0000541c       ?ConfigureProc@@YIHH@Z     1000641c f   ConEmuBgA.obj
+ 0001:00005a00       ?strtoxl@@YAKPB_WPAPA_WHH@Z 10006a00 f   libCRT:strtol.obj
