@@ -33,9 +33,10 @@
 @if not defined TERM set TERM=cygwin
 
 :: Enhance Path
+@set COMPOSER_HOME=%WAGON_ROOT%\composer
 @set git_install_root=%WAGON_ROOT%\git
 @set php_install_root=%WAGON_ROOT%\uwamp\bin\php\php-5.6.4-Win32-VC11-x86
-@set PATH=%CMDER_ROOT%\bin;%php_install_root%;%git_install_root%\bin;%git_install_root%\mingw\bin;%git_install_root%\cmd;%git_install_root%\share\vim\vim74;%CMDER_ROOT%;%PATH%
+@set PATH=%CMDER_ROOT%\bin;%php_install_root%;%COMPOSER_HOME%;%COMPOSER_HOME%\vendor\bin;%git_install_root%\bin;%git_install_root%\mingw\bin;%git_install_root%\cmd;%git_install_root%\share\vim\vim74;%CMDER_ROOT%;%PATH%
 
 :: Add aliases
 @doskey /macrofile="%CMDER_ROOT%\config\aliases"

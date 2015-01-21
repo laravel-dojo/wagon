@@ -1,0 +1,23 @@
+{
+    "name": "laravel/installer",
+    "description": "Laravel application installer.",
+    "keywords": ["laravel"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Taylor Otwell",
+            "email": "taylorotwell@gmail.com"
+        }
+    ],
+	"autoload": {
+		"classmap": ["src"]
+	},
+	"require": {
+		"guzzlehttp/guzzle": "~4.0",
+		"symfony/console": "~2.3"
+	},
+	"bin": [
+		"laravel"
+	],
+	"minimum-stability": "stable"
+}
