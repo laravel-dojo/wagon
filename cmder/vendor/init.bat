@@ -7,6 +7,11 @@
     for /f %%i in ("%ConEmuDir%\..\..") do @set CMDER_ROOT=%%~fi
 )
 
+:: Find wagon dir
+@if not defined WAGON_ROOT (
+    for /f %%i in ("%ConEmuDir%\..\..\..") do @set WAGON_ROOT=%%~fi
+)
+
 :: Change the prompt style
 :: Mmm tasty lamb
 @prompt $E[1;32;40m$P$S{git}$S$_$E[1;30;40m{lamb}$S$E[0m
@@ -28,7 +33,7 @@
 @if not defined TERM set TERM=cygwin
 
 :: Enhance Path
-@set git_install_root=%CMDER_ROOT%\vendor\msysgit
+@set git_install_root=%WAGON_ROOT%\git
 @set PATH=%CMDER_ROOT%\bin;%git_install_root%\bin;%git_install_root%\mingw\bin;%git_install_root%\cmd;%git_install_root%\share\vim\vim74;%CMDER_ROOT%;%PATH%
 
 :: Add aliases
