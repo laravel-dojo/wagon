@@ -1,9 +1,9 @@
 This snapshot was automatically generated on
-Wed, 23 Jul 2014 22:24:42 +0000
+Wed, 17 Dec 2014 21:47:39 +0000
 
-Version: 5.5.15
+Version: 5.6.4
 Branch: HEAD
-Build: C:\php-sdk\php55\vc11\x86\obj\Release_TS
+Build: C:\php-sdk\php56\vc11\x86\obj\Release_TS
 
 Built-in Extensions
 ===========================
@@ -58,6 +58,14 @@ Module: php-win.exe
 ===========================
 	msvcr110.dll
 
+Module: phpdbg.exe
+===========================
+	msvcr110.dll
+
+Module: php5phpdbg.dll
+===========================
+	msvcr110.dll
+
 Module: php_bz2.dll
 ===========================
 	msvcr110.dll
@@ -70,6 +78,7 @@ Module: php_curl.dll
 ===========================
 	libeay32.dll
 	ssleay32.dll
+	libssh2.dll
 	normaliz.dll
 	msvcr110.dll
 
@@ -104,9 +113,9 @@ Module: php_interbase.dll
 
 Module: php_intl.dll
 ===========================
-	icuuc51.dll
-	icuin51.dll
-	icuio51.dll
+	icuuc54.dll
+	icuin54.dll
+	icuio54.dll
 	msvcr110.dll
 	msvcp110.dll
 
@@ -121,11 +130,7 @@ Module: php_mbstring.dll
 ===========================
 	msvcr110.dll
 
-Module: php_oci8.dll
-===========================
-	msvcr110.dll
-
-Module: php_oci8_11g.dll
+Module: php_oci8_12c.dll
 ===========================
 	msvcr110.dll
 
