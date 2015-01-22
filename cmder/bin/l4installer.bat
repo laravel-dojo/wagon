@@ -18,7 +18,7 @@ goto:eof
 echo Creating application...
 
 :: Extra files
-7za x %WAGON_ROOT%\laravel\4.2.11.zip -o%WAGON_ROOT%\uwamp\www\%PROJECT_NAME% -y > nul
+7za x %WAGON_ROOT%\laravel\4.2.16.zip -o%WAGON_ROOT%\uwamp\www\%PROJECT_NAME% -y > nul
 
 :: Change to www folder 
 cd %WAGON_ROOT%\uwamp\www\%PROJECT_NAME%
