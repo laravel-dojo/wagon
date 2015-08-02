@@ -1,5 +1,4 @@
 <?php
-
 namespace GuzzleHttp\Tests;
 
 use GuzzleHttp\Query;
@@ -134,13 +133,25 @@ class UrlTest extends \PHPUnit_Framework_TestCase
     public function testAddsToPath()
     {
         // Does nothing here
-        $this->assertEquals('http://e.com/base?a=1', (string) Url::fromString('http://e.com/base?a=1')->addPath(false));
-        $this->assertEquals('http://e.com/base?a=1', (string) Url::fromString('http://e.com/base?a=1')->addPath(''));
-        $this->assertEquals('http://e.com/base?a=1', (string) Url::fromString('http://e.com/base?a=1')->addPath('/'));
-        $this->assertEquals('http://e.com/base/0', (string) Url::fromString('http://e.com/base')->addPath('0'));
+        $url = Url::fromString('http://e.com/base?a=1');
+        $url->addPath(false);
+        $this->assertEquals('http://e.com/base?a=1', $url);
+        $url = Url::fromString('http://e.com/base?a=1');
+        $url->addPath('');
+        $this->assertEquals('http://e.com/base?a=1', $url);
+        $url = Url::fromString('http://e.com/base?a=1');
+        $url->addPath('/');
+        $this->assertEquals('http://e.com/base?a=1', $url);
+        $url = Url::fromString('http://e.com/base');
+        $url->addPath('0');
+        $this->assertEquals('http://e.com/base/0', $url);
 
-        $this->assertEquals('http://e.com/base/relative?a=1', (string) Url::fromString('http://e.com/base?a=1')->addPath('relative'));
-        $this->assertEquals('http://e.com/base/relative?a=1', (string) Url::fromString('http://e.com/base?a=1')->addPath('/relative'));
+        $url = Url::fromString('http://e.com/base?a=1');
+        $url->addPath('relative');
+        $this->assertEquals('http://e.com/base/relative?a=1', $url);
+        $url = Url::fromString('http://e.com/base?a=1');
+        $url->addPath('/relative');
+        $this->assertEquals('http://e.com/base/relative?a=1', $url);
     }
 
     /**
@@ -219,19 +230,38 @@ class UrlTest extends \PHPUnit_Framework_TestCase
     public function testHasGettersAndSetters()
     {
         $url = Url::fromString('http://www.test.com/');
-        $this->assertEquals('example.com', $url->setHost('example.com')->getHost());
-        $this->assertEquals('8080', $url->setPort(8080)->getPort());
-        $this->assertEquals('/foo/bar', $url->setPath('/foo/bar')->getPath());
-        $this->assertEquals('a', $url->setPassword('a')->getPassword());
-        $this->assertEquals('b', $url->setUsername('b')->getUsername());
-        $this->assertEquals('abc', $url->setFragment('abc')->getFragment());
-        $this->assertEquals('https', $url->setScheme('https')->getScheme());
-        $this->assertEquals('a=123', (string) $url->setQuery('a=123')->getQuery());
-        $this->assertEquals('https://b:a@example.com:8080/foo/bar?a=123#abc', (string) $url);
-        $this->assertEquals('b=boo', (string) $url->setQuery(new Query(array(
-            'b' => 'boo'
-        )))->getQuery());
-        $this->assertEquals('https://b:a@example.com:8080/foo/bar?b=boo#abc', (string) $url);
+        $url->setHost('example.com');
+        $this->assertEquals('example.com', $url->getHost());
+        $url->setPort(8080);
+        $this->assertEquals('8080', $url->getPort());
+        $url->setPath('/foo/bar');
+        $this->assertEquals('/foo/bar', $url->getPath());
+        $url->setPassword('a');
+        $this->assertEquals('a', $url->getPassword());
+        $url->setUsername('b');
+        $this->assertEquals('b', $url->getUsername());
+        $url->setFragment('abc');
+        $this->assertEquals('abc', $url->getFragment());
+        $url->setScheme('https');
+        $this->assertEquals('https', $url->getScheme());
+        $url->setQuery('a=123');
+        $this->assertEquals('a=123', (string) $url->getQuery());
+        $this->assertEquals(
+            'https://b:a@example.com:8080/foo/bar?a=123#abc',
+            (string) $url
+        );
+        $url->setQuery(new Query(['b' => 'boo']));
+        $this->assertEquals('b=boo', $url->getQuery());
+        $this->assertEquals(
+            'https://b:a@example.com:8080/foo/bar?b=boo#abc',
+            (string) $url
+        );
+
+        $url->setQuery('a%20=bar!', true);
+        $this->assertEquals(
+            'https://b:a@example.com:8080/foo/bar?a%20=bar!#abc',
+            (string) $url
+        );
     }
 
     public function testSetQueryAcceptsArray()
@@ -248,6 +278,17 @@ class UrlTest extends \PHPUnit_Framework_TestCase
     {
         $url = Url::fromString('http://www.test.com');
         $url->setQuery(false);
+    }
+
+    public function testDefersParsingAndEncodingQueryUntilNecessary()
+    {
+        $url = Url::fromString('http://www.test.com');
+        // Note that invalid characters are encoded.
+        $url->setQuery('foo#bar/', true);
+        $this->assertEquals('http://www.test.com?foo%23bar/', (string) $url);
+        $this->assertInternalType('string', $this->readAttribute($url, 'query'));
+        $this->assertEquals('foo%23bar%2F', (string) $url->getQuery());
+        $this->assertInstanceOf('GuzzleHttp\Query', $this->readAttribute($url, 'query'));
     }
 
     public function urlProvider()
@@ -279,7 +320,8 @@ class UrlTest extends \PHPUnit_Framework_TestCase
     public function testRemoveDotSegments($path, $result)
     {
         $url = Url::fromString('http://www.example.com');
-        $url->setPath($path)->removeDotSegments();
+        $url->setPath($path);
+        $url->removeDotSegments();
         $this->assertEquals($result, $url->getPath());
     }
 
@@ -304,5 +346,19 @@ class UrlTest extends \PHPUnit_Framework_TestCase
         $url = Url::fromString('http://foo.com/baz bar?a=b');
         $url->addPath('?');
         $this->assertEquals('http://foo.com/baz%20bar/%3F?a=b', (string) $url);
+    }
+
+    public function testCorrectlyEncodesPathWithoutDoubleEncoding()
+    {
+        $url = Url::fromString('http://foo.com/baz%20 bar:boo/baz!');
+        $this->assertEquals('/baz%20%20bar:boo/baz!', $url->getPath());
+    }
+
+    public function testLowercaseScheme()
+    {
+        $url = Url::fromString('HTTP://foo.com/');
+        $this->assertEquals('http', $url->getScheme());
+        $url->setScheme('HTTPS');
+        $this->assertEquals('https', $url->getScheme());
     }
 }

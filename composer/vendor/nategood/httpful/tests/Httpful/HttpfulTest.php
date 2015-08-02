@@ -322,13 +322,14 @@ Content-Type: text/plain; charset=utf-8\r\n", $req);
 
     function testAttach() {
         $req = Request::init();
-
-        $req->attach(array('index' => '/dir/filename'));
+        $testsPath = realpath(dirname(__FILE__) . DIRECTORY_SEPARATOR . '..');
+        $filename = $testsPath . DIRECTORY_SEPARATOR . 'test_image.jpg';
+        $req->attach(array('index' => $filename));
         $payload = $req->payload['index'];
         // PHP 5.5  + will take advantage of CURLFile while previous
         // versions just use the string syntax
         if (is_string($payload)) {
-            $this->assertEquals($payload, '@/dir/filename');
+            $this->assertEquals($payload, '@' . $filename . ';type=image/jpeg');
         } else {
             $this->assertInstanceOf('CURLFile', $payload);
         }
@@ -408,6 +409,31 @@ Content-Type: text/plain; charset=utf-8\r\n", $req);
         } catch (\Httpful\Exception\ConnectionErrorException $e) {}
 
         $this->assertTrue($caught);
+    }
+
+    function testBeforeSend() {
+        $invoked = false;
+        $changed = false;
+        $self = $this;
+
+        try {
+            Request::get('malformed://url')
+                ->beforeSend(function($request) use(&$invoked,$self) {
+                    $self->assertEquals('malformed://url', $request->uri);
+                    $self->assertEquals('A payload', $request->serialized_payload);
+                    $request->uri('malformed2://url');
+                    $invoked = true;
+                })
+                ->whenError(function($error) { /* Be silent */ })
+                ->body('A payload')
+                ->send();
+        } catch (\Httpful\Exception\ConnectionErrorException $e) {
+            $this->assertTrue(strpos($e->getMessage(), 'malformed2') !== false);
+            $changed = true;
+        }
+
+        $this->assertTrue($invoked);
+        $this->assertTrue($changed);
     }
 
     function test_parseCode()

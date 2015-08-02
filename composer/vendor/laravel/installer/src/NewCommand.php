@@ -1,121 +1,149 @@
 <?php namespace Laravel\Installer\Console;
 
 use ZipArchive;
-use Symfony\Component\Console\Input\InputOption;
+use RuntimeException;
+use GuzzleHttp\Client;
+use Symfony\Component\Process\Process;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class NewCommand extends \Symfony\Component\Console\Command\Command {
+class NewCommand extends Command
+{
+    /**
+     * Configure the command options.
+     *
+     * @return void
+     */
+    protected function configure()
+    {
+        $this->setName('new')
+             ->setDescription('Create a new Laravel application.')
+             ->addArgument('name', InputArgument::REQUIRED);
+    }
 
-	/**
-	 * Configure the command options.
-	 *
-	 * @return void
-	 */
-	protected function configure()
-	{
-		$this->setName('new')
-				->setDescription('Create a new Laravel application.')
-				->addArgument('name', InputArgument::REQUIRED);
-	}
+    /**
+     * Execute the command.
+     *
+     * @param  InputInterface  $input
+     * @param  OutputInterface  $output
+     * @return void
+     */
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        $this->verifyApplicationDoesntExist(
+            $directory = getcwd().'/'.$input->getArgument('name'),
+            $output
+        );
 
-	/**
-	 * Execute the command.
-	 *
-	 * @param  InputInterface  $input
-	 * @param  OutputInterface  $output
-	 * @return void
-	 */
-	protected function execute(InputInterface $input, OutputInterface $output)
-	{
-		$this->verifyApplicationDoesntExist(
-			$directory = getcwd().'/'.$input->getArgument('name')
-		);
+        $output->writeln('<info>Crafting application...</info>');
 
-		$output->writeln('<info>Crafting application...</info>');
-
-		$this->download($zipFile = $this->makeFilename())
+        $this->download($zipFile = $this->makeFilename())
              ->extract($zipFile, $directory)
              ->cleanUp($zipFile);
 
-		$output->writeln('<comment>Application ready! Build something amazing.</comment>');
-	}
+        $composer = $this->findComposer();
 
-	/**
-	 * Verify that the application does not already exist.
-	 *
-	 * @param  string  $directory
-	 * @return void
-	 */
-	protected function verifyApplicationDoesntExist($directory)
-	{
-		if (is_dir($directory))
-		{
-			$output->writeln('<error>Application already exists!</error>');
+        $commands = [
+            $composer.' run-script post-root-package-install',
+            $composer.' run-script post-install-cmd',
+            $composer.' run-script post-create-project-cmd',
+        ];
 
-			exit(1);
-		}
-	}
+        $process = new Process(implode(' && ', $commands), $directory, null, null, null);
 
-	/**
-	 * Generate a random temporary filename.
-	 *
-	 * @return string
-	 */
-	protected function makeFilename()
-	{
-		return getcwd().'/laravel_'.md5(time().uniqid()).'.zip';
-	}
+        $process->run(function ($type, $line) use ($output) {
+            $output->write($line);
+        });
 
-	/**
-	 * Download the temporary Zip to the given file.
-	 *
-	 * @param  string  $zipFile
-	 * @return $this
-	 */
-	protected function download($zipFile)
-	{
-		$response = \GuzzleHttp\get('http://cabinet.laravel.com/latest.zip')->getBody();
+        $output->writeln('<comment>Application ready! Build something amazing.</comment>');
+    }
 
-		file_put_contents($zipFile, $response);
+    /**
+     * Verify that the application does not already exist.
+     *
+     * @param  string  $directory
+     * @return void
+     */
+    protected function verifyApplicationDoesntExist($directory, OutputInterface $output)
+    {
+        if (is_dir($directory)) {
+            throw new RuntimeException('Application already exists!');
+        }
+    }
 
-		return $this;
-	}
+    /**
+     * Generate a random temporary filename.
+     *
+     * @return string
+     */
+    protected function makeFilename()
+    {
+        return getcwd().'/laravel_'.md5(time().uniqid()).'.zip';
+    }
 
-	/**
-	 * Extract the zip file into the given directory.
-	 *
-	 * @param  string  $zipFile
-	 * @param  string  $directory
-	 * @return $this
-	 */
-	protected function extract($zipFile, $directory)
-	{
-		$archive = new ZipArchive;
+    /**
+     * Download the temporary Zip to the given file.
+     *
+     * @param  string  $zipFile
+     * @return $this
+     */
+    protected function download($zipFile)
+    {
+        $response = (new Client)->get('http://cabinet.laravel.com/latest.zip');
 
-		$archive->open($zipFile);
+        file_put_contents($zipFile, $response->getBody());
 
-		$archive->extractTo($directory);
+        return $this;
+    }
 
-		$archive->close();
+    /**
+     * Extract the zip file into the given directory.
+     *
+     * @param  string  $zipFile
+     * @param  string  $directory
+     * @return $this
+     */
+    protected function extract($zipFile, $directory)
+    {
+        $archive = new ZipArchive;
 
-		return $this;
-	}
+        $archive->open($zipFile);
 
-	/**
-	 * Clean-up the Zip file.
-	 *
-	 * @param  string  $zipFile
-	 * @return $this
-	 */
-	protected function cleanUp($zipFile)
-	{
-		@chmod($zipFile, 0777);
+        $archive->extractTo($directory);
 
-		@unlink($zipFile);
+        $archive->close();
 
-		return $this;
-	}
+        return $this;
+    }
 
+    /**
+     * Clean-up the Zip file.
+     *
+     * @param  string  $zipFile
+     * @return $this
+     */
+    protected function cleanUp($zipFile)
+    {
+        @chmod($zipFile, 0777);
+
+        @unlink($zipFile);
+
+        return $this;
+    }
+
+    /**
+     * Get the composer command for the environment.
+     *
+     * @return string
+     */
+    protected function findComposer()
+    {
+        if (file_exists(getcwd().'/composer.phar')) {
+            return '"'.PHP_BINARY.'" composer.phar';
+        }
+
+        return 'composer';
+    }
 }

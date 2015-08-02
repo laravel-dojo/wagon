@@ -1,5 +1,4 @@
 <?php
-
 namespace GuzzleHttp;
 
 /**
@@ -10,9 +9,8 @@ class Query extends Collection
     const RFC3986 = 'RFC3986';
     const RFC1738 = 'RFC1738';
 
-    /** @var bool URL encode fields and values */
-    private $encoding = self::RFC3986;
-
+    /** @var callable Encoding function */
+    private $encoding = 'rawurlencode';
     /** @var callable */
     private $aggregator;
 
@@ -76,27 +74,16 @@ class Query extends Collection
 
         $result = '';
         $aggregator = $this->aggregator;
+        $encoder = $this->encoding;
 
         foreach ($aggregator($this->data) as $key => $values) {
             foreach ($values as $value) {
                 if ($result) {
                     $result .= '&';
                 }
-                if ($this->encoding == self::RFC1738) {
-                    $result .= urlencode($key);
-                    if ($value !== null) {
-                        $result .= '=' . urlencode($value);
-                    }
-                } elseif ($this->encoding == self::RFC3986) {
-                    $result .= rawurlencode($key);
-                    if ($value !== null) {
-                        $result .= '=' . rawurlencode($value);
-                    }
-                } else {
-                    $result .= $key;
-                    if ($value !== null) {
-                        $result .= '=' . $value;
-                    }
+                $result .= $encoder($key);
+                if ($value !== null) {
+                    $result .= '=' . $encoder($value);
                 }
             }
         }
@@ -115,14 +102,10 @@ class Query extends Collection
      *     pairs. The callable accepts an array of query data and returns a
      *     flattened array of key value pairs where each value is an array of
      *     strings.
-     *
-     * @return self
      */
     public function setAggregator(callable $aggregator)
     {
         $this->aggregator = $aggregator;
-
-        return $this;
     }
 
     /**
@@ -130,18 +113,23 @@ class Query extends Collection
      *
      * @param string|bool $type One of 'RFC1738', 'RFC3986', or false to disable encoding
      *
-     * @return self
      * @throws \InvalidArgumentException
      */
     public function setEncodingType($type)
     {
-        if ($type === false || $type === self::RFC1738 || $type === self::RFC3986) {
-            $this->encoding = $type;
-        } else {
-            throw new \InvalidArgumentException('Invalid URL encoding type');
+        switch ($type) {
+            case self::RFC3986:
+                $this->encoding = 'rawurlencode';
+                break;
+            case self::RFC1738:
+                $this->encoding = 'urlencode';
+                break;
+            case false:
+                $this->encoding = function ($v) { return $v; };
+                break;
+            default:
+                throw new \InvalidArgumentException('Invalid URL encoding type');
         }
-
-        return $this;
     }
 
     /**

@@ -1,21 +1,16 @@
 <?php
-
 namespace GuzzleHttp;
 
-use GuzzleHttp\Adapter\AdapterInterface;
-use GuzzleHttp\Adapter\Curl\CurlAdapter;
-use GuzzleHttp\Adapter\Curl\MultiAdapter;
-use GuzzleHttp\Adapter\FakeParallelAdapter;
-use GuzzleHttp\Adapter\ParallelAdapterInterface;
-use GuzzleHttp\Adapter\StreamAdapter;
-use GuzzleHttp\Adapter\StreamingProxyAdapter;
-use GuzzleHttp\Adapter\Transaction;
-use GuzzleHttp\Adapter\TransactionIterator;
 use GuzzleHttp\Event\HasEmitterTrait;
-use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Message\MessageFactory;
 use GuzzleHttp\Message\MessageFactoryInterface;
 use GuzzleHttp\Message\RequestInterface;
+use GuzzleHttp\Message\FutureResponse;
+use GuzzleHttp\Ring\Core;
+use GuzzleHttp\Ring\Future\FutureInterface;
+use GuzzleHttp\Exception\RequestException;
+use React\Promise\FulfilledPromise;
+use React\Promise\RejectedPromise;
 
 /**
  * HTTP client
@@ -24,22 +19,17 @@ class Client implements ClientInterface
 {
     use HasEmitterTrait;
 
-    const DEFAULT_CONCURRENCY = 25;
-
     /** @var MessageFactoryInterface Request factory used by the client */
     private $messageFactory;
-
-    /** @var AdapterInterface */
-    private $adapter;
-
-    /** @var ParallelAdapterInterface */
-    private $parallelAdapter;
 
     /** @var Url Base URL of the client */
     private $baseUrl;
 
     /** @var array Default request options */
     private $defaults;
+
+    /** @var callable Request state machine */
+    private $fsm;
 
     /**
      * Clients accept an array of constructor parameters.
@@ -65,61 +55,52 @@ class Client implements ClientInterface
      *       Can be a string or an array that contains a URI template followed
      *       by an associative array of expansion variables to inject into the
      *       URI template.
-     *     - adapter: Adapter used to transfer requests
-     *     - parallel_adapter: Adapter used to transfer requests in parallel
+     *     - handler: callable RingPHP handler used to transfer requests
      *     - message_factory: Factory used to create request and response object
      *     - defaults: Default request options to apply to each request
      *     - emitter: Event emitter used for request events
+     *     - fsm: (internal use only) The request finite state machine. A
+     *       function that accepts a transaction and optional final state. The
+     *       function is responsible for transitioning a request through its
+     *       lifecycle events.
      */
     public function __construct(array $config = [])
     {
         $this->configureBaseUrl($config);
         $this->configureDefaults($config);
-        $this->configureAdapter($config);
+
         if (isset($config['emitter'])) {
             $this->emitter = $config['emitter'];
         }
-    }
 
-    /**
-     * Get the default User-Agent string to use with Guzzle
-     *
-     * @return string
-     */
-    public static function getDefaultUserAgent()
-    {
-        static $defaultAgent = '';
-        if (!$defaultAgent) {
-            $defaultAgent = 'Guzzle/' . self::VERSION;
-            if (extension_loaded('curl')) {
-                $defaultAgent .= ' curl/' . curl_version()['version'];
+        $this->messageFactory = isset($config['message_factory'])
+            ? $config['message_factory']
+            : new MessageFactory();
+
+        if (isset($config['fsm'])) {
+            $this->fsm = $config['fsm'];
+        } else {
+            if (isset($config['handler'])) {
+                $handler = $config['handler'];
+            } elseif (isset($config['adapter'])) {
+                $handler = $config['adapter'];
+            } else {
+                $handler = Utils::getDefaultHandler();
             }
-            $defaultAgent .= ' PHP/' . PHP_VERSION;
+            $this->fsm = new RequestFsm($handler, $this->messageFactory);
         }
-
-        return $defaultAgent;
-    }
-
-    public function __call($name, $arguments)
-    {
-        return \GuzzleHttp\deprecation_proxy(
-            $this,
-            $name,
-            $arguments,
-            ['getEventDispatcher' => 'getEmitter']
-        );
     }
 
     public function getDefaultOption($keyOrPath = null)
     {
         return $keyOrPath === null
             ? $this->defaults
-            : \GuzzleHttp\get_path($this->defaults, $keyOrPath);
+            : Utils::getPath($this->defaults, $keyOrPath);
     }
 
     public function setDefaultOption($keyOrPath, $value)
     {
-        \GuzzleHttp\set_path($this->defaults, $keyOrPath, $value);
+        Utils::setPath($this->defaults, $keyOrPath, $value);
     }
 
     public function getBaseUrl()
@@ -129,26 +110,14 @@ class Client implements ClientInterface
 
     public function createRequest($method, $url = null, array $options = [])
     {
-        $headers = $this->mergeDefaults($options);
+        $options = $this->mergeDefaults($options);
         // Use a clone of the client's emitter
         $options['config']['emitter'] = clone $this->getEmitter();
+        $url = $url || (is_string($url) && strlen($url))
+            ? $this->buildUrl($url)
+            : (string) $this->baseUrl;
 
-        $request = $this->messageFactory->createRequest(
-            $method,
-            $url ? (string) $this->buildUrl($url) : (string) $this->baseUrl,
-            $options
-        );
-
-        // Merge in default headers
-        if ($headers) {
-            foreach ($headers as $key => $value) {
-                if (!$request->hasHeader($key)) {
-                    $request->setHeader($key, $value);
-                }
-            }
-        }
-
-        return $request;
+        return $this->messageFactory->createRequest($method, $url, $options);
     }
 
     public function get($url = null, $options = [])
@@ -188,32 +157,32 @@ class Client implements ClientInterface
 
     public function send(RequestInterface $request)
     {
-        $transaction = new Transaction($this, $request);
+        $isFuture = $request->getConfig()->get('future');
+        $trans = new Transaction($this, $request, $isFuture);
+        $fn = $this->fsm;
+
         try {
-            if ($response = $this->adapter->send($transaction)) {
-                return $response;
+            $fn($trans);
+            if ($isFuture) {
+                // Turn the normal response into a future if needed.
+                return $trans->response instanceof FutureInterface
+                    ? $trans->response
+                    : new FutureResponse(new FulfilledPromise($trans->response));
             }
-            throw new \LogicException('No response was associated with the transaction');
-        } catch (RequestException $e) {
-            throw $e;
+            // Resolve deep futures if this is not a future
+            // transaction. This accounts for things like retries
+            // that do not have an immediate side-effect.
+            while ($trans->response instanceof FutureInterface) {
+                $trans->response = $trans->response->wait();
+            }
+            return $trans->response;
         } catch (\Exception $e) {
-            // Wrap exceptions in a RequestException to adhere to the interface
-            throw new RequestException($e->getMessage(), $request, null, $e);
+            if ($isFuture) {
+                // Wrap the exception in a promise
+                return new FutureResponse(new RejectedPromise($e));
+            }
+            throw RequestException::wrapException($trans->request, $e);
         }
-    }
-
-    public function sendAll($requests, array $options = [])
-    {
-        if (!($requests instanceof TransactionIterator)) {
-            $requests = new TransactionIterator($requests, $this, $options);
-        }
-
-        $this->parallelAdapter->sendAll(
-            $requests,
-            isset($options['parallel'])
-                ? $options['parallel']
-                : self::DEFAULT_CONCURRENCY
-        );
     }
 
     /**
@@ -227,16 +196,8 @@ class Client implements ClientInterface
             'allow_redirects' => true,
             'exceptions'      => true,
             'decode_content'  => true,
-            'verify'          => __DIR__ . '/cacert.pem'
+            'verify'          => true
         ];
-
-        // Use the bundled cacert if it is a regular file, or set to true if
-        // using a phar file (because curL and the stream wrapper can't read
-        // cacerts from the phar stream wrapper). Favor the ini setting over
-        // the system's cacert.
-        if (substr(__FILE__, 0, 7) == 'phar://') {
-            $settings['verify'] = ini_get('openssl.cafile') ?: true;
-        }
 
         // Use the standard Linux HTTP_PROXY and HTTPS_PROXY if set
         if ($proxy = getenv('HTTP_PROXY')) {
@@ -253,77 +214,53 @@ class Client implements ClientInterface
     /**
      * Expand a URI template and inherit from the base URL if it's relative
      *
-     * @param string|array $url URL or URI template to expand
-     *
+     * @param string|array $url URL or an array of the URI template to expand
+     *                          followed by a hash of template varnames.
      * @return string
+     * @throws \InvalidArgumentException
      */
     private function buildUrl($url)
     {
+        // URI template (absolute or relative)
         if (!is_array($url)) {
-            if (strpos($url, '://')) {
-                return (string) $url;
-            }
-            return (string) $this->baseUrl->combine($url);
-        } elseif (strpos($url[0], '://')) {
-            return \GuzzleHttp\uri_template($url[0], $url[1]);
+            return strpos($url, '://')
+                ? (string) $url
+                : (string) $this->baseUrl->combine($url);
         }
 
+        if (!isset($url[1])) {
+            throw new \InvalidArgumentException('You must provide a hash of '
+                . 'varname options in the second element of a URL array.');
+        }
+
+        // Absolute URL
+        if (strpos($url[0], '://')) {
+            return Utils::uriTemplate($url[0], $url[1]);
+        }
+
+        // Combine the relative URL with the base URL
         return (string) $this->baseUrl->combine(
-            \GuzzleHttp\uri_template($url[0], $url[1])
+            Utils::uriTemplate($url[0], $url[1])
         );
-    }
-
-    /**
-     * Get a default parallel adapter to use based on the environment
-     *
-     * @return ParallelAdapterInterface
-     */
-    private function getDefaultParallelAdapter()
-    {
-        return extension_loaded('curl')
-            ? new MultiAdapter($this->messageFactory)
-            : new FakeParallelAdapter($this->adapter);
-    }
-
-    /**
-     * Create a default adapter to use based on the environment
-     * @throws \RuntimeException
-     */
-    private function getDefaultAdapter()
-    {
-        if (extension_loaded('curl')) {
-            $this->parallelAdapter = new MultiAdapter($this->messageFactory);
-            $this->adapter = function_exists('curl_reset')
-                ? new CurlAdapter($this->messageFactory)
-                : $this->parallelAdapter;
-            if (ini_get('allow_url_fopen')) {
-                $this->adapter = new StreamingProxyAdapter(
-                    $this->adapter,
-                    new StreamAdapter($this->messageFactory)
-                );
-            }
-        } elseif (ini_get('allow_url_fopen')) {
-            $this->adapter = new StreamAdapter($this->messageFactory);
-        } else {
-            throw new \RuntimeException('Guzzle requires cURL, the '
-                . 'allow_url_fopen ini setting, or a custom HTTP adapter.');
-        }
     }
 
     private function configureBaseUrl(&$config)
     {
         if (!isset($config['base_url'])) {
             $this->baseUrl = new Url('', '');
-        } elseif (is_array($config['base_url'])) {
+        } elseif (!is_array($config['base_url'])) {
+            $this->baseUrl = Url::fromString($config['base_url']);
+        } elseif (count($config['base_url']) < 2) {
+            throw new \InvalidArgumentException('You must provide a hash of '
+                . 'varname options in the second element of a base_url array.');
+        } else {
             $this->baseUrl = Url::fromString(
-                \GuzzleHttp\uri_template(
+                Utils::uriTemplate(
                     $config['base_url'][0],
                     $config['base_url'][1]
                 )
             );
             $config['base_url'] = (string) $this->baseUrl;
-        } else {
-            $this->baseUrl = Url::fromString($config['base_url']);
         }
     }
 
@@ -341,57 +278,75 @@ class Client implements ClientInterface
         // Add the default user-agent header
         if (!isset($this->defaults['headers'])) {
             $this->defaults['headers'] = [
-                'User-Agent' => static::getDefaultUserAgent()
+                'User-Agent' => Utils::getDefaultUserAgent()
             ];
-        } elseif (!isset(array_change_key_case($this->defaults['headers'])['user-agent'])) {
+        } elseif (!Core::hasHeader($this->defaults, 'User-Agent')) {
             // Add the User-Agent header if one was not already set
-            $this->defaults['headers']['User-Agent'] = static::getDefaultUserAgent();
-        }
-    }
-
-    private function configureAdapter(&$config)
-    {
-        if (isset($config['message_factory'])) {
-            $this->messageFactory = $config['message_factory'];
-        } else {
-            $this->messageFactory = new MessageFactory();
-        }
-        if (isset($config['adapter'])) {
-            $this->adapter = $config['adapter'];
-        } else {
-            $this->getDefaultAdapter();
-        }
-        // If no parallel adapter was explicitly provided and one was not
-        // defaulted when creating the default adapter, then create one now.
-        if (isset($config['parallel_adapter'])) {
-            $this->parallelAdapter = $config['parallel_adapter'];
-        } elseif (!$this->parallelAdapter) {
-            $this->parallelAdapter = $this->getDefaultParallelAdapter();
+            $this->defaults['headers']['User-Agent'] = Utils::getDefaultUserAgent();
         }
     }
 
     /**
-     * Merges default options into the array passed by reference and returns
-     * an array of headers that need to be merged in after the request is
-     * created.
+     * Merges default options into the array passed by reference.
      *
      * @param array $options Options to modify by reference
      *
-     * @return array|null
+     * @return array
      */
-    private function mergeDefaults(&$options)
+    private function mergeDefaults($options)
     {
-        // Merging optimization for when no headers are present
-        if (!isset($options['headers'])
-            || !isset($this->defaults['headers'])) {
-            $options = array_replace_recursive($this->defaults, $options);
-            return null;
+        $defaults = $this->defaults;
+
+        // Case-insensitively merge in default headers if both defaults and
+        // options have headers specified.
+        if (!empty($defaults['headers']) && !empty($options['headers'])) {
+            // Create a set of lowercased keys that are present.
+            $lkeys = [];
+            foreach (array_keys($options['headers']) as $k) {
+                $lkeys[strtolower($k)] = true;
+            }
+            // Merge in lowercase default keys when not present in above set.
+            foreach ($defaults['headers'] as $key => $value) {
+                if (!isset($lkeys[strtolower($key)])) {
+                    $options['headers'][$key] = $value;
+                }
+            }
+            // No longer need to merge in headers.
+            unset($defaults['headers']);
         }
 
-        $defaults = $this->defaults;
-        unset($defaults['headers']);
-        $options = array_replace_recursive($defaults, $options);
+        $result = array_replace_recursive($defaults, $options);
+        foreach ($options as $k => $v) {
+            if ($v === null) {
+                unset($result[$k]);
+            }
+        }
 
-        return $this->defaults['headers'];
+        return $result;
+    }
+
+    /**
+     * @deprecated Use {@see GuzzleHttp\Pool} instead.
+     * @see GuzzleHttp\Pool
+     */
+    public function sendAll($requests, array $options = [])
+    {
+        Pool::send($this, $requests, $options);
+    }
+
+    /**
+     * @deprecated Use GuzzleHttp\Utils::getDefaultHandler
+     */
+    public static function getDefaultHandler()
+    {
+        return Utils::getDefaultHandler();
+    }
+
+    /**
+     * @deprecated Use GuzzleHttp\Utils::getDefaultUserAgent
+     */
+    public static function getDefaultUserAgent()
+    {
+        return Utils::getDefaultUserAgent();
     }
 }

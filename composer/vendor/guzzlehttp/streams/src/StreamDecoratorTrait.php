@@ -1,5 +1,6 @@
 <?php
 namespace GuzzleHttp\Stream;
+use GuzzleHttp\Stream\Exception\CannotAttachException;
 
 /**
  * Stream decorator trait
@@ -42,9 +43,9 @@ trait StreamDecoratorTrait
         }
     }
 
-    public function getContents($maxLength = -1)
+    public function getContents()
     {
-        return Utils::copyToString($this, $maxLength);
+        return Utils::copyToString($this);
     }
 
     /**
@@ -70,14 +71,17 @@ trait StreamDecoratorTrait
 
     public function getMetadata($key = null)
     {
-        return $this->stream instanceof MetadataStreamInterface
-            ? $this->stream->getMetadata($key)
-            : null;
+        return $this->stream->getMetadata($key);
     }
 
     public function detach()
     {
         return $this->stream->detach();
+    }
+
+    public function attach($stream)
+    {
+        throw new CannotAttachException();
     }
 
     public function getSize()
@@ -123,11 +127,6 @@ trait StreamDecoratorTrait
     public function write($string)
     {
         return $this->stream->write($string);
-    }
-
-    public function flush()
-    {
-        return $this->stream->flush();
     }
 
     /**

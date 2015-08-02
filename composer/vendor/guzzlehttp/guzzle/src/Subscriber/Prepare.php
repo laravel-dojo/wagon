@@ -1,14 +1,12 @@
 <?php
-
 namespace GuzzleHttp\Subscriber;
 
 use GuzzleHttp\Event\BeforeEvent;
 use GuzzleHttp\Event\RequestEvents;
 use GuzzleHttp\Event\SubscriberInterface;
+use GuzzleHttp\Message\AppliesHeadersInterface;
 use GuzzleHttp\Message\RequestInterface;
 use GuzzleHttp\Mimetypes;
-use GuzzleHttp\Post\PostBodyInterface;
-use GuzzleHttp\Stream\MetadataStreamInterface;
 use GuzzleHttp\Stream\StreamInterface;
 
 /**
@@ -42,8 +40,8 @@ class Prepare implements SubscriberInterface
 
         $this->addContentLength($request, $body);
 
-        if ($body instanceof PostBodyInterface) {
-            // Synchronize the POST body with the request's headers
+        if ($body instanceof AppliesHeadersInterface) {
+            // Synchronize the body with the request headers
             $body->applyRequestHeaders($request);
         } elseif (!$request->hasHeader('Content-Type')) {
             $this->addContentType($request, $body);
@@ -56,10 +54,6 @@ class Prepare implements SubscriberInterface
         RequestInterface $request,
         StreamInterface $body
     ) {
-        if (!($body instanceof MetadataStreamInterface)) {
-            return;
-        }
-
         if (!($uri = $body->getMetadata('uri'))) {
             return;
         }
@@ -89,13 +83,13 @@ class Prepare implements SubscriberInterface
         }
 
         if (null !== ($size = $body->getSize())) {
-            $request->setHeader('Content-Length', $size)
-                ->removeHeader('Transfer-Encoding');
+            $request->setHeader('Content-Length', $size);
+            $request->removeHeader('Transfer-Encoding');
         } elseif ('1.1' == $request->getProtocolVersion()) {
             // Use chunked Transfer-Encoding if there is no determinable
             // content-length header and we're using HTTP/1.1.
-            $request->setHeader('Transfer-Encoding', 'chunked')
-                ->removeHeader('Content-Length');
+            $request->setHeader('Transfer-Encoding', 'chunked');
+            $request->removeHeader('Content-Length');
         }
     }
 

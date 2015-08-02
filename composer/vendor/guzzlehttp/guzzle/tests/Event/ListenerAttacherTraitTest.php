@@ -1,5 +1,4 @@
 <?php
-
 namespace GuzzleHttp\Tests\Event;
 
 use GuzzleHttp\Event\HasEmitterInterface;
@@ -88,6 +87,6 @@ class ListenerAttacherTraitTest extends \PHPUnit_Framework_TestCase
      */
     public function testValidatesEvents()
     {
-        $o = new ObjectWithEvents(['foo' => 'bar']);
+        new ObjectWithEvents(['foo' => 'bar']);
     }
 }

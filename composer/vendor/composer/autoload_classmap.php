@@ -20,5 +20,4 @@ return array(
     'Laravel\\Envoy\\Slack' => $vendorDir . '/laravel/envoy/src/Slack.php',
     'Laravel\\Envoy\\Task' => $vendorDir . '/laravel/envoy/src/Task.php',
     'Laravel\\Envoy\\TaskContainer' => $vendorDir . '/laravel/envoy/src/TaskContainer.php',
-    'Laravel\\Installer\\Console\\NewCommand' => $vendorDir . '/laravel/installer/src/NewCommand.php',
 );

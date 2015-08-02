@@ -1,15 +1,15 @@
 <?php
-
 namespace GuzzleHttp\Tests\Message;
 
 use GuzzleHttp\Client;
-use GuzzleHttp\Cookie\CookieJar;
-use GuzzleHttp\Message\MessageFactory;
-use GuzzleHttp\Message\Response;
+use GuzzleHttp\Message\RequestInterface;
 use GuzzleHttp\Post\PostFile;
+use GuzzleHttp\Message\Response;
+use GuzzleHttp\Message\MessageFactory;
+use GuzzleHttp\Subscriber\Cookie;
+use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Query;
 use GuzzleHttp\Stream\Stream;
-use GuzzleHttp\Subscriber\Cookie;
 use GuzzleHttp\Subscriber\History;
 use GuzzleHttp\Subscriber\Mock;
 
@@ -144,7 +144,7 @@ class MessageFactoryTest extends \PHPUnit_Framework_TestCase
      */
     public function testValidatesRedirects()
     {
-        (new MessageFactory())->createRequest('GET', '/', ['allow_redirects' => []]);
+        (new MessageFactory())->createRequest('GET', '/', ['allow_redirects' => 'foo']);
     }
 
     public function testCanEnableStrictRedirectsAndSpecifyMax()
@@ -236,9 +236,12 @@ class MessageFactoryTest extends \PHPUnit_Framework_TestCase
 
     public function testCanSetDefaultQueryWithObject()
     {
-        $request = (new MessageFactory())->createRequest('GET', 'http://foo.com?test=abc', [
-            'query' => new Query(['Foo' => 'Bar', 'test' => 'def'])
-        ]);
+        $request = (new MessageFactory)->createRequest(
+            'GET',
+            'http://foo.com?test=abc', [
+                'query' => new Query(['Foo' => 'Bar', 'test' => 'def'])
+            ]
+        );
         $this->assertEquals('Bar', $request->getQuery()->get('Foo'));
         $this->assertEquals('abc', $request->getQuery()->get('test'));
     }
@@ -349,7 +352,7 @@ class MessageFactoryTest extends \PHPUnit_Framework_TestCase
         $mock = new Mock([new Response(200)]);
         $client = new Client();
         $client->getEmitter()->attach($mock);
-        $request = $client->get('http://test.com', ['subscribers' => [$mock]]);
+        $client->get('http://test.com', ['subscribers' => [$mock]]);
     }
 
     public function testCanDisableExceptions()
@@ -511,21 +514,22 @@ class MessageFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('null', (string) $request->getBody());
     }
 
-    public function testCanUseCustomSubclassesWithMethods()
+    public function testCanUseCustomRequestOptions()
     {
-        (new ExtendedFactory())->createRequest('PUT', 'http://f.com', [
+        $c = false;
+        $f = new MessageFactory([
+            'foo' => function (RequestInterface $request, $value) use (&$c) {
+                $c = true;
+                $this->assertEquals('bar', $value);
+            }
+        ]);
+
+        $f->createRequest('PUT', 'http://f.com', [
             'headers' => ['Content-Type' => 'foo'],
             'foo' => 'bar'
         ]);
-        try {
-            $f = new MessageFactory();
-            $f->createRequest('PUT', 'http://f.com', [
-                'headers' => ['Content-Type' => 'foo'],
-                'foo' => 'bar'
-            ]);
-        } catch (\InvalidArgumentException $e) {
-            $this->assertContains('foo config', $e->getMessage());
-        }
+
+        $this->assertTrue($c);
     }
 
     /**
@@ -551,7 +555,7 @@ class MessageFactoryTest extends \PHPUnit_Framework_TestCase
         $client->getEmitter()->attach($history);
         $client->post('http://foo.com', [
             'headers' => ['Content-Type' => 'multipart/form-data'],
-            'body' => ['foo' => 'bar']
+            'body'    => ['foo' => 'bar']
         ]);
         $this->assertContains(
             'multipart/form-data; boundary=',

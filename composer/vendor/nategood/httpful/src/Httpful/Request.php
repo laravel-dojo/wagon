@@ -44,6 +44,7 @@ class Request
            $payload,
            $parse_callback,
            $error_callback,
+           $send_callback,
            $follow_redirects        = false,
            $max_redirects           = self::MAX_REDIRECTS_DEFAULT,
            $payload_serializers     = array();
@@ -204,11 +205,11 @@ class Request
             if ($curlErrorNumber = curl_errno($this->_ch)) {
                 $curlErrorString = curl_error($this->_ch);
                 $this->_error($curlErrorString);
-                throw new ConnectionErrorException('Unable to connect: ' . $curlErrorNumber . ' ' . $curlErrorString);
+                throw new ConnectionErrorException('Unable to connect to "'.$this->uri.'": ' . $curlErrorNumber . ' ' . $curlErrorString);
             }
 
-            $this->_error('Unable to connect.');
-            throw new ConnectionErrorException('Unable to connect.');
+            $this->_error('Unable to connect to "'.$this->uri.'".');
+            throw new ConnectionErrorException('Unable to connect to "'.$this->uri.'".');
         }
 
         $info = curl_getinfo($this->_ch);
@@ -392,11 +393,13 @@ class Request
 
     public function attach($files)
     {
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
         foreach ($files as $key => $file) {
+            $mimeType = finfo_file($finfo, $file);
             if (function_exists('curl_file_create')) {
-                $this->payload[$key] = curl_file_create($file);
+                $this->payload[$key] = curl_file_create($file, $mimeType);
             } else {
-                $this->payload[$key] = "@{$file}";
+                $this->payload[$key] = '@' . $file . ';type=' . $mimeType;
             }
         }
         $this->sendsType(Mime::UPLOAD);
@@ -647,6 +650,18 @@ class Request
     }
 
     /**
+     * Callback invoked after payload has been serialized but before
+     * the request has been built.
+     * @return Request this
+     * @param \Closure $callback (Request $request)
+     */
+    public function beforeSend(\Closure $callback)
+    {
+        $this->send_callback = $callback;
+        return $this;
+    }
+
+    /**
      * Register a callback that will be used to serialize the payload
      * for a particular mime type.  When using "*" for the mime
      * type, it will use that parser for all responses regardless of the mime
@@ -823,6 +838,14 @@ class Request
         if (!isset($this->uri))
             throw new \Exception('Attempting to send a request before defining a URI endpoint.');
 
+        if (isset($this->payload)) {
+            $this->serialized_payload = $this->_serializePayload($this->payload);
+        }
+
+        if (isset($this->send_callback)) {
+            call_user_func($this->send_callback, $this);
+        }
+
         $ch = curl_init($this->uri);
 
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $this->method);
@@ -874,7 +897,6 @@ class Request
         // https://github.com/nategood/httpful/issues/84
         // set Content-Length to the size of the payload if present
         if (isset($this->payload)) {
-            $this->serialized_payload = $this->_serializePayload($this->payload);
             curl_setopt($ch, CURLOPT_POSTFIELDS, $this->serialized_payload);
             if (!$this->isUpload()) {
                 $this->headers['Content-Length'] =

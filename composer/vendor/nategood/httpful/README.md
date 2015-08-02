@@ -72,6 +72,17 @@ Httpful highly encourages sending in pull requests.  When submitting a pull requ
 
 # Changelog
 
+## 0.2.19
+
+ - FEATURE Before send hook [PR #164](https://github.com/nategood/httpful/pull/164)
+ - MINOR More descriptive connection exceptions [PR #166](https://github.com/nategood/httpful/pull/166)
+
+## 0.2.18
+
+ - FIX [PR #149](https://github.com/nategood/httpful/pull/149)
+ - FIX [PR #150](https://github.com/nategood/httpful/pull/150)
+ - FIX [PR #156](https://github.com/nategood/httpful/pull/156)
+
 ## 0.2.17
 
  - FEATURE [PR #144](https://github.com/nategood/httpful/pull/144) Adds additional parameter to the Response class to specify additional meta data about the request/response (e.g. number of redirect).

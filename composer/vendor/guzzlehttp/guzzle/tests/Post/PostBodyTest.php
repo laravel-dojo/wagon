@@ -1,5 +1,4 @@
 <?php
-
 namespace GuzzleHttp\Tests\Post;
 
 use GuzzleHttp\Message\Request;
@@ -131,7 +130,6 @@ class PostBodyTest extends \PHPUnit_Framework_TestCase
         $b->seek(0);
         $this->assertEquals('foo=bar&baz=123', $b->read(1000));
         $this->assertEquals(15, $b->tell());
-        $this->assertTrue($b->eof());
     }
 
     public function testCanSpecifyQueryAggregator()
@@ -151,8 +149,23 @@ class PostBodyTest extends \PHPUnit_Framework_TestCase
         $b = new PostBody();
         $b->setField('foo', 'bar');
         $b->detach();
-        $this->assertTrue($b->close());
+        $b->close();
         $this->assertEquals('', $b->read(10));
+    }
+
+    public function testDetachesWhenBodyIsPresent()
+    {
+        $b = new PostBody();
+        $b->setField('foo', 'bar');
+        $b->getContents();
+        $b->detach();
+    }
+
+    public function testFlushAndMetadataPlaceholders()
+    {
+        $b = new PostBody();
+        $this->assertEquals([], $b->getMetadata());
+        $this->assertNull($b->getMetadata('foo'));
     }
 
     public function testCreatesMultipartUploadWithMultiFields()
@@ -215,5 +228,28 @@ class PostBodyTest extends \PHPUnit_Framework_TestCase
         $contents = $b->getContents();
         $this->assertContains('name="a"', $contents);
         $this->assertContains('b&c=d', $contents);
+    }
+
+    /**
+     * @expectedException \GuzzleHttp\Stream\Exception\CannotAttachException
+     */
+    public function testCannotAttach()
+    {
+        $b = new PostBody();
+        $b->attach('foo');
+    }
+
+    public function testDoesNotOverwriteExistingHeaderForUrlencoded()
+    {
+        $m = new Request('POST', 'http://foo.com', [
+            'content-type' => 'application/x-www-form-urlencoded; charset=utf-8'
+        ]);
+        $b = new PostBody();
+        $b->setField('foo', 'bar');
+        $b->applyRequestHeaders($m);
+        $this->assertEquals(
+            'application/x-www-form-urlencoded; charset=utf-8',
+            $m->getHeader('Content-Type')
+        );
     }
 }

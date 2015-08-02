@@ -1,6 +1,6 @@
 {
     "require": {
-        "laravel/installer": "~1.1",
-        "laravel/envoy": "~1.0"
+        "laravel/installer": "^1.2",
+        "laravel/envoy": "^1.0"
     }
 }

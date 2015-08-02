@@ -1,10 +1,10 @@
 <?php
-
 namespace GuzzleHttp\Message;
 
 use GuzzleHttp\Exception\ParseException;
 use GuzzleHttp\Exception\XmlParseException;
 use GuzzleHttp\Stream\StreamInterface;
+use GuzzleHttp\Utils;
 
 /**
  * Guzzle HTTP response object
@@ -83,7 +83,7 @@ class Response extends AbstractMessage implements ResponseInterface
     private $effectiveUrl;
 
     /**
-     * @param string          $statusCode The response status code (e.g. 200)
+     * @param int|string      $statusCode The response status code (e.g. 200)
      * @param array           $headers    The response headers
      * @param StreamInterface $body       The body of the response
      * @param array           $options    Response message options
@@ -96,7 +96,7 @@ class Response extends AbstractMessage implements ResponseInterface
         StreamInterface $body = null,
         array $options = []
     ) {
-        $this->statusCode = (string) $statusCode;
+        $this->statusCode = (int) $statusCode;
         $this->handleOptions($options);
 
         // Assume a reason phrase if one was not applied as an option
@@ -120,15 +120,25 @@ class Response extends AbstractMessage implements ResponseInterface
         return $this->statusCode;
     }
 
+    public function setStatusCode($code)
+    {
+        return $this->statusCode = (int) $code;
+    }
+
     public function getReasonPhrase()
     {
         return $this->reasonPhrase;
     }
 
+    public function setReasonPhrase($phrase)
+    {
+        return $this->reasonPhrase = $phrase;
+    }
+
     public function json(array $config = [])
     {
         try {
-            return \GuzzleHttp\json_decode(
+            return Utils::jsonDecode(
                 (string) $this->getBody(),
                 isset($config['object']) ? !$config['object'] : true,
                 512,
@@ -180,8 +190,6 @@ class Response extends AbstractMessage implements ResponseInterface
     public function setEffectiveUrl($url)
     {
         $this->effectiveUrl = $url;
-
-        return $this;
     }
 
     /**
