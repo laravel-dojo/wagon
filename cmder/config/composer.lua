@@ -32,6 +32,7 @@ composer_basic_parser:set_arguments({
 						),          
 	"browse" .. flags(
 						"--homepage","-H",
+						"--show","-s",
 						composer_basic_options
 						),           
 	"clear-cache" .. flags(composer_basic_options),      
@@ -43,6 +44,7 @@ composer_basic_parser:set_arguments({
 						"--unset",
 						"--list","-l",
 						"--file","-f",
+						"--absolute",
 						composer_basic_options
 						),           
 	"create-project" .. flags(
@@ -58,6 +60,7 @@ composer_basic_parser:set_arguments({
 						"--no-progress",
 						"--keep-vcs",
 						"--no-install",
+						"--ignore-platform-reqs",
 						composer_basic_options
 						),   
 	"depends" .. flags(
@@ -84,12 +87,23 @@ composer_basic_parser:set_arguments({
 						),             
 	"home" .. flags(
 						"--homepage","-H",
+						"--show", "-s",
 						composer_basic_options
-						),             
+						),
+	"info" .. flags(
+						"--installed", "-i",
+						"--platform", "-p",
+						"--available", "-a",
+						"--self", "-s",
+						"--name-only", "-N",
+						"--path", "-P",
+						composer_basic_options
+						), 
 	"init" .. flags(
 						"--name",
 						"--description",
 						"--author",
+						"--type",
 						"--homepage",
 						"--require",
 						"--require-dev",
@@ -113,6 +127,7 @@ composer_basic_parser:set_arguments({
 						),          
 	"licenses" .. flags(
 						"--format","-f",
+						"--no-dev",
 						composer_basic_options
 						),         
 	"list" .. flags(
@@ -138,11 +153,13 @@ composer_basic_parser:set_arguments({
 						"--update-no-dev",
 						"--update-with-dependencies",
 						"--ignore-platform-reqs",
+						"--sort-packages",
 						composer_basic_options
 						),          
 	"run-script" .. flags(
 						"--dev",
 						"--no-dev",
+						"--list", "-l",
 						composer_basic_options
 						),       
 	"search" .. flags(
@@ -152,11 +169,13 @@ composer_basic_parser:set_arguments({
 	"self-update" .. flags(
 						"--rollback","-r",
 						"--clean-backups",
+						"--no-progress",
 						composer_basic_options
 						),      
 	"selfupdate" .. flags(
 						"--rollback","-r",
 						"--clean-backups",
+						"--no-progress",
 						composer_basic_options
 						),       
 	"show" .. flags(
@@ -178,15 +197,19 @@ composer_basic_parser:set_arguments({
 						"--lock",
 						"--no-plugins",
 						"--no-custom-installers",
+						"--no-autoloader",
 						"--no-scripts",
 						"--no-progress",
 						"--with-dependencies",
 						"--optimize-autoloader","-o",
 						"--ignore-platform-reqs",
+						"--prefer-stable",
+						"--prefer-lowest",
 						composer_basic_options
 						),           
 	"validate" .. flags(
 						"--no-check-all",
+						"--no-check-publish",
 						composer_basic_options
 						)
 })

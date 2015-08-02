@@ -36,12 +36,22 @@ homestead_basic_parser:set_arguments({
 						"--xml",
 						"--format",
 						"--raw"
-						),          
+						),
+	"make" .. flags(
+						"--name",
+						"--hostname",
+						"--after",
+						"--aliases"
+						),
+	"provision" .. flags(homestead_basic_options),
 	"resume" .. flags(homestead_basic_options),
 	"ssh" .. flags(homestead_basic_options),  
 	"status" .. flags(homestead_basic_options),
 	"suspend" .. flags(homestead_basic_options),         
-	"up" .. flags(homestead_basic_options),
+	"up" .. flags(
+						"--provision",
+						homestead_basic_options
+						),
 	"update" .. flags(homestead_basic_options)    
 })
 

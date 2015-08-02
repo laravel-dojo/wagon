@@ -23,69 +23,89 @@ local artisan_basic_options = {
 local artisan_basic_parser = clink.arg.new_parser()
 artisan_basic_parser:set_flags(artisan_basic_options)
 artisan_basic_parser:set_arguments({
-	"changes",
 	"clear-compiled",
 	"down",
-	"dump-autoload",
 	"env",
 	"help",
+	"inspire",
 	"list",
 	"migrate",
 	"optimize",
-	"routes",
 	"serve",
-	"tail",
 	"tinker",
 	"up",
-	"workbench",
 })
 
 local artisan_command_parser = clink.arg.new_parser()
 artisan_command_parser:set_arguments({
-	"asset:publish" .. flags(artisan_basic_options),
-	"auth:clear-reminders" .. flags(artisan_basic_options),
-	"auth:reminders-controller" .. flags(artisan_basic_options),
-	"auth:reminders-table" .. flags(artisan_basic_options),
+	"app:name" .. flags(artisan_basic_options),
+	"auth:clear-resets" .. flags(artisan_basic_options),
 	"cache:clear" .. flags(artisan_basic_options),
 	"cache:table" .. flags(artisan_basic_options),
-	"command:make" .. flags(
-						"--command",
-						"--path",
-						"--namespace",
-						artisan_basic_options
-						),
-	"config:publish" .. flags(
-						"--path",
-						"--force",
-						artisan_basic_options
-						),
-	"controller:make" .. flags(
-						"--bench",
-						"--only",
-						"--except",
-						"--path",
-						artisan_basic_options
-		),
+	"config:cache" .. flags(artisan_basic_options),
+	"config:clear" .. flags(artisan_basic_options),
 	"db:seed" .. flags(
 						"--class",
 						"--database",
 						"--force",
 						artisan_basic_options
 						),
-	"key:generate" .. flags(artisan_basic_options),
+	"event:generate" .. flags(artisan_basic_options),
+	"handler:command" .. flags(
+						"--command",
+						artisan_basic_options
+						),
+	"handler:event" .. flags(
+						"--event",
+						"--queued",
+						artisan_basic_options
+						),
+	"key:generate" .. flags(
+						"--show",
+						artisan_basic_options
+						),
+	"make:command" .. flags(
+						"--handler",
+						"--queued",
+						artisan_basic_options
+						),
+	"make:console" .. flags(
+						"--command",
+						artisan_basic_options
+						),
+	"make:controller" .. flags(
+						"--plain",
+						artisan_basic_options
+						),
+	"make:event" .. flags(artisan_basic_options),
+	"make:job" .. flags(
+						"--queued",
+						artisan_basic_options
+						),
+
+	"make:listener" .. flags(
+						"--event",
+						"--queued",
+						artisan_basic_options
+						),
+	"make:middleware" .. flags(artisan_basic_options),
+	"make:migration" .. flags(
+						"--create",
+						"--table",
+						artisan_basic_options
+						),
+	"make:model" .. flags(
+						"--migration", "-m",
+						"--table",
+						artisan_basic_options
+						),
+	"make:provider" .. flags(artisan_basic_options),
+	"make:request" .. flags(artisan_basic_options),
+	"make:seeder" .. flags(artisan_basic_options),
 	"migrate:install" .. flags(
 						"--database",
 						artisan_basic_options
 						),
-	"migrate:make" .. flags(
-						"--bench",
-						"--create",
-						"--package",
-						"--path",
-						"--table",
-						artisan_basic_options
-						),
-	"migrate:publish" .. flags(artisan_basic_options),
 	"migrate:refresh" .. flags(
 						"--database",
 						"--force",
@@ -123,6 +143,7 @@ artisan_command_parser:set_arguments({
 						"--type",
 						artisan_basic_options
 						),
+	"queue:table" .. flags(artisan_basic_options),
 	"queue:work" .. flags(
 						"--queue",
 						"--daemon",
@@ -132,11 +153,22 @@ artisan_command_parser:set_arguments({
 						"--sleep",
 						"--tries",
 						artisan_basic_options),
-	"session:table" .. flags(artisan_basic_options),
-	"view:publish" .. flags(
+	"route:cache" .. flags(artisan_basic_options),
+	"route:clear" .. flags(artisan_basic_options),
+	"route:list" .. flags(
+						"--name",
 						"--path",
 						artisan_basic_options
 						),
+	"schedule:run" .. flags(artisan_basic_options),
+	"session:table" .. flags(artisan_basic_options),
+	"vendor:publish" .. flags(
+						"--force",
+						"--provider",
+						"--tag",
+						artisan_basic_options
+						),
+	"view:clear" .. flags(artisan_basic_options),
 })
 
 clink.arg.register_parser("artisan", artisan_basic_parser)
