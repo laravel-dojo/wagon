@@ -1,6 +1,12 @@
 {
     "name": "illuminate/hashing",
+    "description": "The Illuminate Hashing package.",
     "license": "MIT",
+    "homepage": "http://laravel.com",
+    "support": {
+        "issues": "https://github.com/laravel/framework/issues",
+        "source": "https://github.com/laravel/framework"
+    },
     "authors": [
         {
             "name": "Taylor Otwell",
@@ -8,19 +14,18 @@
         }
     ],
     "require": {
-        "php": ">=5.4.0",
-        "illuminate/support": "4.2.*",
-        "ircmaxell/password-compat": "~1.0"
+        "php": ">=5.5.9",
+        "illuminate/contracts": "5.1.*",
+        "illuminate/support": "5.1.*"
     },
     "autoload": {
-        "psr-0": {
-            "Illuminate\\Hashing": ""
+        "psr-4": {
+            "Illuminate\\Hashing\\": ""
         }
     },
-    "target-dir": "Illuminate/Hashing",
     "extra": {
         "branch-alias": {
-            "dev-master": "4.2-dev"
+            "dev-master": "5.1-dev"
         }
     },
     "minimum-stability": "dev"

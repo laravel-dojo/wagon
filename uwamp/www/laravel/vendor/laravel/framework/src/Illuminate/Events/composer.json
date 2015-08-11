@@ -1,6 +1,12 @@
 {
     "name": "illuminate/events",
+    "description": "The Illuminate Events package.",
     "license": "MIT",
+    "homepage": "http://laravel.com",
+    "support": {
+        "issues": "https://github.com/laravel/framework/issues",
+        "source": "https://github.com/laravel/framework"
+    },
     "authors": [
         {
             "name": "Taylor Otwell",
@@ -8,19 +14,19 @@
         }
     ],
     "require": {
-        "php": ">=5.4.0",
-        "illuminate/container": "4.2.*",
-        "illuminate/support": "4.2.*"
+        "php": ">=5.5.9",
+        "illuminate/container": "5.1.*",
+        "illuminate/contracts": "5.1.*",
+        "illuminate/support": "5.1.*"
     },
     "autoload": {
-        "psr-0": {
-            "Illuminate\\Events": ""
+        "psr-4": {
+            "Illuminate\\Events\\": ""
         }
     },
-    "target-dir": "Illuminate/Events",
     "extra": {
         "branch-alias": {
-            "dev-master": "4.2-dev"
+            "dev-master": "5.1-dev"
         }
     },
     "minimum-stability": "dev"

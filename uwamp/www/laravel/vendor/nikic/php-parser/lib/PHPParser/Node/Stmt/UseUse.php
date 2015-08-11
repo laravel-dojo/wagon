@@ -1,36 +1,42 @@
 <?php
 
-/**
- * @property PHPParser_Node_Name $name  Namespace/Class to alias
- * @property string              $alias Alias
- */
-class PHPParser_Node_Stmt_UseUse extends PHPParser_Node_Stmt
+namespace PhpParser\Node\Stmt;
+
+use PhpParser\Node;
+use PhpParser\Error;
+
+class UseUse extends Node\Stmt
 {
+    /** @var Node\Name Namespace, class, function or constant to alias */
+    public $name;
+    /** @var string Alias */
+    public $alias;
+
     /**
      * Constructs an alias (use) node.
      *
-     * @param PHPParser_Node_Name $name       Namespace/Class to alias
-     * @param null|string         $alias      Alias
-     * @param array               $attributes Additional attributes
+     * @param Node\Name   $name       Namespace/Class to alias
+     * @param null|string $alias      Alias
+     * @param array       $attributes Additional attributes
      */
-    public function __construct(PHPParser_Node_Name $name, $alias = null, array $attributes = array()) {
+    public function __construct(Node\Name $name, $alias = null, array $attributes = array()) {
         if (null === $alias) {
             $alias = $name->getLast();
         }
 
-        if ('self' == $alias || 'parent' == $alias) {
-            throw new PHPParser_Error(sprintf(
+        if ('self' == strtolower($alias) || 'parent' == strtolower($alias)) {
+            throw new Error(sprintf(
                 'Cannot use %s as %s because \'%2$s\' is a special class name',
                 $name, $alias
             ));
         }
 
-        parent::__construct(
-            array(
-                'name'  => $name,
-                'alias' => $alias,
-            ),
-            $attributes
-        );
+        parent::__construct(null, $attributes);
+        $this->name = $name;
+        $this->alias = $alias;
+    }
+
+    public function getSubNodeNames() {
+        return array('name', 'alias');
     }
 }

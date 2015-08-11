@@ -1,132 +1,130 @@
-<?php namespace Illuminate\Session;
+<?php
 
-use Illuminate\Database\Connection;
+namespace Illuminate\Session;
 
-class DatabaseSessionHandler implements \SessionHandlerInterface, ExistenceAwareInterface {
+use SessionHandlerInterface;
+use Illuminate\Database\ConnectionInterface;
 
-	/**
-	 * The database connection instance.
-	 *
-	 * @var \Illuminate\Database\Connection
-	 */
-	protected $connection;
+class DatabaseSessionHandler implements SessionHandlerInterface, ExistenceAwareInterface
+{
+    /**
+     * The database connection instance.
+     *
+     * @var \Illuminate\Database\ConnectionInterface
+     */
+    protected $connection;
 
-	/**
-	 * The name of the session table.
-	 *
-	 * @var string
-	 */
-	protected $table;
+    /**
+     * The name of the session table.
+     *
+     * @var string
+     */
+    protected $table;
 
-	/**
-	 * The existence state of the session.
-	 *
-	 * @var bool
-	 */
-	protected $exists;
+    /**
+     * The existence state of the session.
+     *
+     * @var bool
+     */
+    protected $exists;
 
-	/**
-	 * Create a new database session handler instance.
-	 *
-	 * @param  \Illuminate\Database\Connection  $connection
-	 * @param  string  $table
-	 * @return void
-	 */
-	public function __construct(Connection $connection, $table)
-	{
-		$this->table = $table;
-		$this->connection = $connection;
-	}
+    /**
+     * Create a new database session handler instance.
+     *
+     * @param  \Illuminate\Database\ConnectionInterface  $connection
+     * @param  string  $table
+     * @return void
+     */
+    public function __construct(ConnectionInterface $connection, $table)
+    {
+        $this->table = $table;
+        $this->connection = $connection;
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public function open($savePath, $sessionName)
-	{
-		return true;
-	}
+    /**
+     * {@inheritdoc}
+     */
+    public function open($savePath, $sessionName)
+    {
+        return true;
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public function close()
-	{
-		return true;
-	}
+    /**
+     * {@inheritdoc}
+     */
+    public function close()
+    {
+        return true;
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public function read($sessionId)
-	{
-		$session = (object) $this->getQuery()->find($sessionId);
+    /**
+     * {@inheritdoc}
+     */
+    public function read($sessionId)
+    {
+        $session = (object) $this->getQuery()->find($sessionId);
 
-		if (isset($session->payload))
-		{
-			$this->exists = true;
+        if (isset($session->payload)) {
+            $this->exists = true;
 
-			return base64_decode($session->payload);
-		}
-	}
+            return base64_decode($session->payload);
+        }
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public function write($sessionId, $data)
-	{
-		if ($this->exists)
-		{
-			$this->getQuery()->where('id', $sessionId)->update([
-				'payload' => base64_encode($data), 'last_activity' => time(),
-			]);
-		}
-		else
-		{
-			$this->getQuery()->insert([
-				'id' => $sessionId, 'payload' => base64_encode($data), 'last_activity' => time(),
-			]);
-		}
-		
-		$this->exists = true;
-	}
+    /**
+     * {@inheritdoc}
+     */
+    public function write($sessionId, $data)
+    {
+        if ($this->exists) {
+            $this->getQuery()->where('id', $sessionId)->update([
+                'payload' => base64_encode($data), 'last_activity' => time(),
+            ]);
+        } else {
+            $this->getQuery()->insert([
+                'id' => $sessionId, 'payload' => base64_encode($data), 'last_activity' => time(),
+            ]);
+        }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public function destroy($sessionId)
-	{
-		$this->getQuery()->where('id', $sessionId)->delete();
-	}
+        $this->exists = true;
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public function gc($lifetime)
-	{
-		$this->getQuery()->where('last_activity', '<=', time() - $lifetime)->delete();
-	}
+    /**
+     * {@inheritdoc}
+     */
+    public function destroy($sessionId)
+    {
+        $this->getQuery()->where('id', $sessionId)->delete();
+    }
 
-	/**
-	 * Get a fresh query builder instance for the table.
-	 *
-	 * @return \Illuminate\Database\Query\Builder
-	 */
-	protected function getQuery()
-	{
-		return $this->connection->table($this->table);
-	}
+    /**
+     * {@inheritdoc}
+     */
+    public function gc($lifetime)
+    {
+        $this->getQuery()->where('last_activity', '<=', time() - $lifetime)->delete();
+    }
 
-	/**
-	 * Set the existence state for the session.
-	 *
-	 * @param  bool  $value
-	 * @return $this
-	 */
-	public function setExists($value)
-	{
-		$this->exists = $value;
+    /**
+     * Get a fresh query builder instance for the table.
+     *
+     * @return \Illuminate\Database\Query\Builder
+     */
+    protected function getQuery()
+    {
+        return $this->connection->table($this->table);
+    }
 
-		return $this;
-	}
+    /**
+     * Set the existence state for the session.
+     *
+     * @param  bool  $value
+     * @return $this
+     */
+    public function setExists($value)
+    {
+        $this->exists = $value;
 
+        return $this;
+    }
 }

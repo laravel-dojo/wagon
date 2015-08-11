@@ -1,3 +1,12 @@
-<?php namespace Illuminate\Container;
+<?php
 
-class BindingResolutionException extends \Exception {}
+namespace Illuminate\Container;
+
+use Exception;
+
+/**
+ * @deprecated since version 5.1. Use Illuminate\Contracts\Container\BindingResolutionException.
+ */
+class BindingResolutionException extends Exception
+{
+}

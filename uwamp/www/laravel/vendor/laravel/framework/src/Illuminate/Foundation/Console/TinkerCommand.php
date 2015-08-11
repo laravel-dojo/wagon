@@ -1,125 +1,100 @@
-<?php namespace Illuminate\Foundation\Console;
+<?php
 
-use Boris\Boris;
+namespace Illuminate\Foundation\Console;
+
+use Psy\Shell;
+use Psy\Configuration;
 use Illuminate\Console\Command;
+use Symfony\Component\Console\Input\InputArgument;
 
-class TinkerCommand extends Command {
+class TinkerCommand extends Command
+{
+    /**
+     * artisan commands to include in the tinker shell.
+     *
+     * @var array
+     */
+    protected $commandWhitelist = [
+        'clear-compiled', 'down', 'env', 'inspire', 'migrate', 'optimize', 'up',
+    ];
 
-	/**
-	 * The console command name.
-	 *
-	 * @var string
-	 */
-	protected $name = 'tinker';
+    /**
+     * The console command name.
+     *
+     * @var string
+     */
+    protected $name = 'tinker';
 
-	/**
-	 * The console command description.
-	 *
-	 * @var string
-	 */
-	protected $description = "Interact with your application";
+    /**
+     * The console command description.
+     *
+     * @var string
+     */
+    protected $description = 'Interact with your application';
 
-	/**
-	 * Execute the console command.
-	 *
-	 * @return void
-	 */
-	public function fire()
-	{
-		if ($this->supportsBoris())
-		{
-			$this->runBorisShell();
-		}
-		else
-		{
-			$this->comment('Full REPL not supported. Falling back to simple shell.');
+    /**
+     * Execute the console command.
+     *
+     * @return void
+     */
+    public function fire()
+    {
+        $this->getApplication()->setCatchExceptions(false);
 
-			$this->runPlainShell();
-		}
-	}
+        $config = new Configuration;
 
-	/**
-	 * Run the Boris REPL with the current context.
-	 *
-	 * @return void
-	 */
-	protected function runBorisShell()
-	{
-		$this->setupBorisErrorHandling();
+        $config->getPresenter()->addCasters(
+            $this->getCasters()
+        );
 
-		(new Boris('> '))->start();
-	}
+        $shell = new Shell($config);
+        $shell->addCommands($this->getCommands());
+        $shell->setIncludes($this->argument('include'));
 
-	/**
-	 * Setup the Boris exception handling.
-	 *
-	 * @return void
-	 */
-	protected function setupBorisErrorHandling()
-	{
-		restore_error_handler(); restore_exception_handler();
+        $shell->run();
+    }
 
-		$this->laravel->make('artisan')->setCatchExceptions(false);
+    /**
+     * Get artisan commands to pass through to PsySH.
+     *
+     * @return array
+     */
+    protected function getCommands()
+    {
+        $commands = [];
 
-		$this->laravel->error(function() { return ''; });
-	}
+        foreach ($this->getApplication()->all() as $name => $command) {
+            if (in_array($name, $this->commandWhitelist)) {
+                $commands[] = $command;
+            }
+        }
 
-	/**
-	 * Run the plain Artisan tinker shell.
-	 *
-	 * @return void
-	 */
-	protected function runPlainShell()
-	{
-		$input = $this->prompt();
+        return $commands;
+    }
 
-		while ($input != 'quit')
-		{
-			// We will wrap the execution of the command in a try / catch block so we
-			// can easily display the errors in a convenient way instead of having
-			// them bubble back out to the CLI and stop the entire command loop.
-			try
-			{
-				if (starts_with($input, 'dump '))
-				{
-					$input = 'var_dump('.substr($input, 5).');';
-				}
+    /**
+     * Get an array of Laravel tailored casters.
+     *
+     * @return array
+     */
+    protected function getCasters()
+    {
+        return [
+            'Illuminate\Foundation\Application' => 'Illuminate\Foundation\Console\IlluminateCaster::castApplication',
+            'Illuminate\Support\Collection' => 'Illuminate\Foundation\Console\IlluminateCaster::castCollection',
+            'Illuminate\Database\Eloquent\Model' => 'Illuminate\Foundation\Console\IlluminateCaster::castModel',
+        ];
+    }
 
-				eval($input);
-			}
-
-			// If an exception occurs, we will just display the message and keep this
-			// loop going so we can keep executing commands. However, when a fatal
-			// error occurs, we have no choice but to bail out of this routines.
-			catch (\Exception $e)
-			{
-				$this->error($e->getMessage());
-			}
-
-			$input = $this->prompt();
-		}
-	}
-
-	/**
-	 * Prompt the developer for a command.
-	 *
-	 * @return string
-	 */
-	protected function prompt()
-	{
-		$dialog = $this->getHelperSet()->get('dialog');
-
-		return $dialog->ask($this->output, "<info>></info>", null);
-	}
-
-	/**
-	 * Determine if the current environment supports Boris.
-	 *
-	 * @return bool
-	 */
-	protected function supportsBoris()
-	{
-		return extension_loaded('readline') && extension_loaded('posix') && extension_loaded('pcntl');
-	}
-
+    /**
+     * Get the console command arguments.
+     *
+     * @return array
+     */
+    protected function getArguments()
+    {
+        return [
+            ['include', InputArgument::IS_ARRAY, 'Include file(s) before starting tinker'],
+        ];
+    }
 }

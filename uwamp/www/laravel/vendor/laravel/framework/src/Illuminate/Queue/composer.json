@@ -1,6 +1,12 @@
 {
     "name": "illuminate/queue",
+    "description": "The Illuminate Queue package.",
     "license": "MIT",
+    "homepage": "http://laravel.com",
+    "support": {
+        "issues": "https://github.com/laravel/framework/issues",
+        "source": "https://github.com/laravel/framework"
+    },
     "authors": [
         {
             "name": "Taylor Otwell",
@@ -8,37 +14,33 @@
         }
     ],
     "require": {
-        "php": ">=5.4.0",
-        "illuminate/console": "4.2.*",
-        "illuminate/container": "4.2.*",
-        "illuminate/http": "4.2.*",
-        "illuminate/support": "4.2.*",
-        "symfony/process": "2.5.*",
-        "nesbot/carbon": "~1.0"
-    },
-    "require-dev": {
-        "illuminate/cache": "4.2.*",
-        "illuminate/events": "4.2.*",
-        "aws/aws-sdk-php": "~2.6",
-        "iron-io/iron_mq": "~1.5",
-        "pda/pheanstalk": "~2.1"
+        "php": ">=5.5.9",
+        "illuminate/console": "5.1.*",
+        "illuminate/contracts": "5.1.*",
+        "illuminate/container": "5.1.*",
+        "illuminate/http": "5.1.*",
+        "illuminate/support": "5.1.*",
+        "symfony/process": "2.7.*",
+        "nesbot/carbon": "~1.19"
     },
     "autoload": {
-        "psr-0": {
-            "Illuminate\\Queue": ""
+        "psr-4": {
+            "Illuminate\\Queue\\": ""
         },
         "classmap": [
             "IlluminateQueueClosure.php"
         ]
     },
-    "target-dir": "Illuminate/Queue",
     "extra": {
         "branch-alias": {
-            "dev-master": "4.2-dev"
+            "dev-master": "5.1-dev"
         }
     },
     "suggest": {
-        "illuminate/redis": "Allows use of the Redis queue driver."
+        "aws/aws-sdk-php": "Required to use the SQS queue driver (~3.0).",
+        "illuminate/redis": "Required to use the redis queue driver (5.1.*).",
+        "iron-io/iron_mq": "Required to use the iron queue driver (~2.0).",
+        "pda/pheanstalk": "Required to use the beanstalk queue driver (~3.0)."
     },
     "minimum-stability": "dev"
 }

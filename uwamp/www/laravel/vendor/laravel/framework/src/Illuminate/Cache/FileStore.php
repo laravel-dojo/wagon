@@ -1,257 +1,250 @@
-<?php namespace Illuminate\Cache;
+<?php
 
+namespace Illuminate\Cache;
+
+use Exception;
+use Illuminate\Support\Arr;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Contracts\Cache\Store;
 
-class FileStore implements StoreInterface {
+class FileStore implements Store
+{
+    /**
+     * The Illuminate Filesystem instance.
+     *
+     * @var \Illuminate\Filesystem\Filesystem
+     */
+    protected $files;
 
-	/**
-	 * The Illuminate Filesystem instance.
-	 *
-	 * @var \Illuminate\Filesystem\Filesystem
-	 */
-	protected $files;
+    /**
+     * The file cache directory.
+     *
+     * @var string
+     */
+    protected $directory;
 
-	/**
-	 * The file cache directory
-	 *
-	 * @var string
-	 */
-	protected $directory;
+    /**
+     * Create a new file cache store instance.
+     *
+     * @param  \Illuminate\Filesystem\Filesystem  $files
+     * @param  string  $directory
+     * @return void
+     */
+    public function __construct(Filesystem $files, $directory)
+    {
+        $this->files = $files;
+        $this->directory = $directory;
+    }
 
-	/**
-	 * Create a new file cache store instance.
-	 *
-	 * @param  \Illuminate\Filesystem\Filesystem  $files
-	 * @param  string  $directory
-	 * @return void
-	 */
-	public function __construct(Filesystem $files, $directory)
-	{
-		$this->files = $files;
-		$this->directory = $directory;
-	}
+    /**
+     * Retrieve an item from the cache by key.
+     *
+     * @param  string  $key
+     * @return mixed
+     */
+    public function get($key)
+    {
+        return Arr::get($this->getPayload($key), 'data');
+    }
 
-	/**
-	 * Retrieve an item from the cache by key.
-	 *
-	 * @param  string  $key
-	 * @return mixed
-	 */
-	public function get($key)
-	{
-		return array_get($this->getPayload($key), 'data');
-	}
+    /**
+     * Retrieve an item and expiry time from the cache by key.
+     *
+     * @param  string  $key
+     * @return array
+     */
+    protected function getPayload($key)
+    {
+        $path = $this->path($key);
 
-	/**
-	 * Retrieve an item and expiry time from the cache by key.
-	 *
-	 * @param  string  $key
-	 * @return array
-	 */
-	protected function getPayload($key)
-	{
-		$path = $this->path($key);
+        // If the file doesn't exists, we obviously can't return the cache so we will
+        // just return null. Otherwise, we'll get the contents of the file and get
+        // the expiration UNIX timestamps from the start of the file's contents.
+        try {
+            $expire = substr($contents = $this->files->get($path), 0, 10);
+        } catch (Exception $e) {
+            return ['data' => null, 'time' => null];
+        }
 
-		// If the file doesn't exists, we obviously can't return the cache so we will
-		// just return null. Otherwise, we'll get the contents of the file and get
-		// the expiration UNIX timestamps from the start of the file's contents.
-		if ( ! $this->files->exists($path))
-		{
-			return array('data' => null, 'time' => null);
-		}
+        // If the current time is greater than expiration timestamps we will delete
+        // the file and return null. This helps clean up the old files and keeps
+        // this directory much cleaner for us as old files aren't hanging out.
+        if (time() >= $expire) {
+            $this->forget($key);
 
-		try
-		{
-			$expire = substr($contents = $this->files->get($path), 0, 10);
-		}
-		catch (\Exception $e)
-		{
-			return array('data' => null, 'time' => null);
-		}
+            return ['data' => null, 'time' => null];
+        }
 
-		// If the current time is greater than expiration timestamps we will delete
-		// the file and return null. This helps clean up the old files and keeps
-		// this directory much cleaner for us as old files aren't hanging out.
-		if (time() >= $expire)
-		{
-			$this->forget($key);
+        $data = unserialize(substr($contents, 10));
 
-			return array('data' => null, 'time' => null);
-		}
+        // Next, we'll extract the number of minutes that are remaining for a cache
+        // so that we can properly retain the time for things like the increment
+        // operation that may be performed on the cache. We'll round this out.
+        $time = ceil(($expire - time()) / 60);
 
-		$data = unserialize(substr($contents, 10));
+        return compact('data', 'time');
+    }
 
-		// Next, we'll extract the number of minutes that are remaining for a cache
-		// so that we can properly retain the time for things like the increment
-		// operation that may be performed on the cache. We'll round this out.
-		$time = ceil(($expire - time()) / 60);
+    /**
+     * Store an item in the cache for a given number of minutes.
+     *
+     * @param  string  $key
+     * @param  mixed   $value
+     * @param  int     $minutes
+     * @return void
+     */
+    public function put($key, $value, $minutes)
+    {
+        $value = $this->expiration($minutes).serialize($value);
 
-		return compact('data', 'time');
-	}
+        $this->createCacheDirectory($path = $this->path($key));
 
-	/**
-	 * Store an item in the cache for a given number of minutes.
-	 *
-	 * @param  string  $key
-	 * @param  mixed   $value
-	 * @param  int     $minutes
-	 * @return void
-	 */
-	public function put($key, $value, $minutes)
-	{
-		$value = $this->expiration($minutes).serialize($value);
+        $this->files->put($path, $value);
+    }
 
-		$this->createCacheDirectory($path = $this->path($key));
+    /**
+     * Create the file cache directory if necessary.
+     *
+     * @param  string  $path
+     * @return void
+     */
+    protected function createCacheDirectory($path)
+    {
+        try {
+            $this->files->makeDirectory(dirname($path), 0777, true, true);
+        } catch (Exception $e) {
+            //
+        }
+    }
 
-		$this->files->put($path, $value);
-	}
+    /**
+     * Increment the value of an item in the cache.
+     *
+     * @param  string  $key
+     * @param  mixed   $value
+     * @return int
+     */
+    public function increment($key, $value = 1)
+    {
+        $raw = $this->getPayload($key);
 
-	/**
-	 * Create the file cache directory if necessary.
-	 *
-	 * @param  string  $path
-	 * @return void
-	 */
-	protected function createCacheDirectory($path)
-	{
-		try
-		{
-			$this->files->makeDirectory(dirname($path), 0777, true, true);
-		}
-		catch (\Exception $e)
-		{
-			//
-		}
-	}
+        $int = ((int) $raw['data']) + $value;
 
-	/**
-	 * Increment the value of an item in the cache.
-	 *
-	 * @param  string  $key
-	 * @param  mixed   $value
-	 * @return int
-	 */
-	public function increment($key, $value = 1)
-	{
-		$raw = $this->getPayload($key);
+        $this->put($key, $int, (int) $raw['time']);
 
-		$int = ((int) $raw['data']) + $value;
+        return $int;
+    }
 
-		$this->put($key, $int, (int) $raw['time']);
+    /**
+     * Decrement the value of an item in the cache.
+     *
+     * @param  string  $key
+     * @param  mixed   $value
+     * @return int
+     */
+    public function decrement($key, $value = 1)
+    {
+        return $this->increment($key, $value * -1);
+    }
 
-		return $int;
-	}
+    /**
+     * Store an item in the cache indefinitely.
+     *
+     * @param  string  $key
+     * @param  mixed   $value
+     * @return void
+     */
+    public function forever($key, $value)
+    {
+        $this->put($key, $value, 0);
+    }
 
-	/**
-	 * Decrement the value of an item in the cache.
-	 *
-	 * @param  string  $key
-	 * @param  mixed   $value
-	 * @return int
-	 */
-	public function decrement($key, $value = 1)
-	{
-		return $this->increment($key, $value * -1);
-	}
+    /**
+     * Remove an item from the cache.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    public function forget($key)
+    {
+        $file = $this->path($key);
 
-	/**
-	 * Store an item in the cache indefinitely.
-	 *
-	 * @param  string  $key
-	 * @param  mixed   $value
-	 * @return void
-	 */
-	public function forever($key, $value)
-	{
-		return $this->put($key, $value, 0);
-	}
+        if ($this->files->exists($file)) {
+            return $this->files->delete($file);
+        }
 
-	/**
-	 * Remove an item from the cache.
-	 *
-	 * @param  string  $key
-	 * @return void
-	 */
-	public function forget($key)
-	{
-		$file = $this->path($key);
+        return false;
+    }
 
-		if ($this->files->exists($file))
-		{
-			$this->files->delete($file);
-		}
-	}
+    /**
+     * Remove all items from the cache.
+     *
+     * @return void
+     */
+    public function flush()
+    {
+        if ($this->files->isDirectory($this->directory)) {
+            foreach ($this->files->directories($this->directory) as $directory) {
+                $this->files->deleteDirectory($directory);
+            }
+        }
+    }
 
-	/**
-	 * Remove all items from the cache.
-	 *
-	 * @return void
-	 */
-	public function flush()
-	{
-		if ($this->files->isDirectory($this->directory))
-		{
-			foreach ($this->files->directories($this->directory) as $directory)
-			{
-				$this->files->deleteDirectory($directory);
-			}
-		}
-	}
+    /**
+     * Get the full path for the given cache key.
+     *
+     * @param  string  $key
+     * @return string
+     */
+    protected function path($key)
+    {
+        $parts = array_slice(str_split($hash = md5($key), 2), 0, 2);
 
-	/**
-	 * Get the full path for the given cache key.
-	 *
-	 * @param  string  $key
-	 * @return string
-	 */
-	protected function path($key)
-	{
-		$parts = array_slice(str_split($hash = md5($key), 2), 0, 2);
+        return $this->directory.'/'.implode('/', $parts).'/'.$hash;
+    }
 
-		return $this->directory.'/'.join('/', $parts).'/'.$hash;
-	}
+    /**
+     * Get the expiration time based on the given minutes.
+     *
+     * @param  int  $minutes
+     * @return int
+     */
+    protected function expiration($minutes)
+    {
+        if ($minutes === 0) {
+            return 9999999999;
+        }
 
-	/**
-	 * Get the expiration time based on the given minutes.
-	 *
-	 * @param  int  $minutes
-	 * @return int
-	 */
-	protected function expiration($minutes)
-	{
-		if ($minutes === 0) return 9999999999;
+        return time() + ($minutes * 60);
+    }
 
-		return time() + ($minutes * 60);
-	}
+    /**
+     * Get the Filesystem instance.
+     *
+     * @return \Illuminate\Filesystem\Filesystem
+     */
+    public function getFilesystem()
+    {
+        return $this->files;
+    }
 
-	/**
-	 * Get the Filesystem instance.
-	 *
-	 * @return \Illuminate\Filesystem\Filesystem
-	 */
-	public function getFilesystem()
-	{
-		return $this->files;
-	}
+    /**
+     * Get the working directory of the cache.
+     *
+     * @return string
+     */
+    public function getDirectory()
+    {
+        return $this->directory;
+    }
 
-	/**
-	 * Get the working directory of the cache.
-	 *
-	 * @return string
-	 */
-	public function getDirectory()
-	{
-		return $this->directory;
-	}
-
-	/**
-	 * Get the cache key prefix.
-	 *
-	 * @return string
-	 */
-	public function getPrefix()
-	{
-		return '';
-	}
-
+    /**
+     * Get the cache key prefix.
+     *
+     * @return string
+     */
+    public function getPrefix()
+    {
+        return '';
+    }
 }

@@ -714,7 +714,7 @@ class Swift_Transport_LoadBalancedTransportTest extends \SwiftMailerTestCase
     }
 
     /**
-     * Adapted from Yay_Matchers_ReferenceMatcher
+     * Adapted from Yay_Matchers_ReferenceMatcher.
      */
     public function varsAreReferences(&$ref1, &$ref2)
     {
@@ -747,10 +747,5 @@ class Swift_Transport_LoadBalancedTransportTest extends \SwiftMailerTestCase
     private function _createPlugin()
     {
         return $this->getMockery('Swift_Events_EventListener');
-    }
-
-    private function _createInnerTransport()
-    {
-        return $this->getMockery('Swift_Transport');
     }
 }
