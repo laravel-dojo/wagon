@@ -17,7 +17,7 @@
 在 wagon 裡已經幫您整合好以下軟體，皆為免安裝版本：
 
 * [cmder](http://bliker.github.io/cmder/) 1.1.4.1
-* [UwAmp](http://www.uwamp.com/en/) 3.0.2 (Apache, MySQL, [php 5.6.4-Win32-VC11-x86](http://windows.php.net/download/))
+* [UwAmp](http://www.uwamp.com/en/) 3.0.2 (Apache, MySQL, [php 5.6.12-Win32-VC11-x86](http://windows.php.net/download/))
 * [msysgit](https://msysgit.github.io/) 1.9.5
 * [7-zip](http://www.7-zip.org/download.html) 9.20
 * [composer](https://getcomposer.org/doc/00-intro.md#manual-installation) 1.0-dev
