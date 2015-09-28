@@ -1,6 +1,6 @@
  gdi+
 
- Timestamp is 53bc6333 (Wed Jul 09 01:31:31 2014)
+ Timestamp is 5553e040 (Thu May 14 02:37:36 2015)
 
  Preferred load address is 0000000180000000
 
@@ -9,23 +9,21 @@
  0001:00000160 000008a0H .rdata                  CODE
  0001:00000a00 00000062H .rdata$debug            CODE
  0001:00000a70 00002308H .text                   CODE
- 0001:00002d80 0000005eH .text$00                CODE
- 0001:00002de0 00000244H .xdata                  CODE
- 0001:00003024 00000050H .idata$2                CODE
- 0001:00003074 00000014H .idata$3                CODE
- 0001:00003088 00000158H .idata$4                CODE
- 0001:000031e0 00000294H .idata$6                CODE
- 0001:00003480 00000092H .edata                  CODE
- 0002:00000000 00000000H .data                   DATA
+ 0001:00002d78 0000023cH .xdata                  CODE
+ 0001:00002fb4 00000050H .idata$2                CODE
+ 0001:00003004 00000014H .idata$3                CODE
+ 0001:00003018 00000158H .idata$4                CODE
+ 0001:00003170 00000294H .idata$6                CODE
+ 0001:00003410 00000092H .edata                  CODE
  0002:00000000 00000088H .bss                    DATA
- 0003:00000000 000001e0H .pdata                  DATA
+ 0003:00000000 000001d4H .pdata                  DATA
  0004:00000000 00000058H .rsrc$01                DATA
- 0004:00000060 00000270H .rsrc$02                DATA
+ 0004:00000060 000002b8H .rsrc$02                DATA
 
   Address         Publics by Value              Rva+Base               Lib:Object
 
- 0000:00000000       ___safe_se_handler_table   0000000000000000     <absolute>
  0000:00000000       ___safe_se_handler_count   0000000000000000     <absolute>
+ 0000:00000000       ___safe_se_handler_table   0000000000000000     <absolute>
  0000:00000000       __ImageBase                0000000180000000     <linker-defined>
  0001:00000000       __imp_SelectObject         0000000180001000     gdi32:GDI32.dll
  0001:00000008       __imp_DeleteDC             0000000180001008     gdi32:GDI32.dll
@@ -288,13 +286,11 @@
  0001:00002d66       CreateCompatibleDC         0000000180003d66 f   gdi32:GDI32.dll
  0001:00002d6c       CoInitialize               0000000180003d6c f   ole32:ole32.dll
  0001:00002d72       CoUninitialize             0000000180003d72 f   ole32:ole32.dll
- 0001:00002d90       _alloca_probe              0000000180003d90     chkstk.obj
- 0001:00002d90       __chkstk                   0000000180003d90 f   chkstk.obj
- 0001:00003024       __IMPORT_DESCRIPTOR_KERNEL32 0000000180004024     kernel32:KERNEL32.dll
- 0001:00003038       __IMPORT_DESCRIPTOR_USER32 0000000180004038     user32:USER32.dll
- 0001:0000304c       __IMPORT_DESCRIPTOR_GDI32  000000018000404c     gdi32:GDI32.dll
- 0001:00003060       __IMPORT_DESCRIPTOR_ole32  0000000180004060     ole32:ole32.dll
- 0001:00003074       __NULL_IMPORT_DESCRIPTOR   0000000180004074     kernel32:KERNEL32.dll
+ 0001:00002fb4       __IMPORT_DESCRIPTOR_KERNEL32 0000000180003fb4     kernel32:KERNEL32.dll
+ 0001:00002fc8       __IMPORT_DESCRIPTOR_USER32 0000000180003fc8     user32:USER32.dll
+ 0001:00002fdc       __IMPORT_DESCRIPTOR_GDI32  0000000180003fdc     gdi32:GDI32.dll
+ 0001:00002ff0       __IMPORT_DESCRIPTOR_ole32  0000000180003ff0     ole32:ole32.dll
+ 0001:00003004       __NULL_IMPORT_DESCRIPTOR   0000000180004004     kernel32:KERNEL32.dll
  0002:00000000       ?ghModule@@3PEAUHINSTANCE__@@EA 0000000180005000     gdip.obj
  0002:00000070       ?gnLastWin32Error@@3KA     0000000180005070     gdip.obj
  0002:00000078       ?AssertMsgBox@@3P6AHPEB_WI0PEAUHWND__@@_N@ZEA 0000000180005078     MAssert.obj

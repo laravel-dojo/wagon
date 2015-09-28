@@ -437,7 +437,7 @@ local is_parser
 local is_sub_parser
 local new_sub_parser
 local parser_go_impl
---local merge_parsers
+local merge_parsers
 
 local parser_meta_table     = {}
 local sub_parser_meta_table = {}
@@ -489,7 +489,7 @@ local function parser_add_arguments(parser, ...)
     for _, i in ipairs({...}) do
         -- Check all arguments are tables.
         if type(i) ~= "table" then
-            error("All arguments to set_arguments() must be tables.", 2)
+            error("All arguments to add_arguments() must be tables.", 2)
         end
 
         -- Only parsers are allowed to be specified without being wrapped in a
@@ -554,16 +554,12 @@ local function parser_set_flags(parser, ...)
 end
 
 --------------------------------------------------------------------------------
-local function parser_flatten_argument(parser, index, part)
+local function parser_flatten_argument(parser, index, func_thunk)
     -- Sanity check the 'index' param to make sure it's valid.
     if type(index) == "number" then
         if index <= 0 or index > #parser.arguments then
             return parser.use_file_matching
         end
-    end
-
-    if part == nil then
-        part = ""
     end
 
     -- index == nil is a special case that returns the parser's flags
@@ -582,8 +578,13 @@ local function parser_flatten_argument(parser, index, part)
         else
             local t = type(i)
             if t == "function" then
-                local results = i(part)
-                if type(results) == "table" then
+                local results = func_thunk(i)
+                local t = type(results)
+                if not results then
+                    return parser.use_file_matching
+                elseif t == "boolean" then
+                    return (results and parser.use_file_matching)
+                elseif t == "table" then
                     for _, j in ipairs(results) do
                         table.insert(opts, j)
                     end
@@ -646,7 +647,7 @@ local function parser_go_args(parser, state)
                 end
             end
 
-            -- Check so see if the part has an exact match in the agrument. Note
+            -- Check so see if the part has an exact match in the argument. Note
             -- that only string-type options are considered.
             if type(arg_opt) == "string" then
                 exact = exact or arg_opt == part
@@ -679,7 +680,13 @@ local function parser_go_args(parser, state)
         end
     end
 
-    return parser:flatten_argument(arg_index, part)
+    -- Now we've an index into the parser's arguments that matches the line
+    -- state. Flatten it.
+    local func_thunk = function(func)
+        return func(part)
+    end
+
+    return parser:flatten_argument(arg_index, func_thunk)
 end
 
 --------------------------------------------------------------------------------
@@ -849,12 +856,30 @@ end
 
 --------------------------------------------------------------------------------
 local function parser_loop(parser, loop_point)
-    if loop_point == nil or type(loop_point) ~= "number" then
+    if loop_point == nil or type(loop_point) ~= "number" or loop_point < 1 then
         loop_point = 1
     end
 
     parser.loop_point = loop_point
     return parser
+end
+
+--------------------------------------------------------------------------------
+local function parser_initialise(parser, ...)
+    for _, word in ipairs({...}) do
+        local t = type(word)
+        if t == "string" then
+            parser:add_flags(word)
+        elseif t == "table" then
+            if is_sub_parser(word) and parser_is_flag(nil, word.key) then
+                parser:add_flags(word)
+            else
+                parser:add_arguments(word)
+            end
+        else
+            error("Additional arguments to new_parser() must be tables or strings", 2)
+        end
+    end
 end
 
 --------------------------------------------------------------------------------
@@ -883,20 +908,12 @@ function clink.arg.new_parser(...)
 
     setmetatable(parser, parser_meta_table)
 
-    -- If any arguments are provided, treat them as parser's arguments or flags
-    if ... and #... > 0 then
-
-        local arguments = {}
-        local flags = {}
-        
-        for _, word in ipairs({...}) do
-            if type(word) == "string" then table.insert(flags, word)
-            elseif type(word) == "table" then table.insert(arguments, word) end
+    -- If any arguments are provided treat them as parser's arguments or flags
+    if ... then
+        success, msg = pcall(parser_initialise, parser, ...)
+        if not success then
+            error(msg, 2)
         end
-
-        for _, a in ipairs(arguments) do parser:add_arguments(a) end
-        parser:set_flags(flags)
-
     end
 
     return parser
@@ -906,6 +923,11 @@ end
 function merge_parsers(lhs, rhs)
     -- Merging parsers is not a trivial matter and this implementation is far
     -- from correct. It is however sufficient for the majority of cases.
+
+    -- Merge flags.
+    for _, rflag in ipairs(rhs.flags) do
+        table.insert(lhs.flags, rflag)
+    end
 
     -- Remove (and save value of) the first argument in RHS.
     local rhs_arg_1 = table.remove(rhs.arguments, 1)
@@ -945,11 +967,6 @@ function merge_parsers(lhs, rhs)
 
             table.insert(lhs_arg_1, to_add)
         end
-    end
-
-    -- Merge flags.
-    for _, rflag in ipairs(rhs.flags) do
-        table.insert(lhs.flags, rflag)
     end
 end
 
@@ -1097,14 +1114,19 @@ function dir_match_generator_impl(text)
         prefix = text:sub(1, i)
     end
 
+    local include_dots = text:find("%.+$") ~= nil
+
     local matches = {}
     local mask = text.."*"
 
     -- Find matches.
     for _, dir in ipairs(clink.find_dirs(mask, true)) do
         local file = prefix..dir
-        if clink.is_match(text, file) then
-            table.insert(matches, prefix..dir)
+
+        if include_dots or (dir ~= "." and dir ~= "..") then
+            if clink.is_match(text, file) then
+                table.insert(matches, prefix..dir)
+            end
         end
     end
 
@@ -1762,13 +1784,18 @@ set_parser:disable_file_matching()
 set_parser:set_flags("--help")
 set_parser:set_arguments(
     {
+        "ansi_code_support",
         "ctrld_exits",
         "esc_clears_line",
         "exec_match_style",
+        "history_dupe_mode",
+        "history_file_lines",
+        "history_ignore_space",
+        "history_io",
         "match_colour",
-        "persist_history",
         "prompt_colour",
         "space_prefix_match_files",
+        "strip_crlf_on_paste",
         "terminate_autoanswer",
         "use_altgr_substitute",
     }

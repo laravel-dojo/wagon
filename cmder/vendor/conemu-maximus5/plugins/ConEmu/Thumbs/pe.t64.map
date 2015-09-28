@@ -1,6 +1,6 @@
  pe
 
- Timestamp is 53bc6336 (Wed Jul 09 01:31:34 2014)
+ Timestamp is 5553e042 (Thu May 14 02:37:38 2015)
 
  Preferred load address is 0000000180000000
 
@@ -9,18 +9,16 @@
  0001:000000a0 000001d8H .rdata                  CODE
  0001:00000278 0000005eH .rdata$debug            CODE
  0001:000002e0 00002214H .text                   CODE
- 0001:00002500 0000005eH .text$00                CODE
- 0001:00002560 000002acH .xdata                  CODE
- 0001:0000280c 00000028H .idata$2                CODE
- 0001:00002834 00000014H .idata$3                CODE
- 0001:00002848 000000a0H .idata$4                CODE
- 0001:000028e8 0000010cH .idata$6                CODE
- 0001:00002a00 00000090H .edata                  CODE
- 0002:00000000 00000000H .data                   DATA
+ 0001:000024f4 000002a4H .xdata                  CODE
+ 0001:00002798 00000028H .idata$2                CODE
+ 0001:000027c0 00000014H .idata$3                CODE
+ 0001:000027d8 000000a0H .idata$4                CODE
+ 0001:00002878 0000010cH .idata$6                CODE
+ 0001:00002990 00000090H .edata                  CODE
  0002:00000000 00000018H .bss                    DATA
- 0003:00000000 00000204H .pdata                  DATA
+ 0003:00000000 000001f8H .pdata                  DATA
  0004:00000000 00000058H .rsrc$01                DATA
- 0004:00000060 00000270H .rsrc$02                DATA
+ 0004:00000060 000002b8H .rsrc$02                DATA
 
   Address         Publics by Value              Rva+Base               Lib:Object
 
@@ -155,11 +153,9 @@
  0001:000024e2       HeapValidate               00000001800034e2 f   kernel32:KERNEL32.dll
  0001:000024e8       lstrlenA                   00000001800034e8 f   kernel32:KERNEL32.dll
  0001:000024ee       wsprintfW                  00000001800034ee f   user32:USER32.dll
- 0001:00002510       _alloca_probe              0000000180003510     chkstk.obj
- 0001:00002510       __chkstk                   0000000180003510 f   chkstk.obj
- 0001:0000280c       __IMPORT_DESCRIPTOR_KERNEL32 000000018000380c     kernel32:KERNEL32.dll
- 0001:00002820       __IMPORT_DESCRIPTOR_USER32 0000000180003820     user32:USER32.dll
- 0001:00002834       __NULL_IMPORT_DESCRIPTOR   0000000180003834     kernel32:KERNEL32.dll
+ 0001:00002798       __IMPORT_DESCRIPTOR_KERNEL32 0000000180003798     kernel32:KERNEL32.dll
+ 0001:000027ac       __IMPORT_DESCRIPTOR_USER32 00000001800037ac     user32:USER32.dll
+ 0001:000027c0       __NULL_IMPORT_DESCRIPTOR   00000001800037c0     kernel32:KERNEL32.dll
  0002:00000000       ?ghModule@@3PEAUHINSTANCE__@@EA 0000000180004000     pe.obj
  0002:00000008       ?AssertMsgBox@@3P6AHPEB_WI0PEAUHWND__@@_N@ZEA 0000000180004008     MAssert.obj
  0002:00000010       ?ghHeap@@3PEAXEA           0000000180004010     Memory.obj

@@ -16,10 +16,11 @@
 
 在 wagon 裡已經幫您整合好以下軟體，皆為免安裝版本：
 
-* [cmder](http://bliker.github.io/cmder/) 1.1.4.1
+* [cmder](http://bliker.github.io/cmder/) 1.2
 * [UwAmp](http://www.uwamp.com/en/) 3.0.2 (Apache, MySQL, [php 5.6.12-Win32-VC11-x86](http://windows.php.net/download/))
 * [msysgit](https://msysgit.github.io/) 1.9.5
 * [7-zip](http://www.7-zip.org/download.html) 9.20
+* [SQLite](https://www.sqlite.org/download.html) 3.8.11.1
 * [composer](https://getcomposer.org/doc/00-intro.md#manual-installation) 1.0-dev
 * [laravel/installer](https://packagist.org/packages/laravel/installer) ^1.2
 * [laravel/envoy](https://packagist.org/packages/laravel/envoy) ^1.0

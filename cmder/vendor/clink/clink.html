@@ -10,7 +10,7 @@
 </head>
 <body>
 
-<h2>Clink v0.4.2</h2>
+<h2>Clink v0.4.4</h2>
 <div><a href="http://github.com/mridgers/clink">http://github.com/mridgers/clink</a></div>
 <div><a href="http://twitter.com/choddlander">Martin Ridgers</a></div>
 
@@ -62,8 +62,8 @@
 <p>Configuring Clink by and large involves configuring Readline by creating a <strong>clink_inputrc</strong> file. There is excellent documentation for all the options available to configure Readline in Readline's <a href="http://tinyurl.com/oum26rp">manual</a>.</p>
 <p>Where Clink looks for <strong>clink_inputrc</strong> (as well as .lua scripts and the settings file) depends on which distribution of Clink was used. If you installed Clink using the .exe installer then Clink uses the current user's non-roaming application data directory. This user directory is usually found in one of the following locations;</p>
 <ul>
-<li>c:and Settings&amp;lt;username&gt;SettingsData <em>(XP)</em></li>
-<li>c:&amp;lt;username&gt;(Vista onwards)*</li>
+<li>c:and Settings\&lt;username&gt;SettingsData <em>(XP)</em></li>
+<li>c:\&lt;username&gt;(Vista onwards)*</li>
 </ul>
 <p>The .zip distribution of Clink creates and uses a directory called <strong>profile</strong> which is located in the same directory where Clink's core files are found.</p>
 <p>All of the above locations can be overriden using the <strong>--profile &lt;path&gt;</strong> command line option which is specified when injecting Clink into cmd.exe using <strong>clink inject</strong>.</p>
@@ -71,7 +71,68 @@
 <p>It is also possible to configure settings specific to Clink. These are stored in a file called <strong>settings</strong> which is found in one of the locations mentioned in the previous section. The settings file gets created the first time Clink is run.</p>
 <p>Settings loaded from the file can be overriden by setting environment variables matching the setting name and prefixed with &quot;clink.&quot;. For example, the command <strong>set clink.prompt_colour=10</strong> will turn the prompt green regardless of what is in the settings file. Overrides are not saved to disk.</p>
 <p>The following table describes the available settings;</p>
-<p>Name | Description ---- | ----------- <strong>ctrld_exits</strong> | Ctrl-D exits the process when it is pressed on an empty line. <strong>esc_clears_line</strong> | Clink clears the current line when Esc is pressed (unless Readline's Vi mode is enabled). <strong>exec_match_style</strong> | Changes how Clink will match executables when there is no path separator on the line. 0 = PATH only, 1 = PATH and CWD, 2 = PATH, CWD, and directories. In all cases both executables and directories are matched when there is a path separator present. <strong>match_colour</strong> | Colour to use when displaying matches. A value less than 0 will be the opposite brightness of the default colour. <strong>persist_history</strong> | Enable or disable the saving and loading of command history between sessions. <strong>prompt_colour</strong> | Surrounds the prompt in ANSI escape codes to set the prompt's colour (0..15). Disabled when the value is less than 0. <strong>space_prefix_match_files</strong> | If the line begins with whitespace then Clink bypasses executable matching and will match all files and directories instead. <strong>terminate_autoanswer</strong> | Automatically answers cmd.exe's <strong>Terminate batch job (Y/N)?</strong> prompts. 0 = disabled, 1 = answer Y, 2 = answer N. <strong>use_altgr_substitute</strong> | Windows provides Ctrl-Alt as a substitute for AltGr, historically to support keyboards with no AltGr key. This may collide with some of Readline's bindings.</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Name</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left"><strong>ansi_code_support</strong></td>
+<td align="left">When printing the prompt, Clink has basic built-in support for SGR ANSI escape codes to control the text colours. This is automatically disabled if a third party tool is detected that also provides this facility. It can also be disabled by setting this to 0.</td>
+</tr>
+<tr class="even">
+<td align="left"><strong>ctrld_exits</strong></td>
+<td align="left">Ctrl-D exits the process when it is pressed on an empty line.</td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>esc_clears_line</strong></td>
+<td align="left">Clink clears the current line when Esc is pressed (unless Readline's Vi mode is enabled).</td>
+</tr>
+<tr class="even">
+<td align="left"><strong>exec_match_style</strong></td>
+<td align="left">Changes how Clink will match executables when there is no path separator on the line. 0 = PATH only, 1 = PATH and CWD, 2 = PATH, CWD, and directories. In all cases both executables and directories are matched when there is a path separator present.</td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>history_dupe_mode</strong></td>
+<td align="left">If a line is a duplicate of an existing history entry Clink will erase the duplicate when this is set 2. A value of 1 will not add duplicates to the history and a value of 0 will always add lines.</td>
+</tr>
+<tr class="even">
+<td align="left"><strong>history_file_lines</strong></td>
+<td align="left">When set to a positive integer this is the number of lines of history that will persist when Clink saves the command history to disk. Use 0 for infinite lines and &lt;0 to disable history persistence.</td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>history_ignore_space</strong></td>
+<td align="left">Ignore lines that begin with whitespace when adding lines in to the history.</td>
+</tr>
+<tr class="even">
+<td align="left"><strong>history_io</strong></td>
+<td align="left">Use this setting to control when the history is written to disk and when it is read back. A value of 1 will read the history before editing of a new line commences, 2 will write the history, and 3 will do both. The default (0) is to write the history when the process exits.&quot;,</td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>match_colour</strong></td>
+<td align="left">Colour to use when displaying matches. A value less than 0 will be the opposite brightness of the default colour.</td>
+</tr>
+<tr class="even">
+<td align="left"><strong>prompt_colour</strong></td>
+<td align="left">Surrounds the prompt in ANSI escape codes to set the prompt's colour (0..15). Disabled when the value is less than 0.</td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>space_prefix_match_files</strong></td>
+<td align="left">If the line begins with whitespace then Clink bypasses executable matching and will match all files and directories instead.</td>
+</tr>
+<tr class="even">
+<td align="left"><strong>terminate_autoanswer</strong></td>
+<td align="left">Automatically answers cmd.exe's <strong>Terminate batch job (Y/N)?</strong> prompts. 0 = disabled, 1 = answer Y, 2 = answer N.</td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>use_altgr_substitute</strong></td>
+<td align="left">Windows provides Ctrl-Alt as a substitute for AltGr, historically to support keyboards with no AltGr key. This may collide with some of Readline's bindings.</td>
+</tr>
+</tbody>
+</table>
 <h3 id="extending-clink">Extending Clink</h3>
 <p>The Readline library allows clients to offer an alternative path for creating completion matches. Clink uses this to hook Lua into the completion process making it possible to script the generation of matches with Lua scripts. The following sections describe this in more detail and shows some examples.</p>
 <h4 id="the-location-of-lua-scripts">The Location of Lua Scripts</h4>
@@ -412,6 +473,37 @@ clink.prompt.register_filter(git_prompt_filter, 50)</code></pre>
 
 
 <h3 id="changelog">Changelog</h3>
+<h5 id="v0.4.4">v0.4.4</h5>
+<ul>
+<li>Completing .. behaves more like Bash (closes #277).</li>
+<li>Escape from yes/no question when Ctrl+C is pressed.</li>
+<li>Valid XP executables (fixes #278, #289).</li>
+<li>Fixed n-th argument yank not working as expected (issue #254).</li>
+<li>Fixed prompt colours sometimes not working (issues #279, #286).</li>
+<li>Fixed '!0' causing Clink to crash.</li>
+<li>Save/restore cursor position in case Readline moves it.</li>
+</ul>
+<h5 id="v0.4.3">v0.4.3</h5>
+<ul>
+<li>Localised Y/N when auto-answering &quot;terminate?&quot; prompt.</li>
+<li>$* would early out if there was no arguments.</li>
+<li>Disable ANSI code support if third party provides it.</li>
+<li>Installer can now set %CLINK_DIR% to install location.</li>
+<li>Improved output from 'clink set'.</li>
+<li>Support for Windows 10 Technical Preview.</li>
+<li>Ctrl-L now scrolls last line to the top of the window rather than clearing.</li>
+<li>New option to control how newline characters are pasted to the line.</li>
+<li>New options to control history;
+<ul>
+<li>'history_file_lines' - maximum lines saved to disk.</li>
+<li>'history_ignore_space' - ignore lines prefixed with whitespace.</li>
+<li>'history_dupe_mode' - how duplicate entries are handled.</li>
+<li>'history_io' - load/save history from disk every line.</li>
+</ul></li>
+<li>Fixed nonfunctional numpad keys.</li>
+<li>Fixed missing WINCH signals if other processes resize the buffer.</li>
+<li>Support Alt codes sent from Conhost.</li>
+</ul>
 <h5 id="v0.4.2">v0.4.2</h5>
 <ul>
 <li>Prompt colouring no longer requires third party ANSI code utility.</li>
