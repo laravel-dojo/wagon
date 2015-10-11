@@ -1,6 +1,6 @@
  ico
 
- Timestamp is 53bc633a (Wed Jul 09 01:31:38 2014)
+ Timestamp is 5553e045 (Thu May 14 02:37:41 2015)
 
  Preferred load address is 0000000180000000
 
@@ -9,18 +9,16 @@
  0001:000000f0 00000700H .rdata                  CODE
  0001:000007f0 00000060H .rdata$debug            CODE
  0001:00000850 000023f4H .text                   CODE
- 0001:00002c50 0000005eH .text$00                CODE
- 0001:00002cb0 000002ecH .xdata                  CODE
- 0001:00002f9c 00000050H .idata$2                CODE
- 0001:00002fec 00000014H .idata$3                CODE
- 0001:00003000 000000f0H .idata$4                CODE
- 0001:000030f0 00000200H .idata$6                CODE
- 0001:000032f0 00000091H .edata                  CODE
- 0002:00000000 00000000H .data                   DATA
+ 0001:00002c44 000002e4H .xdata                  CODE
+ 0001:00002f28 00000050H .idata$2                CODE
+ 0001:00002f78 00000014H .idata$3                CODE
+ 0001:00002f90 000000f0H .idata$4                CODE
+ 0001:00003080 00000200H .idata$6                CODE
+ 0001:00003280 00000091H .edata                  CODE
  0002:00000000 00000088H .bss                    DATA
- 0003:00000000 00000264H .pdata                  DATA
+ 0003:00000000 00000258H .pdata                  DATA
  0004:00000000 00000058H .rsrc$01                DATA
- 0004:00000060 00000258H .rsrc$02                DATA
+ 0004:00000060 000002a0H .rsrc$02                DATA
 
   Address         Publics by Value              Rva+Base               Lib:Object
 
@@ -212,8 +210,8 @@
  0001:00001ce4       ??_GImage@Gdiplus@@UEAAPEAXI@Z 0000000180002ce4 f i ico.obj
  0001:00001ce4       ??_EImage@Gdiplus@@UEAAPEAXI@Z 0000000180002ce4 f i ico.obj
  0001:00001d24       ??0Image@Gdiplus@@IEAA@PEAVGpImage@1@W4Status@1@@Z 0000000180002d24 f i ico.obj
- 0001:00001d3c       ??_EBitmap@Gdiplus@@UEAAPEAXI@Z 0000000180002d3c f i ico.obj
  0001:00001d3c       ??_GBitmap@Gdiplus@@UEAAPEAXI@Z 0000000180002d3c f i ico.obj
+ 0001:00001d3c       ??_EBitmap@Gdiplus@@UEAAPEAXI@Z 0000000180002d3c f i ico.obj
  0001:00001d7c       ?Release@MStream@@UEAAKXZ  0000000180002d7c f i ico.obj
  0001:00001da8       ??0ISequentialStream@@QEAA@XZ 0000000180002da8 f i ico.obj
  0001:00001dac       ?Clone@Image@Gdiplus@@UEAAPEAV12@XZ 0000000180002dac f i ico.obj
@@ -268,13 +266,11 @@
  0001:00002c32       GdiplusShutdown            0000000180003c32 f   gdiplus:gdiplus.dll
  0001:00002c38       GdiplusStartup             0000000180003c38 f   gdiplus:gdiplus.dll
  0001:00002c3e       GdipCloneImage             0000000180003c3e f   gdiplus:gdiplus.dll
- 0001:00002c60       __chkstk                   0000000180003c60 f   chkstk.obj
- 0001:00002c60       _alloca_probe              0000000180003c60     chkstk.obj
- 0001:00002f9c       __IMPORT_DESCRIPTOR_KERNEL32 0000000180003f9c     kernel32:KERNEL32.dll
- 0001:00002fb0       __IMPORT_DESCRIPTOR_USER32 0000000180003fb0     user32:USER32.dll
- 0001:00002fc4       __IMPORT_DESCRIPTOR_ole32  0000000180003fc4     ole32:ole32.dll
- 0001:00002fd8       __IMPORT_DESCRIPTOR_gdiplus 0000000180003fd8     gdiplus:gdiplus.dll
- 0001:00002fec       __NULL_IMPORT_DESCRIPTOR   0000000180003fec     kernel32:KERNEL32.dll
+ 0001:00002f28       __IMPORT_DESCRIPTOR_KERNEL32 0000000180003f28     kernel32:KERNEL32.dll
+ 0001:00002f3c       __IMPORT_DESCRIPTOR_USER32 0000000180003f3c     user32:USER32.dll
+ 0001:00002f50       __IMPORT_DESCRIPTOR_ole32  0000000180003f50     ole32:ole32.dll
+ 0001:00002f64       __IMPORT_DESCRIPTOR_gdiplus 0000000180003f64     gdiplus:gdiplus.dll
+ 0001:00002f78       __NULL_IMPORT_DESCRIPTOR   0000000180003f78     kernel32:KERNEL32.dll
  0002:00000068       ?gnLastWin32Error@@3KA     0000000180005068     ico.obj
  0002:00000070       ?ghModule@@3PEAUHINSTANCE__@@EA 0000000180005070     ico.obj
  0002:00000078       ?AssertMsgBox@@3P6AHPEB_WI0PEAUHWND__@@_N@ZEA 0000000180005078     MAssert.obj

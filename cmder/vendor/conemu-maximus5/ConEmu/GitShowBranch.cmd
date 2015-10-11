@@ -11,15 +11,30 @@ if NOT exist %ConEmuGitPath% (
 )
 
 if /I "%~1" == "/i" (
+  if exist "%~dp0ConEmuC.exe" (
+    call "%~dp0ConEmuC.exe" /IsConEmu
+    if errorlevel 2 goto no_conemu
+  ) else if exist "%~dp0ConEmuC64.exe" (
+    call "%~dp0ConEmuC64.exe" /IsConEmu
+    if errorlevel 2 goto no_conemu
+  )
   call %ConEmuGitPath% --version
   if errorlevel 1 (
     call cecho "GIT not found, change your ConEmuGitPath environment variable"
     goto :EOF
   )
-  prompt $P$E]9;7;"cmd /c%~nx0"$e\$E]9;8;"gitbranch"$e\$g
+  if defined ConEmuPrompt1 (
+    PROMPT %ConEmuPrompt1%$E]9;7;"cmd -cur_console:R /c%~nx0"$e\$E]9;8;"gitbranch"$e\%ConEmuPrompt2%%ConEmuPrompt3%
+  ) else (
+    PROMPT $P$E]9;7;"cmd -cur_console:R /c%~nx0"$e\$E]9;8;"gitbranch"$e\$g
+  )
   goto :EOF
 ) else if /I "%~1" == "/u" (
-  prompt $P$G
+  if defined ConEmuPrompt1 (
+    PROMPT %ConEmuPrompt1%%ConEmuPrompt2%%ConEmuPrompt3%
+  ) else (
+    PROMPT $P$G
+  )
   goto :EOF
 )
 
@@ -92,13 +107,28 @@ goto :EOF
 for /F "delims=." %%l in ("%gitbranch%") do set gitbranch=%%l
 goto :EOF
 
+:no_conemu
+rem GitShowBranch works in ConEmu only
+rem Also gitbranch can't be modified
+rem because export will not be working
+exit /b 0
+goto :EOF
+
 :run
+
+if exist "%~dp0ConEmuC.exe" (
+  call "%~dp0ConEmuC.exe" /IsConEmu
+  if errorlevel 2 goto no_conemu
+) else if exist "%~dp0ConEmuC64.exe" (
+  call "%~dp0ConEmuC64.exe" /IsConEmu
+  if errorlevel 2 goto no_conemu
+)
 
 
 rem let gitlogpath be folder to store git output
 if "%TEMP:~-1%" == "\" (set gitlogpath=%TEMP:~0,-1%) else (set gitlogpath=%TEMP%)
-set git_out=%gitlogpath%\conemu_git_1.log
-set git_err=%gitlogpath%\conemu_git_2.log
+set git_out=%gitlogpath%\conemu_git_%ConEmuServerPID%_1.log
+set git_err=%gitlogpath%\conemu_git_%ConEmuServerPID%_2.log
 
 call %ConEmuGitPath% -c color.status=false status --short --branch --porcelain 1>"%git_out%" 2>"%git_err%"
 if errorlevel 1 (
@@ -118,7 +148,7 @@ rem But we need only first line of it
 set gitbranch=%gitbranch%
 rem To ensure that %git_out% does not contain brackets
 pushd %gitlogpath%
-for /F %%l in (conemu_git_1.log) do call :calc "%%l"
+for /F %%l in (conemu_git_%ConEmuServerPID%_1.log) do call :calc "%%l"
 popd
 rem echo done ':calc', br='%gitbranch%', ad='%gitbranch_add%', ch='%gitbranch_chg%', dl='%gitbranch_del%'
 
