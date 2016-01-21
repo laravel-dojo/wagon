@@ -1,27 +1,29 @@
-README.portable (Draft)
+README.portable
 =======================
 
-This "portable" version of Git for Windows (MSysGit) does not need to
+This version of Git for Windows is portable, i.e. does not need to
 be installed. It will run from any directory you place it in, even
-onto a USB thumbdrive. It will not write permanent entries into the 
+from a USB thumbdrive. It will not write permanent entries into the
 Windows registry. It does not need administrator privileges to "install".
 
 
 Installation
 ------------
 
-This package is contained in a 7-zip archive with a file name like
-'PortableGit-<versionstring>.7z'.  It is a self-extracting archive:
-add the file extension '.exe', and you can (double-)click it; you'll be
-asked for the desired target directory (which defaults to C:\Program
-Files\Git). You may change that as needed or desired. Your user account
-needs write access to the selected directory. (You can move that
-directory with all its contents to a different place or computer at any
-time should you later desire so).
+This package is contained in a 7-zip archive with a file name of the form
+'PortableGit-<versionstring>.7z.exe'.  It is a self-extracting archive:
+you can (double-)click it and it will ask for the desired target directory
+(which defaults to C:\Program Files\Git). You may change that as needed or
+desired. Your user account needs write access to the selected directory.
+(You can move that directory with all its contents to a different place or
+computer at any time should you later desire so).
 
+*NOTE*: if you decide to unpack the archive using 7-Zip manually, you must
+run the `post-install.bat` script. Git will not run correctly
+otherwise.
 
-Functional differences to "normal" MSysGit installation package
----------------------------------------------------------------
+Functional differences to the non-portable Git for Windows
+----------------------------------------------------------
 
 This version does not offer you the convenient right-click context menu
 entries "Git GUI Here" and "Git Bash Here", because these would require
@@ -40,9 +42,9 @@ to your %path%.
 How to start using PortableGit
 ------------------------------
 
-If you are comfortable with a Unix-like shell, just launch 'git-bash.bat'.
+If you are comfortable with a Unix-like shell, just launch 'git-bash.exe'.
 
-If not, just launch 'git-cmd.bat'.
+If not, just launch 'git-cmd.exe'.
 
 Alternatively, you can execute these commands to modify the %path%
 variable temporarily:
@@ -54,6 +56,21 @@ Adjust the 'gitdir' according to your setup.  As long as you do not
 close the command window, you can now simply type "git" or "gitk" to
 really call "c:\portablegit\cmd\git.cmd" or "c:\portablegit\cmd\gitk.cmd".
 
+By default, git-cmd and git-bash use the directory they were started from as
+the working directory when run. You can override this by passing --cd-to-home
+to them, which will set the user's home directory as the working directory (as
+if Git for Windows was installed).
+
+In addition, if you set the HOME environment variable (either permanently or
+for the current session only) you can make Git store the configuration files
+and the cloned repositories in the directory specified in that variable. And if
+you specify --cd-to-home, git-bash and git-cmd will use that as the
+working directory, too. For example:
+
+        set HOME=%cd%/home
+        git --cd-to-home
+will use the relative directory named home (%cd% specifies the current
+directory).
 
 Quick start
 -----------

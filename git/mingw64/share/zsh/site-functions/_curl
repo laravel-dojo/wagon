@@ -1,0 +1,190 @@
+#compdef curl
+
+# curl zsh completion
+
+local curcontext="$curcontext" state state_descr line
+typeset -A opt_args
+
+local rc=1
+
+_arguments -C -S \
+  {-y,--speed-time}'[Trigger '\''speed-limit'\'' abort after SECONDS (default: 30)]':SECONDS \
+  --proxy-negotiate'[Use HTTP Negotiate (SPNEGO) authentication on the proxy (H)]' \
+  {-Y,--speed-limit}'[Stop transfers below RATE for '\''speed-time'\'' secs]':RATE \
+  --location-trusted'[Like '\''--location'\'', and send auth to other hosts (H)]' \
+  {-S,--show-error}'[Show error. With -s, make curl show errors when they occur]' \
+  {-c,--cookie-jar}'[Write cookies to FILE after operation (H)]':FILE:_files \
+  --ftp-alternative-to-user'[String to replace "USER \[name\]" (F)]':COMMAND \
+  --ftp-ssl-control'[Require SSL/TLS for FTP login, clear for transfer (F)]' \
+  --libcurl'[Dump libcurl equivalent code of this command line]':FILE:_files \
+  --crlfile'[Get a CRL list in PEM format from the given file]':FILE:_files \
+  {-p,--proxytunnel}'[Operate through a HTTP proxy tunnel (using CONNECT)]' \
+  --hostpubmd5'[Hex-encoded MD5 string of the host public key. (SSH)]':MD5 \
+  {-j,--junk-session-cookies}'[Ignore session cookies read from file (H)]' \
+  {-:,--next}'[Allows the following URL to use a separate set of options]' \
+  {-E,--cert}'[Client certificate file and password (SSL)]':CERT[:PASSWD] \
+  {-R,--remote-time}'[Set the remote file'\''s time on the local output]' \
+  {-P,--ftp-port}'[Use PORT with given address instead of PASV (F)]':ADR \
+  {-Q,--quote}'[Send command(s) to server before transfer (F/SFTP)]':CMD \
+  --socks5-hostname'[SOCKS5 proxy, pass host name to proxy]':HOST[:PORT] \
+  --dns-ipv4-addr'[IPv4 address to use for DNS requests, dot notation]' \
+  --dns-ipv6-addr'[IPv6 address to use for DNS requests, dot notation]' \
+  --engine'[Crypto engine (use "--engine list" for list) (SSL)]':ENGINE \
+  --pinnedpubkey'[Public key to verify peer against (SSL)]':FILE/HASHES \
+  --proto-default'[Use PROTOCOL for any URL missing a scheme]':PROTOCOL \
+  {-O,--remote-name}'[Write output to a file named as the remote file]' \
+  --socks5-gssapi-service'[SOCKS5 proxy service name for GSS-API]':NAME \
+  --stderr'[Where to redirect stderr (use "-" for stdout)]':FILE:_files \
+  {-g,--globoff}'[Disable URL sequences and ranges using {} and \[\]]' \
+  --post301'[Do not switch to GET after following a 301 redirect (H)]' \
+  --post302'[Do not switch to GET after following a 302 redirect (H)]' \
+  --post303'[Do not switch to GET after following a 303 redirect (H)]' \
+  --random-file'[File for reading random data from (SSL)]':FILE:_files \
+  --resolve'[Force resolve of HOST:PORT to ADDRESS]':HOST:PORT:ADDRESS \
+  --unix-socket'[Connect through this Unix domain socket]':FILE:_files \
+  --cacert'[CA certificate to verify peer against (SSL)]':FILE:_files \
+  --compressed'[Request compressed response (using deflate or gzip)]' \
+  {-k,--insecure}'[Allow connections to SSL sites without certs (H)]' \
+  --mail-auth'[Originator address of the original email (SMTP)]':AUTH \
+  --cert-status'[Verify the status of the server certificate (SSL)]' \
+  {-f,--fail}'[Fail silently (no output at all) on HTTP errors (H)]' \
+  --login-options'[Server login options (IMAP, POP3, SMTP)]':OPTIONS \
+  {-#,--progress-bar}'[Display transfer progress as a progress bar]' \
+  --retry'[Retry request NUM times if transient problems occur]':NUM \
+  --keepalive-time'[Wait SECONDS between keepalive probes]':SECONDS \
+  {-J,--remote-header-name}'[Use the header-provided filename (H)]' \
+  --ssl-allow-beast'[Allow security flaw to improve interop (SSL)]' \
+  --trace-ascii'[Like --trace, but without hex output]':FILE:_files \
+  --capath'[CA directory to verify peer against (SSL)]':DIR:_files \
+  --connect-timeout'[Maximum time allowed for connection]':SECONDS \
+  --ftp-method'[Control CWD usage (F)]':[MULTICWD/NOCWD/SINGLECWD] \
+  --ignore-content-length'[Ignore the HTTP Content-Length header]' \
+  {-m,--max-time}'[Maximum time allowed for the transfer]':SECONDS \
+  --oauth2-bearer'[OAuth 2 Bearer Token (IMAP, POP3, SMTP)]':TOKEN \
+  {-x,--proxy}'[Use proxy on given port]':[PROTOCOL://]HOST[:PORT] \
+  {-A,--user-agent}'[Send User-Agent STRING to server (H)]':STRING \
+  --egd-file'[EGD socket path for random data (SSL)]':FILE:_files \
+  --local-port'[Force use of RANGE for local port numbers]':RANGE \
+  --proto-redir'[Enable/disable PROTOCOLS on redirect]':PROTOCOLS \
+  {-a,--append}'[Append to target file when uploading (F/SFTP)]' \
+  {-b,--cookie}'[Read cookies from STRING/FILE (H)]':STRING/FILE \
+  --ftp-create-dirs'[Create the remote dirs if not present (F)]' \
+  {-i,--include}'[Include protocol headers in the output (H/F)]' \
+  --tftp-blksize'[Set TFTP BLKSIZE option (must be >512)]':VALUE \
+  {-T,--upload-file}'[Transfer FILE to destination]':FILE:_files \
+  --tlsauthtype'[TLS authentication type (default: SRP)]':STRING \
+  --cert-type'[Certificate file type (DER/PEM/ENG) (SSL)]':TYPE \
+  --negotiate'[Use HTTP Negotiate (SPNEGO) authentication (H)]' \
+  --proxy-anyauth'[Pick "any" proxy authentication method (H)]' \
+  {-w,--write-out}'[Use output FORMAT after completion]':FORMAT \
+  --form-string'[Specify HTTP multipart POST data (H)]':STRING \
+  --key-type'[Private key file type (DER/PEM/ENG) (SSL)]':TYPE \
+  {-o,--output}'[Write to FILE instead of stdout]':FILE:_files \
+  --proxy-digest'[Use Digest authentication on the proxy (H)]' \
+  {-U,--proxy-user}'[Proxy user and password]':USER[:PASSWORD] \
+  --create-dirs'[Create necessary local directory hierarchy]' \
+  {-D,--dump-header}'[Write the headers to FILE]':FILE:_files \
+  {-F,--form}'[Specify HTTP multipart POST data (H)]':CONTENT \
+  {-H,--header}'[Pass custom header LINE to server (H)]':LINE \
+  --interface'[Use network INTERFACE (or address)]':INTERFACE \
+  --max-filesize'[Maximum file size to download (H/F)]':BYTES \
+  --max-redirs'[Maximum number of redirects allowed (H)]':NUM \
+  {-n,--netrc}'[Must read .netrc for user name and password]' \
+  --sasl-ir'[Enable initial response in SASL authentication]' \
+  --socks4a'[SOCKS4a proxy on given host + port]':HOST[:PORT] \
+  --socks5-gssapi-nec'[Compatibility with NEC SOCKS5 server]' \
+  {-z,--time-cond}'[Transfer based on a time condition]':TIME \
+  --netrc-optional'[Use either .netrc or URL; overrides -n]' \
+  {-N,--no-buffer}'[Disable buffering of the output stream]' \
+  --proxy-basic'[Use Basic authentication on the proxy (H)]' \
+  --proxy1.0'[Use HTTP/1.0 proxy on given port]':HOST[:PORT] \
+  {-r,--range}'[Retrieve only the bytes within RANGE]':RANGE \
+  --remote-name-all'[Use the remote file name for all URLs]' \
+  --ssl-no-revoke'[Disable cert revocation checks (WinSSL)]' \
+  --dns-servers'[DNS server addrs to use: 1.1.1.1;2.2.2.2]' \
+  --no-keepalive'[Disable keepalive use on the connection]' \
+  --retry-max-time'[Retry only within this period]':SECONDS \
+  --socks4'[SOCKS4 proxy on given host + port]':HOST[:PORT] \
+  --socks5'[SOCKS5 proxy on given host + port]':HOST[:PORT] \
+  --tr-encoding'[Request compressed transfer encoding (H)]' \
+  --data-raw'[HTTP POST data, '\''@'\'' allowed (H)]':DATA \
+  --pass'[Pass phrase for the private key (SSL/SSH)]':PASS \
+  --proxy-ntlm'[Use NTLM authentication on the proxy (H)]' \
+  {-X,--request}'[Specify request command to use]':COMMAND \
+  --data-urlencode'[HTTP POST data url encoded (H)]':DATA \
+  {-s,--silent}'[Silent mode (don'\''t output anything)]' \
+  --trace-time'[Add time stamps to trace/verbose output]' \
+  {-u,--user}'[Server user and password]':USER[:PASSWORD] \
+  --ftp-skip-pasv-ip'[Skip the IP address for PASV (F)]' \
+  --krb'[Enable Kerberos with security LEVEL (F)]':LEVEL \
+  --no-sessionid'[Disable SSL session-ID reusing (SSL)]' \
+  --path-as-is'[Do not squash .. sequences in URL path]' \
+  --proxy-service-name'[SPNEGO proxy service name]':NAME \
+  --ftp-ssl-ccc-mode'[Set CCC mode (F)]':ACTIVE/PASSIVE \
+  --mail-rcpt'[Mail to this/these addresses (SMTP)]':TO \
+  --metalink'[Process given URLs as metalink XML file]' \
+  --retry-delay'[Wait SECONDS between retries]':SECONDS \
+  --ssl-reqd'[Require SSL/TLS (FTP, IMAP, POP3, SMTP)]' \
+  --xattr'[Store metadata in extended file attributes]' \
+  {-C,--continue-at}'[Resumed transfer OFFSET]':OFFSET \
+  --delegation'[GSS-API delegation permission]':STRING \
+  --dns-interface'[Interface to use for DNS requests]' \
+  --ftp-pret'[Send PRET before PASV (for drftpd) (F)]' \
+  {-v,--verbose}'[Make the operation more talkative]' \
+  {-K,--config}'[Read config from FILE]':FILE:_files \
+  --ftp-ssl-ccc'[Send CCC after authenticating (F)]' \
+  {-G,--get}'[Send the -d data with a HTTP GET (H)]' \
+  --netrc-file'[Specify FILE for netrc]':FILE:_files \
+  --trace'[Write a debug trace to FILE]':FILE:_files \
+  --anyauth'[Pick "any" authentication method (H)]' \
+  --limit-rate'[Limit transfer speed to RATE]':RATE \
+  --mail-from'[Mail from this address (SMTP)]':FROM \
+  --noproxy'[List of hosts which do not use proxy]' \
+  --disable-eprt'[Inhibit using EPRT or LPRT (F)]' \
+  --raw'[Do HTTP "raw"; no transfer decoding (H)]' \
+  --data-binary'[HTTP POST binary data (H)]':DATA \
+  --ftp-pasv'[Use PASV/EPSV instead of PORT (F)]' \
+  --no-alpn'[Disable the ALPN TLS extension (H)]' \
+  --digest'[Use HTTP Digest Authentication (H)]' \
+  {-V,--version}'[Show version number and quit]' \
+  --data-ascii'[HTTP POST ASCII data (H)]':DATA \
+  --ftp-account'[Account data string (F)]':DATA \
+  --no-npn'[Disable the NPN TLS extension (H)]' \
+  --proto'[Enable/disable PROTOCOLS]':PROTOCOLS \
+  {-t,--telnet-option}'[Set telnet option]':OPT=VAL \
+  --basic'[Use HTTP Basic Authentication (H)]' \
+  --key'[Private key file name (SSL/SSH)]':KEY \
+  --ssl'[Try SSL/TLS (FTP, IMAP, POP3, SMTP)]' \
+  {-4,--ipv4}'[Resolve name to IPv4 address]' \
+  {-6,--ipv6}'[Resolve name to IPv6 address]' \
+  {-l,--list-only}'[List only mode (F/POP3)]' \
+  --tcp-nodelay'[Use the TCP_NODELAY option]' \
+  {-B,--use-ascii}'[Use ASCII/text transfer]' \
+  --ciphers'[SSL ciphers to use (SSL)]':LIST \
+  --ntlm'[Use HTTP NTLM authentication (H)]' \
+  --service-name'[SPNEGO service name]':NAME \
+  --pubkey'[Public key file name (SSH)]':KEY \
+  --disable-epsv'[Inhibit using EPSV (F)]' \
+  --false-start'[Enable TLS False Start.]' \
+  {-M,--manual}'[Display the full manual]' \
+  {-L,--location}'[Follow redirects (H)]' \
+  --crlf'[Convert LF to CRLF in upload]' \
+  {-d,--data}'[HTTP POST data (H)]':DATA \
+  {-I,--head}'[Show document info only]' \
+  --tlspassword'[TLS password]':STRING \
+  {-0,--http1.0}'[Use HTTP 1.0 (H)]' \
+  {-e,--referer}'[Referer URL (H)]' \
+  {-2,--sslv2}'[Use SSLv2 (SSL)]' \
+  {-3,--sslv3}'[Use SSLv3 (SSL)]' \
+  --tlsv1.0'[Use TLSv1.0 (SSL)]' \
+  --tlsv1.1'[Use TLSv1.1 (SSL)]' \
+  --tlsv1.2'[Use TLSv1.2 (SSL)]' \
+  --tlsuser'[TLS username]':USER \
+  {-h,--help}'[This help text]' \
+  --http1.1'[Use HTTP 1.1 (H)]' \
+  --url'[URL to work with]':URL \
+  --http2'[Use HTTP 2 (H)]' \
+  {-1,--tlsv1}'[Use >= TLSv1 (SSL)]' \
+  '*:URL:_urls' && rc=0
+
+return rc

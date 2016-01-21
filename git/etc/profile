@@ -1,184 +1,169 @@
-# Copyright (C) 2001, 2002  Earnie Boyd  <earnie@users.sf.net>
-# This file is part of the Minimal SYStem.
-#   http://www.mingw.org/msys.shtml
-#
-#         File:	profile
-#  Description:	Shell environment initialization script
-# Last Revised:	2002.05.04
+# To the extent possible under law, the author(s) have dedicated all 
+# copyright and related and neighboring rights to this software to the 
+# public domain worldwide. This software is distributed without any warranty. 
+# You should have received a copy of the CC0 Public Domain Dedication along 
+# with this software. 
+# If not, see <http://creativecommons.org/publicdomain/zero/1.0/>. 
 
-if [ -z "$MSYSTEM" ]; then
-  MSYSTEM=MINGW32
-fi
 
-# My decision to add a . to the PATH and as the first item in the path list
-# is to mimick the Win32 method of finding executables.
-#
-# I filter the PATH value setting in order to get ready for self hosting the
-# MSYS runtime and wanting different paths searched first for files.
-if [ $MSYSTEM == MINGW32 ]; then
-  export PATH=".:/usr/local/bin:/mingw/bin:/bin:$PATH"
+# System-wide profile file
+
+# Some resources...
+# Customizing Your Shell: http://www.dsl.org/cookbook/cookbook_5.html#SEC69
+# Consistent BackSpace and Delete Configuration:
+#   http://www.ibb.net/~anne/keyboard.html
+# The Linux Documentation Project: http://www.tldp.org/
+# The Linux Cookbook: http://www.tldp.org/LDP/linuxcookbook/html/
+# Greg's Wiki http://mywiki.wooledge.org/
+
+# Setup some default paths. Note that this order will allow user installed
+# software to override 'system' software.
+# Modifying these default path settings can be done in different ways.
+# To learn more about startup files, refer to your shell's man page.
+
+MSYS2_PATH="/usr/local/bin:/usr/bin:/bin"
+MANPATH="/usr/local/man:/usr/share/man:/usr/man:/share/man:${MANPATH}"
+INFOPATH="/usr/local/info:/usr/share/info:/usr/info:/share/info:${INFOPATH}"
+MINGW_MOUNT_POINT=
+if [ -n "$MSYSTEM" ]
+then
+  case "$MSYSTEM" in
+    MINGW32)
+      MINGW_MOUNT_POINT=/mingw32
+      PATH="${MINGW_MOUNT_POINT}/bin:${MSYS2_PATH}:${PATH}"
+      PKG_CONFIG_PATH="${MINGW_MOUNT_POINT}/lib/pkgconfig:${MINGW_MOUNT_POINT}/share/pkgconfig"
+      ACLOCAL_PATH="${MINGW_MOUNT_POINT}/share/aclocal:/usr/share/aclocal"
+      MANPATH="${MINGW_MOUNT_POINT}/share/man:${MANPATH}"
+    ;;
+    MINGW64)
+      MINGW_MOUNT_POINT=/mingw64
+      PATH="${MINGW_MOUNT_POINT}/bin:${MSYS2_PATH}:${PATH}"
+      PKG_CONFIG_PATH="${MINGW_MOUNT_POINT}/lib/pkgconfig:${MINGW_MOUNT_POINT}/share/pkgconfig"
+      ACLOCAL_PATH="${MINGW_MOUNT_POINT}/share/aclocal:/usr/share/aclocal"
+      MANPATH="${MINGW_MOUNT_POINT}/share/man:${MANPATH}"
+    ;;
+    MSYS)
+      PATH="${MSYS2_PATH}:/opt/bin:${PATH}"
+      PKG_CONFIG_PATH="/usr/lib/pkgconfig:/usr/share/pkgconfig:/lib/pkgconfig"
+    ;;
+    *)
+      PATH="${MSYS2_PATH}:${PATH}"
+    ;;
+  esac
 else
-  export PATH=".:/usr/local/bin:/bin:/mingw/bin:$PATH"
+  PATH="${MSYS2_PATH}:${PATH}"
 fi
 
-# strip out cygwin paths from PATH
-case "$PATH" in
-*/cygwin/*)
-	export PATH=$(p=$(echo $PATH | tr ":" "\n" | grep -v "/cygwin/" | tr "\n" ":"); echo ${p%:})
-	;;
-esac
+MAYBE_FIRST_START=false
+SYSCONFDIR="${SYSCONFDIR:=/etc}"
 
-if [ -z "$USERNAME" ]; then
-  LOGNAME="`id -un`"
-else
-  LOGNAME="$USERNAME"
-fi
-
-# Set up USER's home directory
-if [ -z "$HOME" -o ! -d "$HOME" ]; then
-  HOME="$HOMEDRIVE$HOMEPATH"
-  if [ -z "$HOME" -o ! -d "$HOME" ]; then
-    HOME="$USERPROFILE"
-  fi
-fi
-
-if [ ! -d "$HOME" ]; then
-	printf "\n\033[31mERROR: HOME directory '$HOME' doesn't exist!\033[m\n\n"
-	echo "This is an error which might be related to msysGit issue 108."
-	echo "You might want to set the environment variable HOME explicitly."
-	printf "\nFalling back to \033[31m/ ($(cd / && pwd -W))\033[m.\n\n"
-	HOME=/
-fi
-
-# normalize HOME to unix path
-HOME="$(cd "$HOME" ; pwd)"
-
-export PATH="$HOME/bin:$PATH"
-
-export GNUPGHOME=~/.gnupg
-
-if [ -z "$MAGIC" ]; then
-  magicfile=$(cd / && pwd -W)'/mingw/share/misc/magic.mgc'
-  test -f "$magicfile" && export MAGIC="$magicfile"
-fi
-
-if [ "x$HISTFILE" == "x/.bash_history" ]; then
-  HISTFILE=$HOME/.bash_history
-fi
-
-if [ -e ~/.inputrc ]; then
-    export INPUTRC=~/.inputrc
-else
-    export INPUTRC=/etc/inputrc
-fi
-
-case "$LS_COLORS" in
-*rs*)
-	# Our ls may ot handle LS_COLORS inherited in a Wine process
-	unset LS_COLORS;;
-esac
-
-export HOME LOGNAME MSYSTEM HISTFILE
-
-for i in /etc/profile.d/*.sh ; do
-  if [ -f $i ]; then
-    . $i
-  fi
-done
-
-export MAKE_MODE=unix
-
-# Git specific stuff
-test -e /bin/git.exe -o -e /git/git.exe || {
-	echo
-	echo -------------------------------------------------------
-	echo "Building and Installing Git"
-	echo -------------------------------------------------------
-
-	cd /git &&
-	make install
-
-	case $? in
-	0)
-		MESSAGE="You are in the git working tree, and all is ready for you to hack."
-	;;
-	*)
-		MESSAGE="Your build failed...  Please fix it, and give feedback on the Git list."
-	esac
-
-	test -d /installer-tmp && rm -rf /installer-tmp
-
-	cat <<EOF
-
-
--------------------------
-Hello, dear Git developer.
-
-This is a minimal MSYS environment to work on Git.
-
-$MESSAGE
-
-EOF
+# TMP and TEMP as defined in the Windows environment must be kept
+# for windows apps, even if started from msys2. However, leaving
+# them set to the default Windows temporary directory or unset
+# can have unexpected consequences for msys2 apps, so we define 
+# our own to match GNU/Linux behaviour.
+ORIGINAL_TMP=$TMP
+ORIGINAL_TEMP=$TEMP
+#unset TMP TEMP
+#tmp=$(cygpath -w "$ORIGINAL_TMP" 2> /dev/null)
+#temp=$(cygpath -w "$ORIGINAL_TEMP" 2> /dev/null)
+#TMP="/tmp"
+#TEMP="/tmp"
+case "$TMP" in *\\*) TMP="$(cygpath -m "$TMP")";; esac
+case "$TEMP" in *\\*) TEMP="$(cygpath -m "$TEMP")";; esac
+test -d "$TMPDIR" || test ! -d "$TMP" || {
+  TMPDIR="$TMP"
+  export TMPDIR
 }
 
-# let's make sure that the post-checkout hook is installed
-test -d /.git && test ! -x /.git/hooks/post-checkout &&
-test -x /share/msysGit/post-checkout-hook &&
-mkdir -p /.git/hooks &&
-cp /share/msysGit/post-checkout-hook /.git/hooks/post-checkout
 
-test -f /etc/motd && sed "s/\$MESSAGE/$MESSAGE/" < /etc/motd
-test -x /share/msysGit/initialize.sh -a ! -d /.git &&
-cat << EOF
+# Define default printer
+p='/proc/registry/HKEY_CURRENT_USER/Software/Microsoft/Windows NT/CurrentVersion/Windows/Device'
+if [ -e "${p}" ] ; then
+  read -r PRINTER < "${p}" 
+  PRINTER=${PRINTER%%,*}
+fi
+unset p
 
-It appears that you installed msysGit using the full installer.
-To set up the Git repositories, please run /share/msysGit/initialize.sh
-EOF
+print_flags ()
+{
+  (( $1 & 0x0002 )) && echo -n "binary" || echo -n "text"
+  (( $1 & 0x0010 )) && echo -n ",exec"
+  (( $1 & 0x0040 )) && echo -n ",cygexec"
+  (( $1 & 0x0100 )) && echo -n ",notexec"
+}
 
-case ":$PATH:" in
-*:/cmd:*|*:/bin:*) ;;
-*)
-	cat << EOF
+# Shell dependent settings
+profile_d ()
+{
+  local file=
+  for file in $(export LC_COLLATE=C; echo /etc/profile.d/*.$1); do
+    [ -e "${file}" ] && . "${file}"
+  done
+  
+  if [ -n "${MINGW_MOUNT_POINT}" ]; then
+    for file in $(export LC_COLLATE=C; echo ${MINGW_MOUNT_POINT}/etc/profile.d/*.$1); do
+      [ -e "${file}" ] && . "${file}"
+    done
+  fi
+}
 
-In order to use Git from cmd.exe:
-1. Add c:\msysgit\cmd to cmd's PATH
-2. DON'T add c:\msysgit\bin or c:\msysgit\mingw\bin to cmd's PATH
-Commands like 'git add' will work from cmd.exe now.
-Commands like 'git-add' will NOT work. Add more wrappers as appropriate.
-EOF
-esac
+for postinst in $(export LC_COLLATE=C; echo /etc/post-install/*.post); do
+  [ -e "${postinst}" ] && . "${postinst}"
+done
 
+if [ ! "x${BASH_VERSION}" = "x" ]; then
+  HOSTNAME="$(/usr/bin/hostname)"
+  profile_d sh
+  [ -f "/etc/bash.bashrc" ] && . "/etc/bash.bashrc"
+elif [ ! "x${KSH_VERSION}" = "x" ]; then
+  typeset -l HOSTNAME="$(/usr/bin/hostname)"
+  profile_d sh
+  PS1=$(print '\033]0;${PWD}\n\033[32m${USER}@${HOSTNAME} \033[33m${PWD/${HOME}/~}\033[0m\n$ ')
+elif [ ! "x${ZSH_VERSION}" = "x" ]; then
+  HOSTNAME="$(/usr/bin/hostname)"
+  profile_d zsh
+  PS1='(%n@%m)[%h] %~ %% '
+elif [ ! "x${POSH_VERSION}" = "x" ]; then
+  HOSTNAME="$(/usr/bin/hostname)"
+  PS1="$ "
+else 
+  HOSTNAME="$(/usr/bin/hostname)"
+  profile_d sh
+  PS1="$ "
+fi
 
-. /etc/git-completion.bash
-[ -r /etc/git-prompt.sh ] && . /etc/git-prompt.sh
-
-# non-printable characters must be enclosed inside \[ and \]
-PS1='\[\033]0;$MSYSTEM:${PWD//[^[:ascii:]]/?}\007\]' # set window title
-PS1="$PS1"'\n'                 # new line
-PS1="$PS1"'\[\033[32m\]'       # change color
-PS1="$PS1"'\u@\h '             # user@host<space>
-PS1="$PS1"'\[\033[33m\]'       # change color
-PS1="$PS1"'\w'                 # current working directory
-if test -z "$WINELOADERNOEXEC"
+if [ -n "$ACLOCAL_PATH" ]
 then
-    PS1="$PS1"'$(__git_ps1)'   # bash function
+  export ACLOCAL_PATH
 fi
-PS1="$PS1"'\[\033[0m\]'        # change color
-PS1="$PS1"'\n'                 # new line
-PS1="$PS1"'$ '                 # prompt: always $
 
-# set default options for 'less'
-export LESS=-FRSX
-export LESSCHARSET=utf-8
+export PATH MANPATH INFOPATH PKG_CONFIG_PATH USER TMP TEMP PRINTER HOSTNAME PS1 SHELL tmp temp
+test -n "$TERM" || export TERM=xterm-256color
+unset PATH_SEPARATOR
 
-# set default protocol for 'plink'
-export PLINK_PROTOCOL=ssh
+if [ "$MAYBE_FIRST_START" = "true" ]; then
+  sh /usr/bin/regen-info.sh
+  
+  if [ -f "/usr/bin/update-ca-trust" ]
+  then 
+    sh /usr/bin/update-ca-trust
+  fi
 
-# read user-specific settings, possibly overriding anything above
-if [ -e ~/.bashrc ]; then
-    . ~/.bashrc
-elif [ -e ~/.bash_profile ]; then
-    . ~/.bash_profile
-elif [ -e /etc/bash_profile ]; then
-    . /etc/bash_profile
+  clear
+  echo
+  echo
+  echo "###################################################################"
+  echo "#                                                                 #"
+  echo "#                                                                 #"
+  echo "#                   C   A   U   T   I   O   N                     #"
+  echo "#                                                                 #"
+  echo "#                  This is first start of MSYS2.                  #"
+  echo "#       You MUST restart shell to apply necessary actions.        #"
+  echo "#                                                                 #"
+  echo "#                                                                 #"
+  echo "###################################################################"
+  echo
+  echo
 fi
+unset MAYBE_FIRST_START

@@ -1,25 +1,25 @@
 -- preamble: common routines
 
+local matchers = require('matchers')
+
 function trim(s)
   return s:match "^%s*(.-)%s*$"
 end
 
-local function modules(token)
-    local res = {}
-    local modules = clink.find_dirs('node_modules/*')
-    for _,module in ipairs(modules) do
-        if string.match(module, token) then
-            table.insert(res, module)
-        end
-    end
-    return res
+function get_npm_cache_location()
+    local proc = io.popen("npm config get cache 2>nul")
+    if not proc then return "" end
+
+    return proc:read() or ""
 end
+
+local modules = matchers.create_dirs_matcher('node_modules/*')
+local cached_modules = matchers.create_dirs_matcher(get_npm_cache_location()..'/*')
 
 -- Reads package.json in current directory and extracts all "script" commands defined 
 local function scripts(token)
 
     local matches = {}
-    local match_filters = {}
 
     -- Read package.json first
     local package_json = io.open('package.json')
@@ -31,7 +31,8 @@ local function scripts(token)
     
     -- Read the whole file contents
     local package_contents = package_json:read("*a")
-    
+    package_json:close()
+
     -- First, gind all "scripts" elements in package file
     -- This is necessary since package.json can contain multiple sections
     -- And we'll need to merge them first
@@ -43,21 +44,10 @@ local function scripts(token)
     -- Then merge "scripts" sections found and try to find
     -- <script_name>: <script_command> pairs
     local scripts = table.concat(scripts_sections, ",\n")
-    for script_name, script_command in scripts:gmatch('"(.-)"%s*:%s*(".-")') do
+    for script_name in scripts:gmatch('"(.-)"%s*:%s*(".-")') do
         table.insert(matches, script_name)
-        -- This line adds match filter for each command, since we want to
-        -- see not only command name, but command content as well
-        -- TODO: check how this will looks when command is too long
-        -- TODO: add coloring
-        table.insert(match_filters, script_name.." -> "..script_command)
     end
 
-    -- Finally close the handle
-    package_json:close()
-    -- And register match filters and return the matches collection
-    clink.match_display_filter = function (matches)
-        return match_filters
-    end
     return matches
 end
 
@@ -65,7 +55,7 @@ local parser = clink.arg.new_parser
 
 -- end preamble
 
-local install_parser = parser({dir_match_generator},
+local install_parser = parser({matchers.dirs},
         "--force",
         "-g", "--global",
         "--link",
@@ -77,6 +67,9 @@ local install_parser = parser({dir_match_generator},
         "--save", "--save-dev", "--save-optional",
         "--tag"
         ):loop(1)
+
+-- TODO: list only global modules with -g
+local remove_parser = parser({modules}, "-g", "--global"):loop(1)
 
 local search_parser = parser("--long")
 
@@ -90,7 +83,11 @@ local npm_parser = parser({
     "bin",
     "bugs",
     "c",
-    "cache",
+    "cache"..parser({
+        "add"..parser({matchers.dirs}),
+        "clean"..parser({cached_modules}),
+        "ls"
+        }),
     "completion",
     "config",
     "ddp",
@@ -122,14 +119,17 @@ local npm_parser = parser({
     "pack",
     "prefix",
     "prune",
-    "publish",
+    "publish"..parser(
+        "--tag",
+        "--access"..parser({"public", "restricted"})
+    ),
     "r",
     "rb",
     "rebuild",
-    "remove",
+    "rm" .. remove_parser,
+    "remove" .. remove_parser,
     "repo",
     "restart",
-    "rm" .. parser({modules}, "-g", "--global"):loop(1), -- TODO: list only global modules with -g
     "root",
     "run"..script_parser,
     "run-script"..script_parser,
@@ -145,12 +145,12 @@ local npm_parser = parser({
     "tag",
     "test",
     "un",
-    "uninstall" .. parser({modules}, "-g", "--global"):loop(1), -- TODO: list only global modules with -g
+    "uninstall" .. remove_parser,
     "unlink",
     "unpublish",
     "unstar",
-    "up",
-    "update",
+    "up"..parser({modules}),
+    "update"..parser({modules}),
     "v",
     "version",
     "view",
