@@ -1,4 +1,6 @@
-<?php namespace Laravel\Envoy;
+<?php
+
+namespace Laravel\Envoy;
 
 class SSHConfigFile
 {
@@ -23,7 +25,7 @@ class SSHConfigFile
     /**
      * Parse the given configuration file.
      *
-     * @param  string  $string
+     * @param  string  $file
      * @return \Laravel\Envoy\SSHConfigFile
      */
     public static function parse($file)
@@ -43,41 +45,52 @@ class SSHConfigFile
 
         $index = 0;
 
+        $matchSection = false;
+
         foreach (explode(PHP_EOL, $string) as $line) {
             $line = trim($line);
 
-            // If the line is empty, we'll increment the group counter so we start a new group
-            // on the next iteration through the loop. New blank lines indicate the divider
-            // between various groups of options. Otherwise, we'll keep parsing the line.
-            if ($line == '') {
-                $index++;
-            }
-
-            // If the line begins with a comment, we will just skip that line then continue to
-            // process the rest of the file. All comments in SSH config file start with the
-            // hash so we can easily identify them here and continue with our iterations.
-            elseif (starts_with($line, '#')) {
+            if ('' == $line || starts_with($line, '#')) {
                 continue;
             }
 
-            // If the key is separated by an equals sign, we'll parse it into the two sections
-            // and add it the current group. Items will be specified using either an equals
-            // otherwise they will separated by any number of spaces which we will check.
-            elseif (preg_match('/^\s*(\S+)\s*=(.*)$/', $line, $match)) {
-                $groups[$index][$match[1]] = $match[2];
+            // Keys and values may get separated via an equals, so we'll parse them both
+            // out here and hang onto their values. We will also lower case this keys
+            // and unquotes the values so they are properly formatted for next use.
+            if (preg_match('/^\s*(\S+)\s*=(.*)$/', $line, $match)) {
+                $key = strtolower($match[1]);
+
+                $value = self::unquote($match[2]);
             }
 
-            // Finally, the options must get separated by spaces if no other checks have found
-            // the option. We will split by the first group of spaces then set the items on
-            // the current group in the array. Then we'll return the SSH config instance.
+            // Keys and values may also get separated via a space, so we will parse them
+            // out here and hang onto their values. We will also lower case this keys
+            // and unquotes the values so they are properly formatted for next use.
             else {
                 $segments = preg_split('/\s+/', $line, 2);
 
-                $groups[$index][$segments[0]] = $segments[1];
+                $key = strtolower($segments[0]);
+
+                $value = self::unquote($segments[1]);
+            }
+
+            // The configuration file contains sections separated by Host and / or Match
+            // specifications. Therefore, if we come across a Host keyword we start a
+            // new group. If it's a Match we ignore declarations until next 'Host'.
+            if ('host' === $key) {
+                $index++;
+
+                $matchSection = false;
+            } elseif ('match' === $key) {
+                $matchSection = true;
+            }
+
+            if (! $matchSection) {
+                $groups[$index][$key] = $value;
             }
         }
 
-        return new SSHConfigFile(array_values($groups));
+        return new self(array_values($groups));
     }
 
     /**
@@ -91,13 +104,13 @@ class SSHConfigFile
         list($user, $host) = $this->parseHost($host);
 
         foreach ($this->groups as $group) {
-            if ((isset($group['Host']) == $host && $group['Host'] == $host) ||
-                (isset($group['Hostname']) && $group['Hostname'] == $host)) {
-                if (! empty($user) && isset($group['User']) && $group['User'] != $user) {
+            if ((isset($group['host']) == $host && $group['host'] == $host) ||
+                (isset($group['hostname']) && $group['hostname'] == $host)) {
+                if (! empty($user) && isset($group['user']) && $group['user'] != $user) {
                     continue;
                 }
 
-                return $group['Host'];
+                return $group['host'];
             }
         }
     }
@@ -111,5 +124,20 @@ class SSHConfigFile
     protected function parseHost($host)
     {
         return str_contains($host, '@') ? explode('@', $host) : [null, $host];
+    }
+
+    /**
+     * Unquote an optionally double quoted string.
+     *
+     * @param  string $string
+     * @return string
+     */
+    private static function unquote($string)
+    {
+        if ('"' === substr($string, 0, 1) && '"' === substr($string, -1, 1)) {
+            return substr($string, 1, -1);
+        }
+
+        return $string;
     }
 }

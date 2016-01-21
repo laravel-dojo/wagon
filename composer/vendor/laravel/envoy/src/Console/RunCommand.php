@@ -1,4 +1,6 @@
-<?php namespace Laravel\Envoy\Console;
+<?php
+
+namespace Laravel\Envoy\Console;
 
 use Laravel\Envoy\SSH;
 use Laravel\Envoy\Task;
@@ -142,14 +144,18 @@ class RunCommand extends \Symfony\Component\Console\Command\Command
      */
     protected function displayOutput($type, $host, $line)
     {
-        if (strlen(trim($line)) === 0) {
-            return;
-        }
+        $lines = explode("\n", $line);
 
-        if ($type == Process::OUT) {
-            $this->output->write('<comment>['.$host.']</comment>: '.trim($line).PHP_EOL);
-        } else {
-            $this->output->write('<comment>['.$host.']</comment>: <error>'.trim($line).'</error>'.PHP_EOL);
+        foreach ($lines as $line) {
+            if (strlen(trim($line)) === 0) {
+                return;
+            }
+
+            if ($type == Process::OUT) {
+                $this->output->write('<comment>['.$host.']</comment>: '.trim($line).PHP_EOL);
+            } else {
+                $this->output->write('<comment>['.$host.']</comment>: <error>'.trim($line).'</error>'.PHP_EOL);
+            }
         }
     }
 

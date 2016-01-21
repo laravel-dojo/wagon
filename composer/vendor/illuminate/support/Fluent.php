@@ -83,7 +83,7 @@ class Fluent implements ArrayAccess, Arrayable, Jsonable, JsonSerializable
      */
     public function toJson($options = 0)
     {
-        return json_encode($this->toArray(), $options);
+        return json_encode($this->jsonSerialize(), $options);
     }
 
     /**
@@ -172,7 +172,7 @@ class Fluent implements ArrayAccess, Arrayable, Jsonable, JsonSerializable
      * Dynamically check if an attribute is set.
      *
      * @param  string  $key
-     * @return void
+     * @return bool
      */
     public function __isset($key)
     {

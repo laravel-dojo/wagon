@@ -92,7 +92,7 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
     {
         $messages = (array) $this->messages;
 
-        return !isset($messages[$key]) || !in_array($message, $messages[$key]);
+        return ! isset($messages[$key]) || ! in_array($message, $messages[$key]);
     }
 
     /**
@@ -156,6 +156,17 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
         }
 
         return $all;
+    }
+
+    /**
+     * Get all of the unique messages for every key in the bag.
+     *
+     * @param  string  $format
+     * @return array
+     */
+    public function unique($format = null)
+    {
+        return array_unique($this->all($format));
     }
 
     /**
@@ -243,7 +254,7 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
      */
     public function isEmpty()
     {
-        return !$this->any();
+        return ! $this->any();
     }
 
     /**
@@ -294,7 +305,7 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
      */
     public function toJson($options = 0)
     {
-        return json_encode($this->toArray(), $options);
+        return json_encode($this->jsonSerialize(), $options);
     }
 
     /**

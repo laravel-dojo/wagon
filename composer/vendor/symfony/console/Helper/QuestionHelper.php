@@ -11,7 +11,10 @@
 
 namespace Symfony\Component\Console\Helper;
 
+use Symfony\Component\Console\Exception\InvalidArgumentException;
+use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Question\Question;
@@ -37,10 +40,14 @@ class QuestionHelper extends Helper
      *
      * @return string The user answer
      *
-     * @throws \RuntimeException If there is no data to read in the input stream
+     * @throws RuntimeException If there is no data to read in the input stream
      */
     public function ask(InputInterface $input, OutputInterface $output, Question $question)
     {
+        if ($output instanceof ConsoleOutputInterface) {
+            $output = $output->getErrorOutput();
+        }
+
         if (!$input->isInteractive()) {
             return $question->getDefault();
         }
@@ -65,19 +72,19 @@ class QuestionHelper extends Helper
      *
      * @param resource $stream The input stream
      *
-     * @throws \InvalidArgumentException In case the stream is not a resource
+     * @throws InvalidArgumentException In case the stream is not a resource
      */
     public function setInputStream($stream)
     {
         if (!is_resource($stream)) {
-            throw new \InvalidArgumentException('Input stream must be a valid resource.');
+            throw new InvalidArgumentException('Input stream must be a valid resource.');
         }
 
         $this->inputStream = $stream;
     }
 
     /**
-     * Returns the helper's input stream
+     * Returns the helper's input stream.
      *
      * @return resource
      */
@@ -127,11 +134,7 @@ class QuestionHelper extends Helper
             }
 
             if (false === $ret) {
-                $ret = fgets($inputStream, 4096);
-                if (false === $ret) {
-                    throw new \RuntimeException('Aborted');
-                }
-                $ret = trim($ret);
+                $ret = $this->readFromInput($inputStream);
             }
         } else {
             $ret = trim($this->autocomplete($output, $question, $inputStream));
@@ -150,18 +153,19 @@ class QuestionHelper extends Helper
      * Outputs the question prompt.
      *
      * @param OutputInterface $output
-     * @param Question $question
+     * @param Question        $question
      */
     protected function writePrompt(OutputInterface $output, Question $question)
     {
         $message = $question->getQuestion();
 
         if ($question instanceof ChoiceQuestion) {
-            $width = max(array_map('strlen', array_keys($question->getChoices())));
+            $maxWidth = max(array_map(array($this, 'strlen'), array_keys($question->getChoices())));
 
             $messages = (array) $question->getQuestion();
             foreach ($question->getChoices() as $key => $value) {
-                $messages[] = sprintf("  [<info>%-${width}s</info>] %s", $key, $value);
+                $width = $maxWidth - $this->strlen($key);
+                $messages[] = '  [<info>'.$key.str_repeat(' ', $width).'</info>] '.$value;
             }
 
             $output->writeln($messages);
@@ -222,7 +226,7 @@ class QuestionHelper extends Helper
             // Backspace Character
             if ("\177" === $c) {
                 if (0 === $numMatches && 0 !== $i) {
-                    $i--;
+                    --$i;
                     // Move cursor backwards
                     $output->write("\033[1D");
                 }
@@ -275,7 +279,7 @@ class QuestionHelper extends Helper
             } else {
                 $output->write($c);
                 $ret .= $c;
-                $i++;
+                ++$i;
 
                 $numMatches = 0;
                 $ofs = 0;
@@ -314,7 +318,7 @@ class QuestionHelper extends Helper
      *
      * @return string The answer
      *
-     * @throws \RuntimeException In case the fallback is deactivated and the response cannot be hidden
+     * @throws RuntimeException In case the fallback is deactivated and the response cannot be hidden
      */
     private function getHiddenResponse(OutputInterface $output, $inputStream)
     {
@@ -346,7 +350,7 @@ class QuestionHelper extends Helper
             shell_exec(sprintf('stty %s', $sttyMode));
 
             if (false === $value) {
-                throw new \RuntimeException('Aborted');
+                throw new RuntimeException('Aborted');
             }
 
             $value = trim($value);
@@ -364,7 +368,7 @@ class QuestionHelper extends Helper
             return $value;
         }
 
-        throw new \RuntimeException('Unable to hide the response.');
+        throw new RuntimeException('Unable to hide the response.');
     }
 
     /**
@@ -421,6 +425,30 @@ class QuestionHelper extends Helper
         }
 
         return self::$shell;
+    }
+
+    /**
+     * Reads user input.
+     *
+     * @param resource $stream The input stream
+     *
+     * @return string User input
+     *
+     * @throws RuntimeException
+     */
+    private function readFromInput($stream)
+    {
+        if (STDIN === $stream && function_exists('readline')) {
+            $ret = readline('');
+        } else {
+            $ret = fgets($stream, 4096);
+        }
+
+        if (false === $ret) {
+            throw new RuntimeException('Aborted');
+        }
+
+        return trim($ret);
     }
 
     /**

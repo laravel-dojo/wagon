@@ -1,4 +1,6 @@
-<?php namespace Laravel\Envoy;
+<?php
+
+namespace Laravel\Envoy;
 
 use Closure;
 
@@ -52,6 +54,13 @@ class TaskContainer
      * @var array
      */
     protected $taskStack = [];
+
+    /**
+     * The stack of macro being rendered.
+     *
+     * @var array
+     */
+    protected $macroStack = [];
 
     /**
      * Silently load the Envoy file into the container.

@@ -31,6 +31,8 @@ class Arr
      * @param  array  $array
      * @param  callable  $callback
      * @return array
+     *
+     * @deprecated since version 5.2.
      */
     public static function build($array, callable $callback)
     {
@@ -48,7 +50,7 @@ class Arr
     /**
      * Collapse an array of arrays into a single array.
      *
-     * @param  array|\ArrayAccess  $array
+     * @param  \ArrayAccess|array  $array
      * @return array
      */
     public static function collapse($array)
@@ -58,6 +60,10 @@ class Arr
         foreach ($array as $values) {
             if ($values instanceof Collection) {
                 $values = $values->all();
+            }
+
+            if (! is_array($values)) {
+                continue;
             }
 
             $results = array_merge($results, $values);
@@ -114,32 +120,6 @@ class Arr
     }
 
     /**
-     * Fetch a flattened array of a nested array element.
-     *
-     * @param  array   $array
-     * @param  string  $key
-     * @return array
-     *
-     * @deprecated since version 5.1. Use pluck instead.
-     */
-    public static function fetch($array, $key)
-    {
-        foreach (explode('.', $key) as $segment) {
-            $results = [];
-
-            foreach ($array as $value) {
-                if (array_key_exists($segment, $value = (array) $value)) {
-                    $results[] = $value[$segment];
-                }
-            }
-
-            $array = array_values($results);
-        }
-
-        return array_values($results);
-    }
-
-    /**
      * Return the first element in an array passing a given truth test.
      *
      * @param  array  $array
@@ -175,15 +155,26 @@ class Arr
      * Flatten a multi-dimensional array into a single level.
      *
      * @param  array  $array
+     * @param  int  $depth
      * @return array
      */
-    public static function flatten($array)
+    public static function flatten($array, $depth = INF)
     {
-        $return = [];
+        return array_reduce($array, function ($result, $item) use ($depth) {
+            $item = $item instanceof Collection ? $item->all() : $item;
 
-        array_walk_recursive($array, function ($x) use (&$return) { $return[] = $x; });
+            if (is_array($item)) {
+                if ($depth === 1) {
+                    return array_merge($result, $item);
+                }
 
-        return $return;
+                return array_merge($result, static::flatten($item, $depth - 1));
+            }
+
+            $result[] = $item;
+
+            return $result;
+        }, []);
     }
 
     /**
@@ -197,21 +188,29 @@ class Arr
     {
         $original = &$array;
 
-        foreach ((array) $keys as $key) {
+        $keys = (array) $keys;
+
+        if (count($keys) === 0) {
+            return;
+        }
+
+        foreach ($keys as $key) {
             $parts = explode('.', $key);
+
+            // clean up before each pass
+            $array = &$original;
 
             while (count($parts) > 1) {
                 $part = array_shift($parts);
 
                 if (isset($array[$part]) && is_array($array[$part])) {
                     $array = &$array[$part];
+                } else {
+                    continue 2;
                 }
             }
 
             unset($array[array_shift($parts)]);
-
-            // clean up after each pass
-            $array = &$original;
         }
     }
 
@@ -234,7 +233,7 @@ class Arr
         }
 
         foreach (explode('.', $key) as $segment) {
-            if (!is_array($array) || !array_key_exists($segment, $array)) {
+            if (! is_array($array) || ! array_key_exists($segment, $array)) {
                 return value($default);
             }
 
@@ -262,7 +261,7 @@ class Arr
         }
 
         foreach (explode('.', $key) as $segment) {
-            if (!is_array($array) || !array_key_exists($segment, $array)) {
+            if (! is_array($array) || ! array_key_exists($segment, $array)) {
                 return false;
             }
 
@@ -302,7 +301,7 @@ class Arr
     /**
      * Pluck an array of values from an array.
      *
-     * @param  array   $array
+     * @param  array|\ArrayAccess  $array
      * @param  string|array  $value
      * @param  string|array|null  $key
      * @return array
@@ -340,11 +339,30 @@ class Arr
      */
     protected static function explodePluckParameters($value, $key)
     {
-        $value = is_array($value) ? $value : explode('.', $value);
+        $value = is_string($value) ? explode('.', $value) : $value;
 
         $key = is_null($key) || is_array($key) ? $key : explode('.', $key);
 
         return [$value, $key];
+    }
+
+    /**
+     * Push an item onto the beginning of an array.
+     *
+     * @param  array  $array
+     * @param  mixed  $value
+     * @param  mixed  $key
+     * @return array
+     */
+    public static function prepend($array, $value, $key = null)
+    {
+        if (is_null($key)) {
+            array_unshift($array, $value);
+        } else {
+            $array = [$key => $value] + $array;
+        }
+
+        return $array;
     }
 
     /**
@@ -388,7 +406,7 @@ class Arr
             // If the key doesn't exist at this depth, we will just create an empty array
             // to hold the next value, allowing us to create the arrays to hold final
             // values at the correct depth. Then we'll keep digging into the array.
-            if (!isset($array[$key]) || !is_array($array[$key])) {
+            if (! isset($array[$key]) || ! is_array($array[$key])) {
                 $array[$key] = [];
             }
 
@@ -422,11 +440,11 @@ class Arr
     {
         foreach ($array as &$value) {
             if (is_array($value)) {
-                $value = self::sortRecursive($value);
+                $value = static::sortRecursive($value);
             }
         }
 
-        if (self::isAssoc($array)) {
+        if (static::isAssoc($array)) {
             ksort($array);
         } else {
             sort($array);

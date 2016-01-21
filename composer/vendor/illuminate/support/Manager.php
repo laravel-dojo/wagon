@@ -59,7 +59,7 @@ abstract class Manager
         // If the given driver has not been created before, we will create the instances
         // here and cache it so we can return it next time very quickly. If there is
         // already a driver created by this name, we'll just return that instance.
-        if (!isset($this->drivers[$driver])) {
+        if (! isset($this->drivers[$driver])) {
             $this->drivers[$driver] = $this->createDriver($driver);
         }
 
@@ -76,7 +76,7 @@ abstract class Manager
      */
     protected function createDriver($driver)
     {
-        $method = 'create'.ucfirst($driver).'Driver';
+        $method = 'create'.Str::studly($driver).'Driver';
 
         // We'll check to see if a creator method exists for the given driver. If not we
         // will check for a custom driver creator, which allows developers to create
