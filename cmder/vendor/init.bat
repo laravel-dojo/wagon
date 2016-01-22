@@ -36,14 +36,12 @@
 @if not defined TERM set TERM=cygwin
 
 :: Check if msysgit is installed
-@if exist "%ProgramFiles%\Git" (
+@if exist "%WAGON_ROOT%\git" (
+    set "GIT_INSTALL_ROOT=%WAGON_ROOT%\git"
+) else if exist "%ProgramFiles%\Git" (
     set "GIT_INSTALL_ROOT=%ProgramFiles%\Git"
 ) else if exist "%ProgramFiles(x86)%\Git" (
     set "GIT_INSTALL_ROOT=%ProgramFiles(x86)%\Git"
-) else if exist "%CMDER_ROOT%\vendor" (
-    set "GIT_INSTALL_ROOT=%CMDER_ROOT%\vendor\git-for-windows"
-) else if exist "%WAGON_ROOT%\git" (
-    set "GIT_INSTALL_ROOT=%WAGON_ROOT%\git"
 )
 
 :: Add git to the path
