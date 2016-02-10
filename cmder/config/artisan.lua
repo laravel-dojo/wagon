@@ -12,12 +12,12 @@ end
 local artisan_basic_options = {
 	"--help", "-h",
 	"--quiet", "-q",
-	"--verbose", "-v", "-vv", "-vvv",
 	"--version", "-V",
 	"--ansi",
 	"--no-ansi",
 	"--no-interaction", "-n",
 	"--env"
+	"--verbose", "-v", "-vv", "-vvv",
 }
 
 local artisan_basic_parser = clink.arg.new_parser()
@@ -51,22 +51,12 @@ artisan_command_parser:set_arguments({
 						artisan_basic_options
 						),
 	"event:generate" .. flags(artisan_basic_options),
-	"handler:command" .. flags(
-						"--command",
-						artisan_basic_options
-						),
-	"handler:event" .. flags(
-						"--event",
-						"--queued",
-						artisan_basic_options
-						),
 	"key:generate" .. flags(
 						"--show",
 						artisan_basic_options
 						),
-	"make:command" .. flags(
-						"--handler",
-						"--queued",
+	"make:auth" .. flags(
+						"--views",
 						artisan_basic_options
 						),
 	"make:console" .. flags(
@@ -74,7 +64,7 @@ artisan_command_parser:set_arguments({
 						artisan_basic_options
 						),
 	"make:controller" .. flags(
-						"--plain",
+						"--resource",
 						artisan_basic_options
 						),
 	"make:event" .. flags(artisan_basic_options),
@@ -82,7 +72,6 @@ artisan_command_parser:set_arguments({
 						"--queued",
 						artisan_basic_options
 						),
-
 	"make:listener" .. flags(
 						"--event",
 						"--queued",
@@ -99,9 +88,11 @@ artisan_command_parser:set_arguments({
 						"--table",
 						artisan_basic_options
 						),
+	"make:policy" .. flags(artisan_basic_options),
 	"make:provider" .. flags(artisan_basic_options),
 	"make:request" .. flags(artisan_basic_options),
 	"make:seeder" .. flags(artisan_basic_options),
+	"make:test" .. flags(artisan_basic_options),
 	"migrate:install" .. flags(
 						"--database",
 						artisan_basic_options
@@ -125,6 +116,11 @@ artisan_command_parser:set_arguments({
 						"--pretend",
 						artisan_basic_options
 						),
+	"migrate:status" .. flags(
+						"--database",
+						"--path",
+						artisan_basic_options
+						),
 	"queue:failed" .. flags(artisan_basic_options),
 	"queue:failed-table" .. flags(artisan_basic_options),
 	"queue:flush" .. flags(artisan_basic_options),
@@ -139,10 +135,6 @@ artisan_command_parser:set_arguments({
 						artisan_basic_options),
 	"queue:restart" .. flags(artisan_basic_options),
 	"queue:retry" .. flags(artisan_basic_options),
-	"queue:subscribe" .. flags(
-						"--type",
-						artisan_basic_options
-						),
 	"queue:table" .. flags(artisan_basic_options),
 	"queue:work" .. flags(
 						"--queue",
