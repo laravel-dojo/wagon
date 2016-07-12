@@ -16,7 +16,7 @@ local artisan_basic_options = {
 	"--ansi",
 	"--no-ansi",
 	"--no-interaction", "-n",
-	"--env"
+	"--env",
 	"--verbose", "-v", "-vv", "-vvv",
 }
 
