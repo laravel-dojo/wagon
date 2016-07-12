@@ -21,38 +21,24 @@ local homestead_basic_options = {
 
 local homestead_basic_parser = clink.arg.new_parser()
 homestead_basic_parser:set_flags(homestead_basic_options)
-homestead_basic_parser:set_arguments({         
-	"destroy" .. flags(homestead_basic_options),
-	"edit" .. flags(homestead_basic_options),         
-	"halt" .. flags(homestead_basic_options),
+homestead_basic_parser:set_arguments({
 	"help" .. flags(
-						"--xml",
 						"--format",
 						"--raw",
 						homestead_basic_options
-						),    	
-	"init" .. flags(homestead_basic_options),  
+						),
 	"list" .. flags(
-						"--xml",
 						"--format",
 						"--raw"
 						),
 	"make" .. flags(
 						"--name",
 						"--hostname",
-						"--after",
-						"--aliases"
-						),
-	"provision" .. flags(homestead_basic_options),
-	"resume" .. flags(homestead_basic_options),
-	"ssh" .. flags(homestead_basic_options),  
-	"status" .. flags(homestead_basic_options),
-	"suspend" .. flags(homestead_basic_options),         
-	"up" .. flags(
-						"--provision",
-						homestead_basic_options
-						),
-	"update" .. flags(homestead_basic_options)    
+      					"--ip",
+      					"--after",
+      					"--aliases",
+      					"--example"
+						)
 })
 
 clink.arg.register_parser("homestead", homestead_basic_parser)
