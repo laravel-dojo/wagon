@@ -17,7 +17,7 @@ local composer_basic_options = {
 	"--ansi",
 	"--no-ansi",
 	"--no-interaction", "-n",
-	"--profile",
+	"--profile", "--no-plugins",
 	"--working-dir" , "-d"
 }
 
@@ -26,29 +26,29 @@ composer_basic_parser:set_flags(composer_basic_options)
 composer_basic_parser:set_arguments({
 	"about" .. flags(composer_basic_options),            
 	"archive" .. flags(
-						"--format","-f",
+						"--format", "-f",
 						"--dir",
 						composer_basic_options
 						),          
 	"browse" .. flags(
-						"--homepage","-H",
-						"--show","-s",
+						"--homepage", "-H",
+						"--show", "-s",
 						composer_basic_options
 						),           
 	"clear-cache" .. flags(composer_basic_options),      
 	"clearcache" .. flags(composer_basic_options),       
 	"config" .. flags(
-						"--global","-g",
-						"--editor","-e",
-						"--auth","-a",
+						"--global", "-g",
+						"--editor", "-e",
+						"--auth", "-a",
 						"--unset",
-						"--list","-l",
-						"--file","-f",
+						"--list", "-l",
+						"--file", "-f",
 						"--absolute",
 						composer_basic_options
 						),           
 	"create-project" .. flags(
-						"--stability","-s",
+						"--stability", "-s",
 						"--prefer-source",
 						"--prefer-dist",
 						"--repository-url",
@@ -69,15 +69,19 @@ composer_basic_parser:set_arguments({
 						),          
 	"diagnose" .. flags(composer_basic_options),         
 	"dump-autoload" .. flags(
-						"--optimize","-o",
+						"--optimize", "-o",
 						"--no-dev",
 						composer_basic_options
 						),    
 	"dumpautoload" .. flags(
-						"--optimize","-o",
+						"--optimize", "-o",
 						"--no-dev",
 						composer_basic_options
-						),     
+						),
+	"exec" .. flags(
+						"--list", "-l",
+						composer_basic_options
+						),
 	"global" .. flags(composer_basic_options),           
 	"help" .. flags(
 						"--xml",
@@ -86,7 +90,7 @@ composer_basic_parser:set_arguments({
 						composer_basic_options
 						),             
 	"home" .. flags(
-						"--homepage","-H",
+						"--homepage", "-H",
 						"--show", "-s",
 						composer_basic_options
 						),
@@ -107,8 +111,8 @@ composer_basic_parser:set_arguments({
 						"--homepage",
 						"--require",
 						"--require-dev",
-						"--stability","-s",
-						"--license","-l",
+						"--stability", "-s",
+						"--license", "-l",
 						composer_basic_options
 						),             
 	"install" .. flags(
@@ -121,12 +125,12 @@ composer_basic_parser:set_arguments({
 						"--no-custom-installers",
 						"--no-scripts",
 						"--no-progress",
-						"--optimize-autoloader","-o",
+						"--optimize-autoloader", "-o",
 						"--ignore-platform-reqs",
 						composer_basic_options
 						),          
 	"licenses" .. flags(
-						"--format","-f",
+						"--format", "-f",
 						"--no-dev",
 						composer_basic_options
 						),         
@@ -134,7 +138,18 @@ composer_basic_parser:set_arguments({
 						"--xml",
 						"--format",
 						"--raw"
-						),             
+						),
+	"outdated" .. flags(
+						"--outdated", "-o",
+						"--all", "-a",
+						"--direct", "-D",
+						composer_basic_options
+						),      
+	"prohibits" .. flags(
+						"--recursive", "-r",
+						"--tree", "-t",
+						composer_basic_options
+						),
 	"remove" .. flags(
 						"--dev",
 						"--no-progress",
@@ -187,7 +202,13 @@ composer_basic_parser:set_arguments({
 						"--path","-P",
 						composer_basic_options
 						),             
-	"status" .. flags(composer_basic_options),           
+	"status" .. flags(composer_basic_options),     
+	"suggests" .. flags(
+      					"--by-package",
+      					"--by-suggestion",
+      					"--no-dev",
+						composer_basic_options
+						),
 	"update" .. flags(
 						"--prefer-source",
 						"--prefer-dist",
@@ -210,6 +231,16 @@ composer_basic_parser:set_arguments({
 	"validate" .. flags(
 						"--no-check-all",
 						"--no-check-publish",
+						composer_basic_options
+						),
+	"why" .. flags(
+						"--recursive", "-r",
+						"--tree", "-t",
+						composer_basic_options
+						),
+	"why-not" .. flags(
+						"--recursive", "-r",
+						"--tree", "-t",
 						composer_basic_options
 						)
 })
