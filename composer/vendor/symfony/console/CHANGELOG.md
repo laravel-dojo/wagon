@@ -1,6 +1,17 @@
 CHANGELOG
 =========
 
+3.1.0
+-----
+
+ * added truncate method to FormatterHelper
+ * added setColumnWidth(s) method to Table 
+
+2.8.3
+-----
+
+ * remove readline support from the question helper as it caused issues
+
 2.8.0
 -----
 

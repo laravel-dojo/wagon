@@ -1,6 +1,7 @@
 {
     "require": {
         "laravel/installer": "^1.3",
-        "laravel/envoy": "^1.0"
+        "laravel/envoy": "^1.2",
+        "psy/psysh": "@stable"
     }
 }

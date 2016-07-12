@@ -138,12 +138,12 @@ class Question
      */
     public function setAutocompleterValues($values)
     {
-        if (is_array($values) && $this->isAssoc($values)) {
-            $values = array_merge(array_keys($values), array_values($values));
+        if (is_array($values)) {
+            $values = $this->isAssoc($values) ? array_merge(array_keys($values), array_values($values)) : array_values($values);
         }
 
         if (null !== $values && !is_array($values)) {
-            if (!$values instanceof \Traversable || $values instanceof \Countable) {
+            if (!$values instanceof \Traversable || !$values instanceof \Countable) {
                 throw new InvalidArgumentException('Autocompleter values can be either an array, `null` or an object implementing both `Countable` and `Traversable` interfaces.');
             }
         }
@@ -164,7 +164,7 @@ class Question
      *
      * @return Question The current instance
      */
-    public function setValidator($validator)
+    public function setValidator(callable $validator = null)
     {
         $this->validator = $validator;
 
@@ -224,7 +224,7 @@ class Question
      *
      * @return Question The current instance
      */
-    public function setNormalizer($normalizer)
+    public function setNormalizer(callable $normalizer)
     {
         $this->normalizer = $normalizer;
 

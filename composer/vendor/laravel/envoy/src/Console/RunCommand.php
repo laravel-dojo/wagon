@@ -16,6 +16,22 @@ class RunCommand extends \Symfony\Component\Console\Command\Command
     use Command;
 
     /**
+     * Command line options that should not be gathered dynamically.
+     *
+     * @var array
+     */
+    protected $ignoreOptions = [
+        '--pretend',
+        '--help',
+        '--quiet',
+        '--version',
+        '--asci',
+        '--no-asci',
+        '--no-interactions',
+        '--verbose',
+    ];
+
+    /**
      * Configure the command options.
      *
      * @return void
@@ -78,13 +94,15 @@ class RunCommand extends \Symfony\Component\Console\Command\Command
      */
     protected function runTask($container, $task)
     {
-        $confirm = $container->getTask($task)->confirm;
+        $macroOptions = $container->getMacroOptions($this->argument('task'));
+
+        $confirm = $container->getTask($task, $macroOptions)->confirm;
 
         if ($confirm && ! $this->confirmTaskWithUser($task, $confirm)) {
             return;
         }
 
-        if (($exitCode = $this->runTaskOverSSH($container->getTask($task))) > 0) {
+        if (($exitCode = $this->runTaskOverSSH($container->getTask($task, $macroOptions))) > 0) {
             foreach ($container->getErrorCallbacks() as $callback) {
                 call_user_func($callback, $task);
             }
@@ -182,7 +200,7 @@ class RunCommand extends \Symfony\Component\Console\Command\Command
     /**
      * Gather the dynamic options for the command.
      *
-     * @return void
+     * @return array
      */
     protected function getOptions()
     {
@@ -192,11 +210,17 @@ class RunCommand extends \Symfony\Component\Console\Command\Command
         // the double hyphens in front of their name. We will make these available to the
         // Blade task file so they can be used in echo statements and other structures.
         foreach ($_SERVER['argv'] as $argument) {
-            preg_match('/^\-\-(.*?)=(.*)$/', $argument, $match);
-
-            if (count($match) > 0) {
-                $options[$match[1]] = $match[2];
+            if (! starts_with($argument, '--') || in_array($argument, $this->ignoreOptions)) {
+                continue;
             }
+
+            $option = explode('=', substr($argument, 2));
+
+            if (count($option) == 1) {
+                $option[1] = true;
+            }
+
+            $options[$option[0]] = $option[1];
         }
 
         return $options;

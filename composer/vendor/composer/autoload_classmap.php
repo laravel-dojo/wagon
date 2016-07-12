@@ -12,6 +12,7 @@ return array(
     'Laravel\\Envoy\\Console\\InitCommand' => $vendorDir . '/laravel/envoy/src/Console/InitCommand.php',
     'Laravel\\Envoy\\Console\\RunCommand' => $vendorDir . '/laravel/envoy/src/Console/RunCommand.php',
     'Laravel\\Envoy\\Console\\SshCommand' => $vendorDir . '/laravel/envoy/src/Console/SshCommand.php',
+    'Laravel\\Envoy\\Console\\TasksCommand' => $vendorDir . '/laravel/envoy/src/Console/TasksCommand.php',
     'Laravel\\Envoy\\Hipchat' => $vendorDir . '/laravel/envoy/src/Hipchat.php',
     'Laravel\\Envoy\\ParallelSSH' => $vendorDir . '/laravel/envoy/src/ParallelSSH.php',
     'Laravel\\Envoy\\RemoteProcessor' => $vendorDir . '/laravel/envoy/src/RemoteProcessor.php',

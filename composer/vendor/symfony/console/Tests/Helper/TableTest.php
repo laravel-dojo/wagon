@@ -269,21 +269,27 @@ TABLE
                         '9971-5-0210-0',
                         new TableCell("A Tale of \nTwo Cities", array('colspan' => 2)),
                     ),
+                    new TableSeparator(),
+                    array(
+                        new TableCell('Cupiditate dicta atque porro, tempora exercitationem modi animi nulla nemo vel nihil!', array('colspan' => 3)),
+                    ),
                 ),
                 'default',
 <<<TABLE
-+----------------+---------------+-----------------+
-| ISBN           | Title         | Author          |
-+----------------+---------------+-----------------+
-| 99921-58-10-7  | Divine Comedy | Dante Alighieri |
-+----------------+---------------+-----------------+
-| Divine Comedy(Dante Alighieri)                   |
-+----------------+---------------+-----------------+
-| Arduino: A Quick-Start Guide   | Mark Schmidt    |
-+----------------+---------------+-----------------+
-| 9971-5-0210-0  | A Tale of                       |
-|                | Two Cities                      |
-+----------------+---------------+-----------------+
++-------------------------------+-------------------------------+-----------------------------+
+| ISBN                          | Title                         | Author                      |
++-------------------------------+-------------------------------+-----------------------------+
+| 99921-58-10-7                 | Divine Comedy                 | Dante Alighieri             |
++-------------------------------+-------------------------------+-----------------------------+
+| Divine Comedy(Dante Alighieri)                                                              |
++-------------------------------+-------------------------------+-----------------------------+
+| Arduino: A Quick-Start Guide                                  | Mark Schmidt                |
++-------------------------------+-------------------------------+-----------------------------+
+| 9971-5-0210-0                 | A Tale of                                                   |
+|                               | Two Cities                                                  |
++-------------------------------+-------------------------------+-----------------------------+
+| Cupiditate dicta atque porro, tempora exercitationem modi animi nulla nemo vel nihil!       |
++-------------------------------+-------------------------------+-----------------------------+
 
 TABLE
             ),
@@ -336,16 +342,16 @@ TABLE
                 ),
                 'default',
 <<<TABLE
-+------------------+--------+-----------------+
-| ISBN             | Title  | Author          |
-+------------------+--------+-----------------+
-| 9971-5-0210-0             | Dante Alighieri |
-|                           | Charles Dickens |
-+------------------+--------+-----------------+
-| Dante Alighieri  | 9971-5-0210-0            |
-| J. R. R. Tolkien |                          |
-| J. R. R          |                          |
-+------------------+--------+-----------------+
++------------------+---------+-----------------+
+| ISBN             | Title   | Author          |
++------------------+---------+-----------------+
+| 9971-5-0210-0              | Dante Alighieri |
+|                            | Charles Dickens |
++------------------+---------+-----------------+
+| Dante Alighieri  | 9971-5-0210-0             |
+| J. R. R. Tolkien |                           |
+| J. R. R          |                           |
++------------------+---------+-----------------+
 
 TABLE
             ),
@@ -473,9 +479,9 @@ TABLE
         ),
                 'default',
 <<<TABLE
-+--+--+--+--+--+--+--+--+--+
-| 1      | 2   | 3   | 4   |
-+--+--+--+--+--+--+--+--+--+
++---+--+--+---+--+---+--+---+--+
+| 1       | 2    | 3    | 4    |
++---+--+--+---+--+---+--+---+--+
 
 TABLE
             ),
@@ -580,15 +586,15 @@ TABLE;
 
         $expected =
 <<<TABLE
-+---+--+
-| foo  |
-+---+--+
-+---+--+
-| foo  |
-+---+--+
-+---+--+
-| foo  |
-+---+--+
++----+---+
+| foo    |
++----+---+
++----+---+
+| foo    |
++----+---+
++----+---+
+| foo    |
++----+---+
 
 TABLE;
 
@@ -619,6 +625,69 @@ TABLE;
 | 99921-58-10-7 | Divine Comedy        | Dante Alighieri |   9.95 |
 | 9971-5-0210-0 | A Tale of Two Cities | Charles Dickens | 139.25 |
 +---------------+----------------------+-----------------+--------+
+
+TABLE;
+
+        $this->assertEquals($expected, $this->getOutputContent($output));
+    }
+
+    public function testColumnWith()
+    {
+        $table = new Table($output = $this->getOutputStream());
+        $table
+            ->setHeaders(array('ISBN', 'Title', 'Author', 'Price'))
+            ->setRows(array(
+                array('99921-58-10-7', 'Divine Comedy', 'Dante Alighieri', '9.95'),
+                array('9971-5-0210-0', 'A Tale of Two Cities', 'Charles Dickens', '139.25'),
+            ))
+            ->setColumnWidth(0, 15)
+            ->setColumnWidth(3, 10);
+
+        $style = new TableStyle();
+        $style->setPadType(STR_PAD_LEFT);
+        $table->setColumnStyle(3, $style);
+
+        $table->render();
+
+        $expected =
+            <<<TABLE
++-----------------+----------------------+-----------------+------------+
+| ISBN            | Title                | Author          |      Price |
++-----------------+----------------------+-----------------+------------+
+| 99921-58-10-7   | Divine Comedy        | Dante Alighieri |       9.95 |
+| 9971-5-0210-0   | A Tale of Two Cities | Charles Dickens |     139.25 |
++-----------------+----------------------+-----------------+------------+
+
+TABLE;
+
+        $this->assertEquals($expected, $this->getOutputContent($output));
+    }
+
+    public function testColumnWiths()
+    {
+        $table = new Table($output = $this->getOutputStream());
+        $table
+            ->setHeaders(array('ISBN', 'Title', 'Author', 'Price'))
+            ->setRows(array(
+                array('99921-58-10-7', 'Divine Comedy', 'Dante Alighieri', '9.95'),
+                array('9971-5-0210-0', 'A Tale of Two Cities', 'Charles Dickens', '139.25'),
+            ))
+            ->setColumnWidths(array(15, 0, -1, 10));
+
+        $style = new TableStyle();
+        $style->setPadType(STR_PAD_LEFT);
+        $table->setColumnStyle(3, $style);
+
+        $table->render();
+
+        $expected =
+            <<<TABLE
++-----------------+----------------------+-----------------+------------+
+| ISBN            | Title                | Author          |      Price |
++-----------------+----------------------+-----------------+------------+
+| 99921-58-10-7   | Divine Comedy        | Dante Alighieri |       9.95 |
+| 9971-5-0210-0   | A Tale of Two Cities | Charles Dickens |     139.25 |
++-----------------+----------------------+-----------------+------------+
 
 TABLE;
 
