@@ -10,3 +10,4 @@ open.=explorer .
 wget=curl -O $*
 
 artisan=php artisan $*
+
