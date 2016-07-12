@@ -42,6 +42,8 @@
     set "GIT_INSTALL_ROOT=%ProgramFiles%\Git"
 ) else if exist "%ProgramFiles(x86)%\Git" (
     set "GIT_INSTALL_ROOT=%ProgramFiles(x86)%\Git"
+) else if exist "%CMDER_ROOT%\vendor" (
+    set "GIT_INSTALL_ROOT=%CMDER_ROOT%\vendor\git-for-windows"
 )
 
 :: Add git to the path
@@ -52,14 +54,12 @@
 )
 
 :: Enhance Path
-@set PATH=%CMDER_ROOT%\bin;%PATH%;%CMDER_ROOT%
-
 @set CMDER_START=%WAGON_ROOT%\uwamp\www
 @set COMPOSER_HOME=%WAGON_ROOT%\composer
 @set PHP_INSTSLL_ROOT=%WAGON_ROOT%\uwamp\bin\php\php-7.0.3
 @set SQLITE_ROOT=%CMDER_ROOT%\vendor\sqlite
 
-@set PATH=%PHP_INSTSLL_ROOT%;%COMPOSER_HOME%;%COMPOSER_HOME%\vendor\bin;%SQLITE_ROOT%;%PATH%
+@set PATH=%PHP_INSTSLL_ROOT%;%COMPOSER_HOME%;%COMPOSER_HOME%\vendor\bin;%SQLITE_ROOT%;%CMDER_ROOT%\bin;%PATH%;%CMDER_ROOT%
 
 :: Add aliases
 @doskey /macrofile="%CMDER_ROOT%\config\aliases"

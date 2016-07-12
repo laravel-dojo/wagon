@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <key name="Software">
 	<key name="ConEmu">
-		<key name=".Vanilla" modified="2016-01-21 18:13:04" build="150913">
+		<key name=".Vanilla" modified="2015-05-17 22:10:27" build="150513">
 			<value name="ColorTable00" type="dword" data="00222827"/>
 			<value name="ColorTable01" type="dword" data="009e5401"/>
 			<value name="ColorTable02" type="dword" data="0004aa74"/>
@@ -127,8 +127,8 @@
 			<value name="ConWnd Width" type="dword" data="0000006f"/>
 			<value name="ConWnd Height" type="dword" data="0000001a"/>
 			<value name="Cascaded" type="hex" data="01"/>
-			<value name="ConWnd X" type="dword" data="00000026"/>
-			<value name="ConWnd Y" type="dword" data="00000024"/>
+			<value name="ConWnd X" type="dword" data="000003f8"/>
+			<value name="ConWnd Y" type="dword" data="00000143"/>
 			<value name="16bit Height" type="dword" data="00000000"/>
 			<value name="AutoSaveSizePos" type="hex" data="00"/>
 			<value name="IntegralSize" type="hex" data="00"/>
@@ -483,9 +483,9 @@
 			<value name="DndLKey" type="hex" data="00"/>
 			<value name="DndRKey" type="hex" data="a2"/>
 			<value name="WndDragKey" type="dword" data="00121101"/>
-			<key name="Tasks" modified="2016-01-21 18:13:04" build="150913">
+			<key name="Tasks" modified="2015-05-17 22:10:27" build="150513">
 				<value name="Count" type="dword" data="00000003"/>
-				<key name="Task1" modified="2016-01-21 18:13:04" build="150913">
+				<key name="Task1" modified="2015-05-17 22:10:27" build="150513">
 					<value name="Name" type="string" data="{cmd}"/>
 					<value name="GuiArgs" type="string" data="/icon &quot;%CMDER_ROOT%\cmder.exe&quot;"/>
 					<value name="Cmd1" type="string" data="cmd /k &quot;%ConEmuDir%\..\init.bat&quot;  -new_console:d:%USERPROFILE%"/>
@@ -494,7 +494,7 @@
 					<value name="Hotkey" type="dword" data="00000000"/>
 					<value name="Flags" type="dword" data="00000000"/>
 				</key>
-				<key name="Task2" modified="2016-01-21 18:13:04" build="150913">
+				<key name="Task2" modified="2015-05-17 22:10:27" build="150513">
 					<value name="Name" type="string" data="{PowerShell}"/>
 					<value name="GuiArgs" type="string" data="/icon &quot;%CMDER_ROOT%\cmder.exe&quot;"/>
 					<value name="Cmd1" type="string" data="PowerShell -ExecutionPolicy Bypass -NoLogo -NoProfile -NoExit -Command &quot;Invoke-Expression '. ''%ConEmuDir%\..\profile.ps1'''&quot; -new_console:d:&quot;%USERPROFILE%&quot;"/>
@@ -503,7 +503,7 @@
 					<value name="Hotkey" type="dword" data="00000000"/>
 					<value name="Flags" type="dword" data="00000000"/>
 				</key>
-				<key name="Task3" modified="2016-01-21 18:13:04" build="150913">
+				<key name="Task3" modified="2015-05-17 22:10:27" build="150513">
 					<value name="Name" type="string" data="{PowerShell as Admin}"/>
 					<value name="Hotkey" type="dword" data="00000000"/>
 					<value name="GuiArgs" type="string" data="/icon &quot;%CMDER_ROOT%\cmder.exe&quot;"/>
@@ -523,11 +523,11 @@
 				</key>
 			</key>
 
-			<key name="Apps" modified="2016-01-21 18:13:04" build="150913">
+			<key name="Apps" modified="2015-05-17 22:10:27" build="150513">
 				<value name="Count" type="dword" data="00000000"/>
 			</key>
-			<key name="Colors" modified="2016-01-21 18:13:04" build="150913">
-				<key name="Palette1" modified="2016-01-21 18:13:04" build="150913">
+			<key name="Colors" modified="2015-05-17 22:10:27" build="150513">
+				<key name="Palette1" modified="2015-05-17 22:10:27" build="150513">
 					<value name="Name" type="string" data="Monokai"/>
 					<value name="ExtendColors" type="hex" data="00"/>
 					<value name="ExtendColorIdx" type="hex" data="0e"/>
@@ -628,7 +628,7 @@
 			<value name="StatusBar.Hide.Dpi" type="hex" data="01"/>
 			<value name="TabFlashChanged" type="dword" data="00000008"/>
 			<value name="TabModifiedSuffix" type="string" data="[*]"/>
-			<key name="HotKeys" modified="2016-01-21 18:13:04" build="150913">
+			<key name="HotKeys" modified="2015-05-17 22:10:27" build="150513">
 				<value name="KeyMacroVersion" type="hex" data="02"/>
 				<value name="Multi.Modifier" type="dword" data="00000011"/>
 				<value name="Multi.ArrowsModifier" type="dword" data="0000005b"/>
@@ -805,15 +805,7 @@
 				<value name="DndLKey" type="hex" data="00"/>
 				<value name="DndRKey" type="hex" data="a2"/>
 				<value name="WndDragKey" type="dword" data="00121101"/>
-				<value name="Multi.Unfasten" type="dword" data="00000000"/>
 			</key>
-			<value name="StartCreateDelay" type="dword" data="00000064"/>
-			<value name="DefaultTerminalDebugLog" type="hex" data="00"/>
-			<value name="Restore2ActiveMon" type="hex" data="00"/>
-			<value name="DownShowExOnTopMessage" type="hex" data="00"/>
-			<value name="EnvironmentSet" type="multi"/>
-			<value name="Update.InetTool" type="hex" data="00"/>
-			<value name="Update.InetToolCmd" type="string" data=""/>
 		</key>
 	</key>
 </key>
