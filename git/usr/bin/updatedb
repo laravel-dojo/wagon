@@ -22,7 +22,7 @@
 #set -x
 
 version='
-updatedb (GNU findutils) 4.5.14
+updatedb (GNU findutils) 4.6.0
 Copyright (C) 2007,2008,2009,2010 Free Software Foundation, Inc.
 License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 This is free software: you are free to change and redistribute it.

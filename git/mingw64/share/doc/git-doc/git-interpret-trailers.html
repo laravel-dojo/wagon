@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 1.5.3">
+<meta name="generator" content="Asciidoctor 1.5.4">
 <title>git-interpret-trailers(1)</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
@@ -430,7 +430,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <h2 id="_synopsis">SYNOPSIS</h2>
 <div class="sectionbody">
 <div class="verseblock">
-<pre class="content"><em>git interpret-trailers</em> [--trim-empty] [(--trailer &lt;token&gt;[(=|:)&lt;value&gt;])&#8230;&#8203;] [&lt;file&gt;&#8230;&#8203;]</pre>
+<pre class="content"><em>git interpret-trailers</em> [--in-place] [--trim-empty] [(--trailer &lt;token&gt;[(=|:)&lt;value&gt;])&#8230;&#8203;] [&lt;file&gt;&#8230;&#8203;]</pre>
 </div>
 </div>
 </div>
@@ -504,6 +504,10 @@ folding rules, the encoding rules and probably many other rules.</p>
 <div class="sectionbody">
 <div class="dlist">
 <dl>
+<dt class="hdlist1">--in-place</dt>
+<dd>
+<p>Edit the files in place.</p>
+</dd>
 <dt class="hdlist1">--trim-empty</dt>
 <dd>
 <p>If the &lt;value&gt; part of any trailer contains only whitespace,
@@ -702,6 +706,27 @@ Signed-off-by: Bob &lt;bob@example.com&gt;</pre>
 </div>
 </li>
 <li>
+<p>Use the <em>--in-place</em> option to edit a message file in place:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ cat msg.txt
+subject
+
+message
+
+Signed-off-by: Bob &lt;bob@example.com&gt;
+$ git interpret-trailers --trailer 'Acked-by: Alice &lt;alice@example.com&gt;' --in-place msg.txt
+$ cat msg.txt
+subject
+
+message
+
+Signed-off-by: Bob &lt;bob@example.com&gt;
+Acked-by: Alice &lt;alice@example.com&gt;</pre>
+</div>
+</div>
+</li>
+<li>
 <p>Extract the last commit as a patch, and add a <em>Cc</em> and a
 <em>Reviewed-by</em> trailer to it:</p>
 <div class="listingblock">
@@ -823,7 +848,7 @@ $ chmod +x .git/hooks/commit-msg</pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-01-05 15:53:48 W. Europe Standard Time
+Last updated 2016-06-14 11:04:07 W. Europe Daylight Time
 </div>
 </div>
 </body>

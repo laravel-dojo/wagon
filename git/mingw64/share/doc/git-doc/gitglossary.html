@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 1.5.3">
+<meta name="generator" content="Asciidoctor 1.5.4">
 <title>gitglossary(7)</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
@@ -609,7 +609,7 @@ do not appear in any <a href="#def_parent">parent</a>.</p>
 <p>A fast-forward is a special type of <a href="#def_merge">merge</a> where you have a
 <a href="#def_revision">revision</a> and you are "merging" another
 <a href="#def_branch">branch</a>'s changes that happen to be a descendant of what
-you have. In such these cases, you do not make a new <a href="#def_merge">merge</a>
+you have. In such a case, you do not make a new <a href="#def_merge">merge</a>
 <a href="#def_commit">commit</a> but instead just update to his
 revision. This will happen frequently on a
 <a href="#def_remote_tracking_branch">remote-tracking branch</a> of a remote
@@ -1078,6 +1078,12 @@ via <a href="#def_alternate_object_database">alternates mechanism</a>.</p>
 <p>"Secure Hash Algorithm 1"; a cryptographic hash function.
 In the context of Git used as a synonym for <a href="#def_object_name">object name</a>.</p>
 </dd>
+<dt class="hdlist1"><a id="def_shallow_clone"></a>shallow clone</dt>
+<dd>
+<p>Mostly a synonym to <a href="#def_shallow_repository">shallow repository</a>
+but the phrase makes it more explicit that it was created by
+running <code>git clone --depth=...</code> command.</p>
+</dd>
 <dt class="hdlist1"><a id="def_shallow_repository"></a>shallow repository</dt>
 <dd>
 <p>A shallow <a href="#def_repository">repository</a> has an incomplete
@@ -1215,7 +1221,7 @@ plus any local changes that you have made but not yet committed.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-01-05 15:53:48 W. Europe Standard Time
+Last updated 2016-06-14 11:04:08 W. Europe Daylight Time
 </div>
 </div>
 </body>

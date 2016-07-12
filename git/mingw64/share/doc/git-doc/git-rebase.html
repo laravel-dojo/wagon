@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 1.5.3">
+<meta name="generator" content="Asciidoctor 1.5.4">
 <title>git-rebase(1)</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
@@ -422,7 +422,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <h1>git-rebase(1) Manual Page</h1>
 <h2>NAME</h2>
 <div class="sectionbody">
-<p>git-rebase - Forward-port local commits to the updated upstream head</p>
+<p>git-rebase - Reapply commits on top of another base tip</p>
 </div>
 </div>
 <div id="content">
@@ -917,10 +917,6 @@ idea unless you know what you are doing (see BUGS below).</p>
 final history. &lt;cmd&gt; will be interpreted as one or more shell
 commands.</p>
 <div class="paragraph">
-<p>This option can only be used with the <code>--interactive</code> option
-(see INTERACTIVE MODE below).</p>
-</div>
-<div class="paragraph">
 <p>You may execute several commands by either using one instance of <code>--exec</code>
 with several commands:</p>
 </div>
@@ -941,6 +937,10 @@ with several commands:</p>
 <p>If <code>--autosquash</code> is used, "exec" lines will not be appended for
 the intermediate commits, and will only appear at the end of each
 squash/fixup series.</p>
+</div>
+<div class="paragraph">
+<p>This uses the <code>--interactive</code> machinery internally, but it can be run
+without an explicit <code>--interactive</code>.</p>
 </div>
 </dd>
 <dt class="hdlist1">--root</dt>
@@ -1109,10 +1109,20 @@ branches with differing checkin/checkout attributes" in
 <p>Disables the <code>renormalize</code> option.  This overrides the
 <code>merge.renormalize</code> configuration variable.</p>
 </dd>
+<dt class="hdlist1">no-renames</dt>
+<dd>
+<p>Turn off rename detection.
+See also <a href="git-diff.html">git-diff</a>(1) <code>--no-renames</code>.</p>
+</dd>
+<dt class="hdlist1">find-renames[=&lt;n&gt;]</dt>
+<dd>
+<p>Turn on rename detection, optionally setting the similarity
+threshold.  This is the default.
+See also <a href="git-diff.html">git-diff</a>(1) <code>--find-renames</code>.</p>
+</dd>
 <dt class="hdlist1">rename-threshold=&lt;n&gt;</dt>
 <dd>
-<p>Controls the similarity threshold used for rename detection.
-See also <a href="git-diff.html">git-diff</a>(1) <code>-M</code>.</p>
+<p>Deprecated synonym for <code>find-renames=&lt;n&gt;</code>.</p>
 </dd>
 <dt class="hdlist1">subtree[=&lt;path&gt;]</dt>
 <dd>
@@ -1648,7 +1658,7 @@ reorder commits tend to produce counterintuitive results.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-01-05 15:53:48 W. Europe Standard Time
+Last updated 2016-06-14 11:04:07 W. Europe Daylight Time
 </div>
 </div>
 </body>

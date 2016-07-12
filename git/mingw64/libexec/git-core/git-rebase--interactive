@@ -82,6 +82,7 @@ rewritten_pending="$state_dir"/rewritten-pending
 cr=$(printf "\015")
 
 strategy_args=${strategy:+--strategy=$strategy}
+test -n "$strategy_opts" &&
 eval '
 	for strategy_opt in '"$strategy_opts"'
 	do
@@ -191,7 +192,6 @@ make_patch () {
 die_with_patch () {
 	echo "$1" > "$state_dir"/stopped-sha
 	make_patch "$1"
-	git rerere
 	die "$2"
 }
 
@@ -548,7 +548,8 @@ do_next () {
 
 		mark_action_done
 		do_pick $sha1 "$rest"
-		warn "Stopped at $sha1... $rest"
+		sha1_abbrev=$(git rev-parse --short $sha1)
+		warn "Stopped at $sha1_abbrev... $rest"
 		exit_with_patch $sha1 0
 		;;
 	squash|s|fixup|f)
@@ -865,12 +866,12 @@ add_exec_commands () {
 # $3: the input filename
 check_commit_sha () {
 	badsha=0
-	if test -z $1
+	if test -z "$1"
 	then
 		badsha=1
 	else
 		sha1_verif="$(git rev-parse --verify --quiet $1^{commit})"
-		if test -z $sha1_verif
+		if test -z "$sha1_verif"
 		then
 			badsha=1
 		fi
@@ -1233,7 +1234,8 @@ then
 	git rev-list $revisions |
 	while read rev
 	do
-		if test -f "$rewritten"/$rev && test "$(sane_grep "$rev" "$state_dir"/not-cherry-picks)" = ""
+		if test -f "$rewritten"/$rev &&
+		   ! sane_grep "$rev" "$state_dir"/not-cherry-picks >/dev/null
 		then
 			# Use -f2 because if rev-list is telling us this commit is
 			# not worthwhile, we don't want to track its multiple heads,

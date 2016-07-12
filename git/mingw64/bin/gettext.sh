@@ -49,7 +49,7 @@ if test -z "${ZSH_VERSION+set}"; then
     gettext.sh | */gettext.sh | *\\gettext.sh)
       progname=$0
       package=gettext-runtime
-      version=0.19.6
+      version=0.19.7
       # func_usage
       # outputs to stdout the --help usage message.
       func_usage ()

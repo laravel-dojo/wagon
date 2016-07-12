@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 1.5.3">
+<meta name="generator" content="Asciidoctor 1.5.4">
 <title>gitcore-tutorial(7)</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
@@ -1356,7 +1356,7 @@ files).</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>$ git clone rsync://rsync.kernel.org/pub/scm/git/git.git/ my-git
+<pre>$ git clone git://git.kernel.org/pub/scm/git/git.git/ my-git
 $ cd my-git
 $ git checkout</pre>
 </div>
@@ -1745,22 +1745,6 @@ repository to download from:</p>
 </div>
 <div class="dlist">
 <dl>
-<dt class="hdlist1">Rsync</dt>
-<dd>
-<p><code>rsync://remote.machine/path/to/repo.git/</code></p>
-<div class="paragraph">
-<p>Rsync transport is usable for both uploading and downloading,
-but is completely unaware of what git does, and can produce
-unexpected results when you download from the public repository
-while the repository owner is uploading into it via <code>rsync</code>
-transport.  Most notably, it could update the files under
-<code>refs/</code> which holds the object name of the topmost commits
-before uploading the files in <code>objects/</code>&#8201;&#8212;&#8201;the downloader would
-obtain head commit object name while that object itself is still
-not available in the repository.  For this reason, it is
-considered deprecated.</p>
-</div>
-</dd>
 <dt class="hdlist1">SSH</dt>
 <dd>
 <p><code>remote.machine:/path/to/repo.git/</code> or</p>
@@ -2316,7 +2300,7 @@ while, depending on how active your project is.</p>
 <div class="paragraph">
 <p>When a repository is synchronized via <code>git push</code> and <code>git pull</code>
 objects packed in the source repository are usually stored
-unpacked in the destination, unless rsync transport is used.
+unpacked in the destination.
 While this allows you to use different packing strategies on
 both ends, it also means you may need to repack both
 repositories every once in a while.</p>
@@ -2628,7 +2612,7 @@ to follow, not easier.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-01-05 15:53:48 W. Europe Standard Time
+Last updated 2016-06-14 11:04:08 W. Europe Daylight Time
 </div>
 </div>
 </body>

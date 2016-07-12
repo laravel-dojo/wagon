@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 1.5.3">
+<meta name="generator" content="Asciidoctor 1.5.4">
 <title>git-svn(1)</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
@@ -1762,6 +1762,8 @@ listed below are allowed:</p>
 	url = http://server.org/svn
 	fetch = trunk/project-a:refs/remotes/project-a/trunk
 	branches = branches/*/project-a:refs/remotes/project-a/branches/*
+	branches = branches/release_*:refs/remotes/project-a/branches/release_*
+	branches = branches/re*se:refs/remotes/project-a/branches/*
 	tags = tags/*/project-a:refs/remotes/project-a/tags/*</pre>
 </div>
 </div>
@@ -1772,6 +1774,25 @@ however the remote wildcard may be anywhere as long as it&#8217;s an
 independent path component (surrounded by <em>/</em> or EOL).   This
 type of configuration is not automatically created by <em>init</em> and
 should be manually entered with a text-editor or using <em>git config</em>.</p>
+</div>
+<div class="paragraph">
+<p>Also note that only one asterisk is allowed per word. For example:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>branches = branches/re*se:refs/remotes/project-a/branches/*</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>will match branches <em>release</em>, <em>rese</em>, <em>re123se</em>, however</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>branches = branches/re*s*e:refs/remotes/project-a/branches/*</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>will produce an error.</p>
 </div>
 <div class="paragraph">
 <p>It is also possible to fetch a subset of branches or tags by using a
@@ -1858,7 +1879,7 @@ rewinds it.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-01-05 15:53:48 W. Europe Standard Time
+Last updated 2016-06-14 11:04:08 W. Europe Daylight Time
 </div>
 </div>
 </body>

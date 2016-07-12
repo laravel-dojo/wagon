@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 1.5.3">
+<meta name="generator" content="Asciidoctor 1.5.4">
 <title>git-p4(1)</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
@@ -1119,23 +1119,18 @@ This variable is a boolean, not the name of a p4 client.</p>
 Git expects paths encoded as UTF-8. Use this config to tell git-p4
 what encoding Perforce had used for the paths. This encoding is used
 to transcode the paths to UTF-8. As an example, Perforce on Windows
-often uses “cp1252” to encode path names.</p>
+often uses "cp1252" to encode path names.</p>
 </dd>
 <dt class="hdlist1">git-p4.largeFileSystem</dt>
 <dd>
 <p>Specify the system that is used for large (binary) files. Please note
 that large file systems do not support the <em>git p4 submit</em> command.
-Only Git LFS [1] is implemented right now. Download
-and install the Git LFS command line extension to use this option
-and configure it like this:</p>
+Only Git LFS is implemented right now (see <a href="https://git-lfs.github.com/" class="bare">https://git-lfs.github.com/</a>
+for more information). Download and install the Git LFS command line
+extension to use this option and configure it like this:</p>
 <div class="listingblock">
 <div class="content">
 <pre>git config       git-p4.largeFileSystem GitLFS</pre>
-</div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>[1] https://git-lfs.github.com/</pre>
 </div>
 </div>
 </dd>
@@ -1166,6 +1161,20 @@ pushed to a server.</p>
 <dd>
 <p>A changelist that contains only excluded files will be imported
 as an empty commit if this boolean option is set to true.</p>
+</dd>
+<dt class="hdlist1">git-p4.mapUser</dt>
+<dd>
+<p>Map a P4 user to a name and email address in Git. Use a string
+with the following format to create a mapping:</p>
+<div class="listingblock">
+<div class="content">
+<pre>git config --add git-p4.mapUser "p4user = First Last &lt;mail@address.com&gt;"</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>A mapping will override any user information from P4. Mappings for
+multiple P4 user can be defined.</p>
+</div>
 </dd>
 </dl>
 </div>
@@ -1281,7 +1290,7 @@ changes are new.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-01-05 15:53:48 W. Europe Standard Time
+Last updated 2016-06-14 11:04:07 W. Europe Daylight Time
 </div>
 </div>
 </body>

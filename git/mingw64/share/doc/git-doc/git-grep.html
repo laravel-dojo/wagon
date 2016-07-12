@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 1.5.3">
+<meta name="generator" content="Asciidoctor 1.5.4">
 <title>git-grep(1)</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
@@ -444,6 +444,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 	   [--break] [--heading] [-p | --show-function]
 	   [-A &lt;post-context&gt;] [-B &lt;pre-context&gt;] [-C &lt;context&gt;]
 	   [-W | --function-context]
+	   [--threads &lt;num&gt;]
 	   [-f &lt;file&gt;] [-e] &lt;pattern&gt;
 	   [--and|--or|--not|(|)|-e &lt;pattern&gt;&#8230;&#8203;]
 	   [ [--[no-]exclude-standard] [--cached | --no-index | --untracked] | &lt;tree&gt;&#8230;&#8203;]
@@ -484,9 +485,19 @@ value <em>default</em> will return to the default matching behavior.</p>
 option is ignored when the <em>grep.patternType</em> option is set to a value
 other than <em>default</em>.</p>
 </dd>
+<dt class="hdlist1">grep.threads</dt>
+<dd>
+<p>Number of grep worker threads to use.  If unset (or set to 0),
+8 threads are used by default (for now).</p>
+</dd>
 <dt class="hdlist1">grep.fullName</dt>
 <dd>
 <p>If set to true, enable <em>--full-name</em> option by default.</p>
+</dd>
+<dt class="hdlist1">grep.fallbackToNoIndex</dt>
+<dd>
+<p>If set to true, fall back to git grep --no-index if git grep
+is executed outside of a git repository.  Defaults to false.</p>
 </dd>
 </dl>
 </div>
@@ -697,6 +708,11 @@ function name up to the one before the next function name,
 effectively showing the whole function in which the match was
 found.</p>
 </dd>
+<dt class="hdlist1">--threads &lt;num&gt;</dt>
+<dd>
+<p>Number of grep worker threads to use.
+See <code>grep.threads</code> in <em>CONFIGURATION</em> for more information.</p>
+</dd>
 <dt class="hdlist1">-f &lt;file&gt;</dt>
 <dd>
 <p>Read patterns from &lt;file&gt;, one per line.</p>
@@ -784,7 +800,7 @@ files that have lines that match both.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-01-05 15:53:48 W. Europe Standard Time
+Last updated 2016-06-14 11:04:07 W. Europe Daylight Time
 </div>
 </div>
 </body>

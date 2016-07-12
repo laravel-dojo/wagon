@@ -272,7 +272,7 @@ proc is_Cygwin {} {
 	if {$_iscygwin eq {}} {
 		if {$::tcl_platform(platform) eq {windows} &&
 				(![info exists ::env(MSYSTEM)] ||
-				 $::env(MSYSTEM) ne {MSYS})} {
+				 $::env(MSYSTEM) eq {MSYS})} {
 			set _iscygwin 1
 		} else {
 			set _iscygwin 0
@@ -1599,11 +1599,13 @@ proc run_prepare_commit_msg_hook {} {
 	if {[file isfile [gitdir MERGE_MSG]]} {
 		set pcm_source "merge"
 		set fd_mm [open [gitdir MERGE_MSG] r]
+		fconfigure $fd_mm -encoding utf-8
 		puts -nonewline $fd_pcm [read $fd_mm]
 		close $fd_mm
 	} elseif {[file isfile [gitdir SQUASH_MSG]]} {
 		set pcm_source "squash"
 		set fd_sm [open [gitdir SQUASH_MSG] r]
+		fconfigure $fd_sm -encoding utf-8
 		puts -nonewline $fd_pcm [read $fd_sm]
 		close $fd_sm
 	} else {

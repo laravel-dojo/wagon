@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 1.5.3">
+<meta name="generator" content="Asciidoctor 1.5.4">
 <title>git-ls-files(1)</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
@@ -433,6 +433,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <pre class="content"><em>git ls-files</em> [-z] [-t] [-v]
 		(--[cached|deleted|others|ignored|stage|unmerged|killed|modified])*
 		(-[c|d|o|i|s|u|k|m])*
+		[--eol]
 		[-x &lt;pattern&gt;|--exclude=&lt;pattern&gt;]
 		[-X &lt;file&gt;|--exclude-from=&lt;file&gt;]
 		[--exclude-per-directory=&lt;file&gt;]
@@ -621,6 +622,28 @@ cache entry.  This is intended to show as much information as
 possible for manual inspection; the exact format may change at
 any time.</p>
 </dd>
+<dt class="hdlist1">--eol</dt>
+<dd>
+<p>Show &lt;eolinfo&gt; and &lt;eolattr&gt; of files.
+&lt;eolinfo&gt; is the file content identification used by Git when
+the "text" attribute is "auto" (or not set and core.autocrlf is not false).
+&lt;eolinfo&gt; is either "-text", "none", "lf", "crlf", "mixed" or "".</p>
+<div class="paragraph">
+<p>"" means the file is not a regular file, it is not in the index or
+not accessible in the working tree.</p>
+</div>
+<div class="paragraph">
+<p>&lt;eolattr&gt; is the attribute that is used when checking out or committing,
+it is either "", "-text", "text", "text=auto", "text eol=lf", "text eol=crlf".
+Note: Currently Git does not support "text=auto eol=lf" or "text=auto eol=crlf",
+that may change in the future.</p>
+</div>
+<div class="paragraph">
+<p>Both the &lt;eolinfo&gt; in the index ("i/&lt;eolinfo&gt;")
+and in the working tree ("w/&lt;eolinfo&gt;") are shown for regular files,
+followed by the  ("attr/&lt;eolattr&gt;").</p>
+</div>
+</dd>
 <dt class="hdlist1">--</dt>
 <dd>
 <p>Do not interpret any more arguments as options.</p>
@@ -645,6 +668,10 @@ which case it outputs:</p>
 <div class="content">
 <pre>[&lt;tag&gt; ]&lt;mode&gt; &lt;object&gt; &lt;stage&gt; &lt;file&gt;</pre>
 </div>
+</div>
+<div class="paragraph">
+<p><em>git ls-files --eol</em> will show
+	i/&lt;eolinfo&gt;&lt;SPACES&gt;w/&lt;eolinfo&gt;&lt;SPACES&gt;attr/&lt;eolattr&gt;&lt;SPACE*&gt;&lt;TAB&gt;&lt;file&gt;</p>
 </div>
 <div class="paragraph">
 <p><em>git ls-files --unmerged</em> and <em>git ls-files --stage</em> can be used to examine
@@ -725,7 +752,7 @@ pattern file appears in.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-01-05 15:53:48 W. Europe Standard Time
+Last updated 2016-06-14 11:04:07 W. Europe Daylight Time
 </div>
 </div>
 </body>

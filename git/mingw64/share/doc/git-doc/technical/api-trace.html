@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 1.5.3">
+<meta name="generator" content="Asciidoctor 1.5.4">
 <title>trace API</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
@@ -459,7 +459,7 @@ don&#8217;t take a key) is <code>GIT_TRACE</code>.</p>
 
 static void trace_print_foo(const char *message)
 {
-	trace_print_key(&amp;trace_foo, message);
+	trace_printf_key(&amp;trace_foo, "%s", message);
 }</pre>
 </div>
 </div>
@@ -542,10 +542,66 @@ trace_performance(t, "frotz");</pre>
 </div>
 </div>
 </div>
+<div class="sect1">
+<h2 id="_bugs_caveats">Bugs &amp; Caveats</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>GIT_TRACE_* environment variables can be used to tell Git to show
+trace output to its standard error stream. Git can often spawn a pager
+internally to run its subcommand and send its standard output and
+standard error to it.</p>
+</div>
+<div class="paragraph">
+<p>Because GIT_TRACE_PERFORMANCE trace is generated only at the very end
+of the program with atexit(), which happens after the pager exits, it
+would not work well if you send its log to the standard error output
+and let Git spawn the pager at the same time.</p>
+</div>
+<div class="paragraph">
+<p>As a work around, you can for example use <em>--no-pager</em>, or set
+GIT_TRACE_PERFORMANCE to another file descriptor which is redirected
+to stderr, or set GIT_TRACE_PERFORMANCE to a file specified by its
+absolute path.</p>
+</div>
+<div class="paragraph">
+<p>For example instead of the following command which by default may not
+print any performance information:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>GIT_TRACE_PERFORMANCE=2 git log -1</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>you may want to use:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>GIT_TRACE_PERFORMANCE=2 git --no-pager log -1</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>or:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>GIT_TRACE_PERFORMANCE=3 3&gt;&amp;2 git log -1</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>or:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>GIT_TRACE_PERFORMANCE=/path/to/log/file git log -1</pre>
+</div>
+</div>
+</div>
+</div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-01-05 15:53:48 W. Europe Standard Time
+Last updated 2016-06-14 11:04:08 W. Europe Daylight Time
 </div>
 </div>
 </body>

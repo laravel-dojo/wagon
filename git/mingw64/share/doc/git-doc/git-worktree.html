@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 1.5.3">
+<meta name="generator" content="Asciidoctor 1.5.4">
 <title>git-worktree(1)</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
@@ -430,7 +430,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <h2 id="_synopsis">SYNOPSIS</h2>
 <div class="sectionbody">
 <div class="verseblock">
-<pre class="content"><em>git worktree add</em> [-f] [--detach] [-b &lt;new-branch&gt;] &lt;path&gt; [&lt;branch&gt;]
+<pre class="content"><em>git worktree add</em> [-f] [--detach] [--checkout] [-b &lt;new-branch&gt;] &lt;path&gt; [&lt;branch&gt;]
 <em>git worktree prune</em> [-n] [-v] [--expire &lt;expire&gt;]
 <em>git worktree list</em> [--porcelain]</pre>
 </div>
@@ -459,11 +459,9 @@ The working tree&#8217;s administrative files in the repository (see
 clean up any stale administrative files.</p>
 </div>
 <div class="paragraph">
-<p>If you move a linked working tree to another file system, or
-within a file system that does not support hard links, you need to run
-at least one git command inside the linked working tree
-(e.g. <code>git status</code>) in order to update its administrative files in the
-repository so that they do not get automatically pruned.</p>
+<p>If you move a linked working tree, you need to manually update the
+administrative files so that they do not get pruned automatically. See
+section "DETAILS" for more information.</p>
 </div>
 <div class="paragraph">
 <p>If a linked working tree is stored on a portable device or network share
@@ -532,6 +530,13 @@ exists. <code>-B</code> overrides this safeguard, resetting <code>&lt;new-branch
 <p>With <code>add</code>, detach HEAD in the new working tree. See "DETACHED HEAD"
 in <a href="git-checkout.html">git-checkout</a>(1).</p>
 </dd>
+<dt class="hdlist1">--[no-]checkout</dt>
+<dd>
+<p>By default, <code>add</code> checks out <code>&lt;branch&gt;</code>, however, <code>--no-checkout</code> can
+be used to suppress checkout in order to make customizations,
+such as configuring sparse-checkout. See "Sparse checkout"
+in <a href="git-read-tree.html">git-read-tree</a>(1).</p>
+</dd>
 <dt class="hdlist1">-n</dt>
 <dt class="hdlist1">--dry-run</dt>
 <dd>
@@ -592,6 +597,14 @@ since refs are shared across all working trees.</p>
 thumb is do not make any assumption about whether a path belongs to
 $GIT_DIR or $GIT_COMMON_DIR when you need to directly access something
 inside $GIT_DIR. Use <code>git rev-parse --git-path</code> to get the final path.</p>
+</div>
+<div class="paragraph">
+<p>If you move a linked working tree, you need to update the <em>gitdir</em> file
+in the entry&#8217;s directory. For example, if a linked working tree is moved
+to <code>/newpath/test-next</code> and its <code>.git</code> file points to
+<code>/path/main/.git/worktrees/test-next</code>, then update
+<code>/path/main/.git/worktrees/test-next/gitdir</code> to reference <code>/newpath/test-next</code>
+instead.</p>
 </div>
 <div class="paragraph">
 <p>To prevent a $GIT_DIR/worktrees entry from being pruned (which
@@ -714,7 +727,7 @@ for a working tree on a portable device)</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-01-05 15:53:48 W. Europe Standard Time
+Last updated 2016-06-14 11:04:08 W. Europe Daylight Time
 </div>
 </div>
 </body>

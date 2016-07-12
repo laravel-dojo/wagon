@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 1.5.3">
+<meta name="generator" content="Asciidoctor 1.5.4">
 <title>git-diff-tree(1)</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
@@ -484,6 +484,14 @@ This is the default.</p>
 <dd>
 <p>Synonym for <code>-p --raw</code>.</p>
 </dd>
+<dt class="hdlist1">--compaction-heuristic</dt>
+<dt class="hdlist1">--no-compaction-heuristic</dt>
+<dd>
+<p>These are to help debugging and tuning an experimental
+heuristic (which is off by default) that shifts the hunk
+boundary in an attempt to make the resulting patch easier
+to read.</p>
+</dd>
 <dt class="hdlist1">--minimal</dt>
 <dd>
 <p>Spend extra time to make sure the smallest possible
@@ -739,7 +747,7 @@ and, correspondingly, show differences character by character.</p>
 </div>
 <div class="paragraph">
 <p>The regex can also be set via a diff driver or configuration option, see
-<a href="gitattributes.html">gitattributes</a>(1) or <a href="git-config.html">git-config</a>(1).  Giving it explicitly
+<a href="gitattributes.html">gitattributes</a>(5) or <a href="git-config.html">git-config</a>(1).  Giving it explicitly
 overrides any diff driver or configuration setting.  Diff drivers
 override configuration settings.</p>
 </div>
@@ -756,8 +764,8 @@ file gives the default to do so.</p>
 </dd>
 <dt class="hdlist1">--check</dt>
 <dd>
-<p>Warn if changes introduce whitespace errors.  What are
-considered whitespace errors is controlled by <code>core.whitespace</code>
+<p>Warn if changes introduce conflict markers or whitespace errors.
+What are considered whitespace errors is controlled by <code>core.whitespace</code>
 configuration.  By default, trailing whitespaces (including
 lines that solely consist of whitespaces) and a space character
 that is immediately followed by a tab character inside the
@@ -1181,7 +1189,23 @@ in <code>X</code> and we are outputting in <code>X</code>, we will output the ob
 verbatim; this means that invalid sequences in the original
 commit may be copied to the output.</p>
 </dd>
-<dt class="hdlist1">--notes[=&lt;ref&gt;]</dt>
+<dt class="hdlist1">--expand-tabs=&lt;n&gt;</dt>
+<dt class="hdlist1">--expand-tabs</dt>
+<dt class="hdlist1">--no-expand-tabs</dt>
+<dd>
+<p>Perform a tab expansion (replace each tab with enough spaces
+to fill to the next display column that is multiple of <em>&lt;n&gt;</em>)
+in the log message before showing it in the output.
+<code>--expand-tabs</code> is a short-hand for <code>--expand-tabs=8</code>, and
+<code>--no-expand-tabs</code> is a short-hand for <code>--expand-tabs=0</code>,
+which disables tab expansion.</p>
+<div class="paragraph">
+<p>By default, tabs are expanded in pretty formats that indent the log
+message by 4 spaces (i.e.  <em>medium</em>, which is the default, <em>full</em>,
+and <em>fuller</em>).</p>
+</div>
+</dd>
+<dt class="hdlist1">--notes[=&lt;treeish&gt;]</dt>
 <dd>
 <p>Show the notes (see <a href="git-notes.html">git-notes</a>(1)) that annotate the
 commit, when showing the commit log message.  This is the default
@@ -1194,8 +1218,8 @@ on the command line.</p>
 environment overrides). See <a href="git-config.html">git-config</a>(1) for more details.</p>
 </div>
 <div class="paragraph">
-<p>With an optional <em>&lt;ref&gt;</em> argument, show this notes ref instead of the
-default notes ref(s). The ref specifies the full refname when it begins
+<p>With an optional <em>&lt;treeish&gt;</em> argument, use the treeish to find the notes
+to display.  The treeish can specify the full refname when it begins
 with <code>refs/notes/</code>; when it begins with <code>notes/</code>, <code>refs/</code> and otherwise
 <code>refs/notes/</code> is prefixed to form a full name of the ref.</p>
 </div>
@@ -1214,7 +1238,7 @@ Options are parsed in the order given on the command line, so e.g.
 "--notes --notes=foo --no-notes --notes=bar" will only show notes
 from "refs/notes/bar".</p>
 </dd>
-<dt class="hdlist1">--show-notes[=&lt;ref&gt;]</dt>
+<dt class="hdlist1">--show-notes[=&lt;treeish&gt;]</dt>
 <dt class="hdlist1">--[no-]standard-notes</dt>
 <dd>
 <p>These options are deprecated. Use the above --notes/--no-notes
@@ -1535,8 +1559,8 @@ or <a href="git-blame.html">git-blame</a>(1))</p>
 <p><em>%GG</em>: raw verification message from GPG for a signed commit</p>
 </li>
 <li>
-<p><em>%G?</em>: show "G" for a Good signature, "B" for a Bad signature, "U" for a good,
-untrusted signature and "N" for no signature</p>
+<p><em>%G?</em>: show "G" for a good (valid) signature, "B" for a bad signature,
+"U" for a good signature with unknown validity and "N" for no signature</p>
 </li>
 <li>
 <p><em>%GS</em>: show the name of the signer for a signed commit</p>
@@ -2336,7 +2360,7 @@ the pathname, but if that is <code>NUL</code>, the record will show two paths.</
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-01-05 15:53:48 W. Europe Standard Time
+Last updated 2016-06-14 11:04:07 W. Europe Daylight Time
 </div>
 </div>
 </body>

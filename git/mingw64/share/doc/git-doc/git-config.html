@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 1.5.3">
+<meta name="generator" content="Asciidoctor 1.5.4">
 <title>git-config(1)</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
@@ -430,18 +430,18 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <h2 id="_synopsis">SYNOPSIS</h2>
 <div class="sectionbody">
 <div class="verseblock">
-<pre class="content"><em>git config</em> [&lt;file-option&gt;] [type] [-z|--null] name [value [value_regex]]
+<pre class="content"><em>git config</em> [&lt;file-option&gt;] [type] [--show-origin] [-z|--null] name [value [value_regex]]
 <em>git config</em> [&lt;file-option&gt;] [type] --add name value
 <em>git config</em> [&lt;file-option&gt;] [type] --replace-all name value [value_regex]
-<em>git config</em> [&lt;file-option&gt;] [type] [-z|--null] --get name [value_regex]
-<em>git config</em> [&lt;file-option&gt;] [type] [-z|--null] --get-all name [value_regex]
-<em>git config</em> [&lt;file-option&gt;] [type] [-z|--null] [--name-only] --get-regexp name_regex [value_regex]
+<em>git config</em> [&lt;file-option&gt;] [type] [--show-origin] [-z|--null] --get name [value_regex]
+<em>git config</em> [&lt;file-option&gt;] [type] [--show-origin] [-z|--null] --get-all name [value_regex]
+<em>git config</em> [&lt;file-option&gt;] [type] [--show-origin] [-z|--null] [--name-only] --get-regexp name_regex [value_regex]
 <em>git config</em> [&lt;file-option&gt;] [type] [-z|--null] --get-urlmatch name URL
 <em>git config</em> [&lt;file-option&gt;] --unset name [value_regex]
 <em>git config</em> [&lt;file-option&gt;] --unset-all name [value_regex]
 <em>git config</em> [&lt;file-option&gt;] --rename-section old_name new_name
 <em>git config</em> [&lt;file-option&gt;] --remove-section name
-<em>git config</em> [&lt;file-option&gt;] [-z|--null] [--name-only] -l | --list
+<em>git config</em> [&lt;file-option&gt;] [--show-origin] [-z|--null] [--name-only] -l | --list
 <em>git config</em> [&lt;file-option&gt;] --get-color name [default]
 <em>git config</em> [&lt;file-option&gt;] --get-colorbool name [stdout-is-tty]
 <em>git config</em> [&lt;file-option&gt;] -e | --edit</pre>
@@ -488,19 +488,19 @@ that location (you can say <em>--local</em> but that is the default).</p>
 <p>This command will fail with non-zero status upon error.  Some exit
 codes are:</p>
 </div>
-<div class="olist arabic">
-<ol class="arabic">
+<div class="ulist">
+<ul>
 <li>
-<p>The config file is invalid (ret=3),</p>
-</li>
-<li>
-<p>can not write to the config file (ret=4),</p>
+<p>The section or key is invalid (ret=1),</p>
 </li>
 <li>
 <p>no section or name was provided (ret=2),</p>
 </li>
 <li>
-<p>the section or key is invalid (ret=1),</p>
+<p>the config file is invalid (ret=3),</p>
+</li>
+<li>
+<p>the config file cannot be written (ret=4),</p>
 </li>
 <li>
 <p>you try to unset an option which does not exist (ret=5),</p>
@@ -511,7 +511,7 @@ codes are:</p>
 <li>
 <p>you try to use an invalid regexp (ret=6).</p>
 </li>
-</ol>
+</ul>
 </div>
 <div class="paragraph">
 <p>On success, the command returns the exit code 0.</p>
@@ -542,8 +542,7 @@ found and the last value if multiple key values were found.</p>
 </dd>
 <dt class="hdlist1">--get-all</dt>
 <dd>
-<p>Like get, but does not fail if the number of values for the key
-is not exactly one.</p>
+<p>Like get, but returns all values for a multi-valued key.</p>
 </dd>
 <dt class="hdlist1">--get-regexp</dt>
 <dd>
@@ -560,7 +559,7 @@ section.&lt;url&gt;.key whose &lt;url&gt; part matches the best to the
 given URL is returned (if no such key exists, the value for
 section.key is used as a fallback).  When given just the
 section as name, do so for all the keys in the section and
-list them.</p>
+list them.  Returns error code 1 if no value is found.</p>
 </dd>
 <dt class="hdlist1">--global</dt>
 <dd>
@@ -674,6 +673,13 @@ contain line breaks.</p>
 <p>Output only the names of config variables for <code>--list</code> or
 <code>--get-regexp</code>.</p>
 </dd>
+<dt class="hdlist1">--show-origin</dt>
+<dd>
+<p>Augment the output of all queried config options with the
+origin type (file, standard input, blob, command line) and
+the actual origin (config file path, ref, or blob id if
+applicable).</p>
+</dd>
 <dt class="hdlist1">--get-colorbool name [stdout-is-tty]</dt>
 <dd>
 <p>Find the color setting for <code>name</code> (e.g. <code>color.diff</code>) and output
@@ -701,7 +707,9 @@ there is no color configured for <code>name</code>.</p>
 <dt class="hdlist1">--[no-]includes</dt>
 <dd>
 <p>Respect <code>include.*</code> directives in config files when looking up
-values. Defaults to on.</p>
+values. Defaults to <code>off</code> when a specific file is given (e.g.,
+using <code>--file</code>, <code>--global</code>, etc) and <code>on</code> when searching all
+config files.</p>
 </dd>
 </dl>
 </div>
@@ -742,9 +750,12 @@ configuration file.</p>
 </div>
 <div class="paragraph">
 <p>On Windows, as there is no central <code>/etc/</code> directory, there is yet another
-config file, intended to contain settings for <strong>all</strong> Git-related software
-running on the machine. Consequently, this config file takes an even lower
-precedence than the <code>$(prefix)/etc/gitconfig</code> file.</p>
+config file (located at <code>$PROGRAMDATA/Git/config</code>), intended to contain
+settings for <strong>all</strong> Git-related software running on the machine. Consequently,
+this config file takes an even lower precedence than the
+<code>$(prefix)/etc/gitconfig</code> file. Typically <code>$PROGRAMDATA</code> points to
+<code>C:\ProgramData</code> (on Windows XP the equivalent in <code>$ALLUSERSPROFILE</code> is used,
+i.e. <code>C:\Documents and Settings\All Users\Application Data\Git\config</code>).</p>
 </div>
 <div class="paragraph">
 <p>If no further options are given, all reading options will read all of these
@@ -1066,13 +1077,16 @@ escape sequences) are invalid.</p>
 <div class="paragraph">
 <p>You can include one config file from another by setting the special
 <code>include.path</code> variable to the name of the file to be included. The
+variable takes a pathname as its value, and is subject to tilde
+expansion.</p>
+</div>
+<div class="paragraph">
+<p>The
 included file is expanded immediately, as if its contents had been
 found at the location of the include directive. If the value of the
 <code>include.path</code> variable is a relative path, the path is considered to be
 relative to the configuration file in which the include directive was
-found. The value of <code>include.path</code> is subject to tilde expansion: <code>~/</code>
-is expanded to the value of <code>$HOME</code>, and <code>~user/</code> to the specified
-user&#8217;s home directory. See below for examples.</p>
+found.  See below for examples.</p>
 </div>
 </div>
 <div class="sect2">
@@ -1113,7 +1127,7 @@ user&#8217;s home directory. See below for examples.</p>
 <pre>[include]
 	path = /path/to/foo.inc ; include by absolute path
 	path = foo ; expand "foo" relative to the current file
-	path = ~/foo ; expand "foo" in your $HOME directory</pre>
+	path = ~/foo ; expand "foo" in your `$HOME` directory</pre>
 </div>
 </div>
 </div>
@@ -1183,6 +1197,14 @@ thing on the same output line (e.g. opening parenthesis before the
 list of branch names in <code>log --decorate</code> output) is set to be
 painted with <code>bold</code> or some other attribute.</p>
 </div>
+</dd>
+<dt class="hdlist1">pathname</dt>
+<dd>
+<p>A variable that takes a pathname value can be given a
+string that begins with "<code>~/</code>" or "<code>~user/</code>", and the usual
+tilde expansion happens to such a string: <code>~/</code>
+is expanded to the value of <code>$HOME</code>, and <code>~user/</code> to the
+specified user&#8217;s home directory.</p>
 </dd>
 </dl>
 </div>
@@ -1328,10 +1350,10 @@ See <a href="git-update-index.html">git-update-index</a>(1).</p>
 </dd>
 <dt class="hdlist1">core.hideDotFiles</dt>
 <dd>
-<p>(Windows-only) If true (which is the default), mark newly-created
-directories and files whose name starts with a dot as hidden.
-If <em>dotGitOnly</em>, only the .git/ directory is hidden, but no other
-files starting with a dot.</p>
+<p>(Windows-only) If true, mark newly-created directories and files whose
+name starts with a dot as hidden.  If <em>dotGitOnly</em>, only the <code>.git/</code>
+directory is hidden, but no other files starting with a dot.  The
+default mode is <em>dotGitOnly</em>.</p>
 </dd>
 <dt class="hdlist1">core.ignoreCase</dt>
 <dd>
@@ -1378,6 +1400,16 @@ is regularly modified by something outside Git (file system
 crawlers and some backup systems).
 See <a href="git-update-index.html">git-update-index</a>(1). True by default.</p>
 </dd>
+<dt class="hdlist1">core.untrackedCache</dt>
+<dd>
+<p>Determines what to do about the untracked cache feature of the
+index. It will be kept, if this variable is unset or set to
+<code>keep</code>. It will automatically be added if set to <code>true</code>. And
+it will automatically be removed, if set to <code>false</code>. Before
+setting it to <code>true</code>, you should check that mtime is working
+properly on your system.
+See <a href="git-update-index.html">git-update-index</a>(1). <code>keep</code> by default.</p>
+</dd>
 <dt class="hdlist1">core.checkStat</dt>
 <dd>
 <p>Determines which stat fields to match between the index
@@ -1401,9 +1433,9 @@ variable.</p>
 <dt class="hdlist1">core.eol</dt>
 <dd>
 <p>Sets the line ending type to use in the working directory for
-files that have the <code>text</code> property set.  Alternatives are
-<em>lf</em>, <em>crlf</em> and <em>native</em>, which uses the platform&#8217;s native
-line ending.  The default value is <code>native</code>.  See
+files that have the <code>text</code> property set when core.autocrlf is false.
+Alternatives are <em>lf</em>, <em>crlf</em> and <em>native</em>, which uses the platform&#8217;s
+native line ending.  The default value is <code>native</code>.  See
 <a href="gitattributes.html">gitattributes</a>(5) for more information on end-of-line
 conversion.</p>
 </dd>
@@ -1571,10 +1603,10 @@ repository&#8217;s usual working tree).</p>
 <dt class="hdlist1">core.logAllRefUpdates</dt>
 <dd>
 <p>Enable the reflog. Updates to a ref &lt;ref&gt; is logged to the file
-"$GIT_DIR/logs/&lt;ref&gt;", by appending the new and old
+"<code>$GIT_DIR/logs/&lt;ref&gt;</code>", by appending the new and old
 SHA-1, the date/time and the reason of the update, but
 only when the file exists.  If this configuration
-variable is set to true, missing "$GIT_DIR/logs/&lt;ref&gt;"
+variable is set to true, missing "<code>$GIT_DIR/logs/&lt;ref&gt;</code>"
 file is automatically created for branch heads (i.e. under
 refs/heads/), remote refs (i.e. under refs/remotes/),
 note refs (i.e. under refs/notes/), and the symbolic ref HEAD.</p>
@@ -1698,12 +1730,11 @@ be delta compressed, but larger binary media files won&#8217;t be.</p>
 </dd>
 <dt class="hdlist1">core.excludesFile</dt>
 <dd>
-<p>In addition to <em>.gitignore</em> (per-directory) and
-<em>.git/info/exclude</em>, Git looks into this file for patterns
-of files which are not meant to be tracked.  "<code>~/</code>" is expanded
-to the value of <code>$HOME</code> and "<code>~user/</code>" to the specified user&#8217;s
-home directory. Its default value is $XDG_CONFIG_HOME/git/ignore.
-If $XDG_CONFIG_HOME is either not set or empty, $HOME/.config/git/ignore
+<p>Specifies the pathname to the file that contains patterns to
+describe paths that are not meant to be tracked, in addition
+to <em>.gitignore</em> (per-directory) and <em>.git/info/exclude</em>.
+Defaults to <code>$XDG_CONFIG_HOME/git/ignore</code>.
+If <code>$XDG_CONFIG_HOME</code> is either not set or empty, <code>$HOME/.config/git/ignore</code>
 is used instead. See <a href="gitignore.html">gitignore</a>(5).</p>
 </dd>
 <dt class="hdlist1">core.askPass</dt>
@@ -1722,8 +1753,28 @@ command-line argument and write the password on its STDOUT.</p>
 <em>.git/info/attributes</em>, Git looks into this file for attributes
 (see <a href="gitattributes.html">gitattributes</a>(5)). Path expansions are made the same
 way as for <code>core.excludesFile</code>. Its default value is
-$XDG_CONFIG_HOME/git/attributes. If $XDG_CONFIG_HOME is either not
-set or empty, $HOME/.config/git/attributes is used instead.</p>
+<code>$XDG_CONFIG_HOME/git/attributes</code>. If <code>$XDG_CONFIG_HOME</code> is either not
+set or empty, <code>$HOME/.config/git/attributes</code> is used instead.</p>
+</dd>
+<dt class="hdlist1">core.hooksPath</dt>
+<dd>
+<p>By default Git will look for your hooks in the
+<em>$GIT_DIR/hooks</em> directory. Set this to different path,
+e.g. <em>/etc/git/hooks</em>, and Git will try to find your hooks in
+that directory, e.g. <em>/etc/git/hooks/pre-receive</em> instead of
+in <em>$GIT_DIR/hooks/pre-receive</em>.</p>
+<div class="paragraph">
+<p>The path can be either absolute or relative. A relative path is
+taken as relative to the directory where the hooks are run (see
+the "DESCRIPTION" section of <a href="githooks.html">githooks</a>(5)).</p>
+</div>
+<div class="paragraph">
+<p>This configuration variable is useful in cases where you&#8217;d like to
+centrally configure your Git hooks instead of configuring them on a
+per-repository basis, or as a more flexible and centralized
+alternative to having an <code>init.templateDir</code> where you&#8217;ve changed
+default hooks.</p>
+</div>
 </dd>
 <dt class="hdlist1">core.editor</dt>
 <dd>
@@ -2047,12 +2098,14 @@ supported.</p>
 <p>When true, rebase the branch &lt;name&gt; on top of the fetched branch,
 instead of merging the default branch from the default remote when
 "git pull" is run. See "pull.rebase" for doing this in a non
-branch-specific manner.
-When the value is <code>interactive</code>, the rebase is run in interactive mode.</p>
+branch-specific manner.</p>
 <div class="paragraph">
 <p>When preserve, also pass <code>--preserve-merges</code> along to <em>git rebase</em>
 so that locally committed merge commits will not be flattened
 by running <em>git pull</em>.</p>
+</div>
+<div class="paragraph">
+<p>When the value is <code>interactive</code>, the rebase is run in interactive mode.</p>
 </div>
 <div class="paragraph">
 <p><strong>NOTE</strong>: this is a possibly dangerous operation; do <strong>not</strong> use
@@ -2365,16 +2418,21 @@ message.  Defaults to true.</p>
 </dd>
 <dt class="hdlist1">commit.template</dt>
 <dd>
-<p>Specify a file to use as the template for new commit messages.
-"<code>~/</code>" is expanded to the value of <code>$HOME</code> and "<code>~user/</code>" to the
-specified user&#8217;s home directory.</p>
+<p>Specify the pathname of a file to use as the template for
+new commit messages.</p>
+</dd>
+<dt class="hdlist1">commit.verbose</dt>
+<dd>
+<p>A boolean or int to specify the level of verbose with <code>git commit</code>.
+See <a href="git-commit.html">git-commit</a>(1).</p>
 </dd>
 <dt class="hdlist1">credential.helper</dt>
 <dd>
 <p>Specify an external helper to be called when a username or
 password credential is needed; the helper may consult external
-storage to avoid prompting the user for the credentials. See
-<a href="gitcredentials.html">gitcredentials</a>(7) for details.</p>
+storage to avoid prompting the user for the credentials. Note
+that multiple helpers may be defined. See <a href="gitcredentials.html">gitcredentials</a>(7)
+for details.</p>
 </dd>
 <dt class="hdlist1">credential.useHttpPath</dt>
 <dd>
@@ -2551,9 +2609,13 @@ detection; equivalent to the <em>git diff</em> option <em>-l</em>.</p>
 </dd>
 <dt class="hdlist1">diff.renames</dt>
 <dd>
-<p>Tells Git to detect renames.  If set to any boolean value, it
-will enable basic rename detection.  If set to "copies" or
-"copy", it will detect copies, as well.</p>
+<p>Whether and how Git detects renames.  If set to "false",
+rename detection is disabled. If set to "true", basic rename
+detection is enabled.  If set to "copies" or "copy", Git will
+detect copies, as well.  Defaults to true.  Note that this
+affects only <em>git diff</em> Porcelain like <a href="git-diff.html">git-diff</a>(1) and
+<a href="git-log.html">git-log</a>(1), and not lower level commands such as
+<a href="git-diff-files.html">git-diff-files</a>(1).</p>
 </dd>
 <dt class="hdlist1">diff.suppressBlankEmpty</dt>
 <dd>
@@ -2646,6 +2708,9 @@ that a corresponding difftool.&lt;tool&gt;.cmd variable is defined.</p>
 <p>emerge</p>
 </li>
 <li>
+<p>examdiff</p>
+</li>
+<li>
 <p>gvimdiff</p>
 </li>
 <li>
@@ -2689,6 +2754,12 @@ that a corresponding difftool.&lt;tool&gt;.cmd variable is defined.</p>
 </li>
 </ul>
 </div>
+</dd>
+<dt class="hdlist1">diff.compactionHeuristic</dt>
+<dd>
+<p>Set this option to <code>true</code> to enable an experimental heuristic that
+shifts the hunk boundary in an attempt to make the resulting
+patch easier to read.</p>
 </dd>
 <dt class="hdlist1">diff.algorithm</dt>
 <dd>
@@ -2855,6 +2926,16 @@ Please see the <em>SubmittingPatches</em> document for further discussion.</p>
 format-patch is invoked, but in addition can be set to "auto", to
 generate a cover-letter only when there&#8217;s more than one patch.</p>
 </dd>
+<dt class="hdlist1">format.outputDirectory</dt>
+<dd>
+<p>Set a custom directory to store the resulting files instead of the
+current working directory.</p>
+</dd>
+<dt class="hdlist1">format.useAutoBase</dt>
+<dd>
+<p>A boolean value which lets you enable the <code>--base=auto</code> option of
+format-patch by default.</p>
+</dd>
 <dt class="hdlist1">filter.&lt;driver&gt;.clean</dt>
 <dd>
 <p>The command which is used to convert the content of a worktree
@@ -2945,7 +3026,7 @@ suppress pruning.</p>
 <em>git worktree prune --expire 3.months.ago</em>.
 This config variable can be used to set a different grace
 period. The value "now" may be used to disable the grace
-period and prune $GIT_DIR/worktrees immediately, or "never"
+period and prune <code>$GIT_DIR/worktrees</code> immediately, or "never"
 may be used to suppress pruning.</p>
 </dd>
 <dt class="hdlist1">gc.reflogExpire</dt>
@@ -3099,15 +3180,25 @@ value <em>default</em> will return to the default matching behavior.</p>
 option is ignored when the <em>grep.patternType</em> option is set to a value
 other than <em>default</em>.</p>
 </dd>
+<dt class="hdlist1">grep.threads</dt>
+<dd>
+<p>Number of grep worker threads to use.
+See <code>grep.threads</code> in <a href="git-grep.html">git-grep</a>(1) for more information.</p>
+</dd>
+<dt class="hdlist1">grep.fallbackToNoIndex</dt>
+<dd>
+<p>If set to true, fall back to git grep --no-index if git grep
+is executed outside of a git repository.  Defaults to false.</p>
+</dd>
 <dt class="hdlist1">gpg.program</dt>
 <dd>
-<p>Use this custom program instead of "gpg" found on $PATH when
+<p>Use this custom program instead of "<code>gpg</code>" found on <code>$PATH</code> when
 making or verifying a PGP signature. The program must support the
 same command-line interface as GPG, namely, to verify a detached
-signature, "gpg --verify $file - &lt;$signature" is run, and the
+signature, "<code>gpg --verify $file - &lt;$signature</code>" is run, and the
 program is expected to signal a good signature by exiting with
 code 0, and to generate an ASCII-armored detached signature, the
-standard input of "gpg -bsau $key" is fed with the contents to be
+standard input of "<code>gpg -bsau $key</code>" is fed with the contents to be
 signed, and the program is expected to send the result to its
 standard output.</p>
 </dd>
@@ -3123,7 +3214,7 @@ made by the <a href="git-gui.html">git-gui</a>(1). The default is "5".</p>
 </dd>
 <dt class="hdlist1">gui.displayUntracked</dt>
 <dd>
-<p>Determines if <a href=":git-gui.html">:git-gui</a>(1) shows untracked files
+<p>Determines if <a href="git-gui.html">git-gui</a>(1) shows untracked files
 in the file list. The default is "true".</p>
 </dd>
 <dt class="hdlist1">gui.encoding</dt>
@@ -3273,17 +3364,73 @@ path of your Git installation.</p>
 <dt class="hdlist1">http.proxy</dt>
 <dd>
 <p>Override the HTTP proxy, normally configured using the <em>http_proxy</em>,
-<em>https_proxy</em>, and <em>all_proxy</em> environment variables (see
-<code>curl(1)</code>).  This can be overridden on a per-remote basis; see
-remote.&lt;name&gt;.proxy</p>
+<em>https_proxy</em>, and <em>all_proxy</em> environment variables (see <code>curl(1)</code>). In
+addition to the syntax understood by curl, it is possible to specify a
+proxy string with a user name but no password, in which case git will
+attempt to acquire one in the same way it does for other credentials. See
+<a href="gitcredentials.html">gitcredentials</a>(7) for more information. The syntax thus is
+<em>[protocol://][user[:password]@]proxyhost[:port]</em>. This can be overridden
+on a per-remote basis; see remote.&lt;name&gt;.proxy</p>
+</dd>
+<dt class="hdlist1">http.proxyAuthMethod</dt>
+<dd>
+<p>Set the method with which to authenticate against the HTTP proxy. This
+only takes effect if the configured proxy string contains a user name part
+(i.e. is of the form <em>user@host</em> or <em>user@host:port</em>). This can be
+overridden on a per-remote basis; see <code>remote.&lt;name&gt;.proxyAuthMethod</code>.
+Both can be overridden by the <em>GIT_HTTP_PROXY_AUTHMETHOD</em> environment
+variable.  Possible values are:</p>
+<div class="openblock">
+<div class="content">
+<div class="ulist">
+<ul>
+<li>
+<p><code>anyauth</code> - Automatically pick a suitable authentication method. It is
+assumed that the proxy answers an unauthenticated request with a 407
+status code and one or more Proxy-authenticate headers with supported
+authentication methods. This is the default.</p>
+</li>
+<li>
+<p><code>basic</code> - HTTP Basic authentication</p>
+</li>
+<li>
+<p><code>digest</code> - HTTP Digest authentication; this prevents the password from being
+transmitted to the proxy in clear text</p>
+</li>
+<li>
+<p><code>negotiate</code> - GSS-Negotiate authentication (compare the --negotiate option
+of <code>curl(1)</code>)</p>
+</li>
+<li>
+<p><code>ntlm</code> - NTLM authentication (compare the --ntlm option of <code>curl(1)</code>)</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</dd>
+<dt class="hdlist1">http.emptyAuth</dt>
+<dd>
+<p>Attempt authentication without seeking a username or password.  This
+can be used to attempt GSS-Negotiate authentication without specifying
+a username in the URL, as libcurl normally requires a username for
+authentication.</p>
+</dd>
+<dt class="hdlist1">http.extraHeader</dt>
+<dd>
+<p>Pass an additional HTTP header when communicating with a server.  If
+more than one such entry exists, all of them are added as extra
+headers.  To allow overriding the settings inherited from the system
+config, an empty value will reset the extra headers to the empty list.</p>
 </dd>
 <dt class="hdlist1">http.cookieFile</dt>
 <dd>
-<p>File containing previously stored cookie lines which should be used
+<p>The pathname of a file containing previously stored cookie lines,
+which should be used
 in the Git http session, if they match the server. The file format
 of the file to read cookies from should be plain HTTP headers or
-the Netscape/Mozilla cookie file format (see <a href="curl.html">curl</a>(1)).
-NOTE that the file specified with http.cookieFile is only used as
+the Netscape/Mozilla cookie file format (see <code>curl(1)</code>).
+NOTE that the file specified with http.cookieFile is used only as
 input unless http.saveCookies is set.</p>
 </dd>
 <dt class="hdlist1">http.saveCookies</dt>
@@ -3381,6 +3528,15 @@ fetching or pushing over HTTPS. Can be overridden by the
 <p>Path containing files with the CA certificates to verify the peer
 with when fetching or pushing over HTTPS. Can be overridden
 by the <em>GIT_SSL_CAPATH</em> environment variable.</p>
+</dd>
+<dt class="hdlist1">http.pinnedpubkey</dt>
+<dd>
+<p>Public key of the https service. It may either be the filename of
+a PEM or DER encoded public key file or a string starting with
+<em>sha256//</em> followed by the base64 encoded sha256 hash of the
+public key. See also libcurl <em>CURLOPT_PINNEDPUBLICKEY</em>. git will
+exit with an error if this option is set but not supported by
+cURL.</p>
 </dd>
 <dt class="hdlist1">http.sslTry</dt>
 <dd>
@@ -3559,6 +3715,15 @@ Currently this is used by the <code>--patch</code> mode of
 setting is silently ignored if portable keystroke input
 is not available; requires the Perl module Term::ReadKey.</p>
 </dd>
+<dt class="hdlist1">interactive.diffFilter</dt>
+<dd>
+<p>When an interactive command (such as <code>git add --patch</code>) shows
+a colorized diff, git will pipe the diff through the shell
+command defined by this configuration variable. The command may
+mark up the diff further for human consumption, provided that it
+retains a one-to-one correspondence with the lines in the
+original diff. Defaults to disabled (no filtering).</p>
+</dd>
 <dt class="hdlist1">log.abbrevCommit</dt>
 <dd>
 <p>If true, makes <a href="git-log.html">git-log</a>(1), <a href="git-show.html">git-show</a>(1), and
@@ -3577,7 +3742,10 @@ Setting a value for log.date is similar to using <em>git log</em>'s
 command. If <em>short</em> is specified, the ref name prefixes <em>refs/heads/</em>,
 <em>refs/tags/</em> and <em>refs/remotes/</em> will not be printed. If <em>full</em> is
 specified, the full ref name (including prefix) will be printed.
-This is the same as the log commands <em>--decorate</em> option.</p>
+If <em>auto</em> is specified, then if the output is going to a terminal,
+the ref names are shown as if <em>short</em> were given, otherwise no ref
+names are shown. This is the same as the <em>--decorate</em> option
+of the <code>git log</code>.</p>
 </dd>
 <dt class="hdlist1">log.follow</dt>
 <dd>
@@ -3740,6 +3908,9 @@ that a corresponding mergetool.&lt;tool&gt;.cmd variable is defined.</p>
 </li>
 <li>
 <p>emerge</p>
+</li>
+<li>
+<p>examdiff</p>
 </li>
 <li>
 <p>gvimdiff</p>
@@ -4018,7 +4189,7 @@ and this config option ignored whenever the corresponding pack is
 larger than 2 GB.</p>
 <div class="paragraph">
 <p>If you have an old Git that does not understand the version 2 <code>*.idx</code> file,
-cloning or fetching over a non native protocol (e.g. "http" and "rsync")
+cloning or fetching over a non native protocol (e.g. "http")
 that will copy both <code>*.pack</code> file and corresponding <code>*.idx</code> file from the
 other side may give you a repository that cannot be accessed with your
 older version of Git. If the <code>*.pack</code> file is smaller than 2 GB, however,
@@ -4031,8 +4202,11 @@ the <code>*.idx</code> file.</p>
 <p>The maximum size of a pack.  This setting only affects
 packing to a file when repacking, i.e. the git:// protocol
 is unaffected.  It can be overridden by the <code>--max-pack-size</code>
-option of <a href="git-repack.html">git-repack</a>(1). The minimum size allowed is
-limited to 1 MiB. The default is unlimited.
+option of <a href="git-repack.html">git-repack</a>(1).  Reaching this limit results
+in the creation of multiple packfiles; which in turn prevents
+bitmaps from being created.
+The minimum size allowed is limited to 1 MiB.
+The default is unlimited.
 Common unit suffixes of <em>k</em>, <em>m</em>, or <em>g</em> are
 supported.</p>
 </dd>
@@ -4101,6 +4275,9 @@ per-branch basis.</p>
 <p>When preserve, also pass <code>--preserve-merges</code> along to <em>git rebase</em>
 so that locally committed merge commits will not be flattened
 by running <em>git pull</em>.</p>
+</div>
+<div class="paragraph">
+<p>When the value is <code>interactive</code>, the rebase is run in interactive mode.</p>
 </div>
 <div class="paragraph">
 <p><strong>NOTE</strong>: this is a possibly dangerous operation; do <strong>not</strong> use
@@ -4412,6 +4589,12 @@ require new shallow roots. Otherwise those refs are rejected.</p>
 the proxy to use for that remote.  Set to the empty string to
 disable proxying for that remote.</p>
 </dd>
+<dt class="hdlist1">remote.&lt;name&gt;.proxyAuthMethod</dt>
+<dd>
+<p>For remotes that require curl (http, https and ftp), the method to use for
+authenticating against the proxy in use (probably set in
+<code>remote.&lt;name&gt;.proxy</code>). See <code>http.proxyAuthMethod</code>.</p>
+</dd>
 <dt class="hdlist1">remote.&lt;name&gt;.fetch</dt>
 <dd>
 <p>The default set of "refspec" for <a href="git-fetch.html">git-fetch</a>(1). See
@@ -4498,8 +4681,9 @@ index is being written (either via <code>--write-bitmap-index</code> or
 objects to disk (e.g., when <code>git repack -a</code> is run).  This
 index can speed up the "counting objects" phase of subsequent
 packs created for clones and fetches, at the cost of some disk
-space and extra time spent on the initial repack.  Defaults to
-false.</p>
+space and extra time spent on the initial repack.  This has
+no effect if multiple packfiles are created.
+Defaults to false.</p>
 </dd>
 <dt class="hdlist1">rerere.autoUpdate</dt>
 <dd>
@@ -4714,6 +4898,19 @@ both settings can be overridden on the command line by using the
 "--ignore-submodules" option. The <em>git submodule</em> commands are not
 affected by this setting.</p>
 </dd>
+<dt class="hdlist1">submodule.fetchJobs</dt>
+<dd>
+<p>Specifies how many submodules are fetched/cloned at the same time.
+A positive integer allows up to that number of submodules fetched
+in parallel. A value of 0 will give some reasonable default.
+If unset, it defaults to 1.</p>
+</dd>
+<dt class="hdlist1">tag.forceSignAnnotated</dt>
+<dd>
+<p>A boolean to specify whether annotated tags created should be GPG signed.
+If <code>--annotate</code> is specified on the command line, it takes
+precedence over this option.</p>
+</dd>
 <dt class="hdlist1">tag.sort</dt>
 <dd>
 <p>This variable controls the sort ordering of tags when displayed by
@@ -4845,6 +5042,17 @@ Can be overridden by the <em>GIT_AUTHOR_EMAIL</em>, <em>GIT_COMMITTER_EMAIL</em>
 Can be overridden by the <em>GIT_AUTHOR_NAME</em> and <em>GIT_COMMITTER_NAME</em>
 environment variables.  See <a href="git-commit-tree.html">git-commit-tree</a>(1).</p>
 </dd>
+<dt class="hdlist1">user.useConfigOnly</dt>
+<dd>
+<p>Instruct Git to avoid trying to guess defaults for <em>user.email</em>
+and <em>user.name</em>, and instead retrieve the values only from the
+configuration. For example, if you have multiple email addresses
+and would like to use a different one for each repository, then
+with this configuration option set to <code>true</code> in the global config
+along with a name, Git will prompt you to set up an email before
+making new commits in a newly cloned repository.
+Defaults to <code>false</code>.</p>
+</dd>
 <dt class="hdlist1">user.signingKey</dt>
 <dd>
 <p>If <a href="git-tag.html">git-tag</a>(1) or <a href="git-commit.html">git-commit</a>(1) is not selecting the
@@ -4896,7 +5104,7 @@ with the dump git protocol. Defaults to true.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-01-05 15:53:48 W. Europe Standard Time
+Last updated 2016-06-14 11:04:07 W. Europe Daylight Time
 </div>
 </div>
 </body>

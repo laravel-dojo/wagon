@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 1.5.3">
+<meta name="generator" content="Asciidoctor 1.5.4">
 <title>gitrevisions(7)</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
@@ -533,12 +533,12 @@ some output processing may assume ref names in UTF-8.</p>
 <dd>
 <p><em>@</em> alone is a shortcut for <em>HEAD</em>.</p>
 </dd>
-<dt class="hdlist1"><em>&lt;refname&gt;@\{&lt;date&gt;\}</em>, e.g. <em>master@{yesterday}</em>, <em>HEAD@\{5 minutes ago\}</em></dt>
+<dt class="hdlist1"><em>&lt;refname&gt;@{&lt;date&gt;}</em>, e.g. <em>master@{yesterday}</em>, <em>HEAD@{5 minutes ago}</em></dt>
 <dd>
 <p>A ref followed by the suffix <em>@</em> with a date specification
 enclosed in a brace
-pair (e.g. <em>{yesterday}</em>, <em>\{1 month 2 weeks 3 days 1 hour 1
-second ago\}</em> or <em>\{1979-02-26 18:30:00\}</em>) specifies the value
+pair (e.g. <em>{yesterday}</em>, <em>{1 month 2 weeks 3 days 1 hour 1
+second ago}</em> or <em>{1979-02-26 18:30:00}</em>) specifies the value
 of the ref at a prior point in time.  This suffix may only be
 used immediately following a ref name and the ref must have an
 existing log (<em>$GIT_DIR/logs/&lt;ref&gt;</em>). Note that this looks up the state
@@ -546,7 +546,7 @@ of your <strong>local</strong> ref at a given time; e.g., what was in your local
 <em>master</em> branch last week. If you want to look at commits made during
 certain times, see <em>--since</em> and <em>--until</em>.</p>
 </dd>
-<dt class="hdlist1"><em>&lt;refname&gt;@\{&lt;n&gt;\}</em>, e.g. <em>master@{1}</em></dt>
+<dt class="hdlist1"><em>&lt;refname&gt;@{&lt;n&gt;}</em>, e.g. <em>master@{1}</em></dt>
 <dd>
 <p>A ref followed by the suffix <em>@</em> with an ordinal specification
 enclosed in a brace pair (e.g. <em>{1}</em>, <em>{15}</em>) specifies
@@ -556,15 +556,15 @@ is the 5th prior value of <em>master</em>. This suffix may only be used
 immediately following a ref name and the ref must have an existing
 log (<em>$GIT_DIR/logs/&lt;refname&gt;</em>).</p>
 </dd>
-<dt class="hdlist1"><em>@\{&lt;n&gt;\}</em>, e.g. <em>@{1}</em></dt>
+<dt class="hdlist1"><em>@{&lt;n&gt;}</em>, e.g. <em>@{1}</em></dt>
 <dd>
 <p>You can use the <em>@</em> construct with an empty ref part to get at a
 reflog entry of the current branch. For example, if you are on
 branch <em>blabla</em> then <em>@{1}</em> means the same as <em>blabla@{1}</em>.</p>
 </dd>
-<dt class="hdlist1"><em>@\{-&lt;n&gt;\}</em>, e.g. <em>@\{-1\}</em></dt>
+<dt class="hdlist1"><em>@{-&lt;n&gt;}</em>, e.g. <em>@{-1}</em></dt>
 <dd>
-<p>The construct <em>@\{-&lt;n&gt;\}</em> means the &lt;n&gt;th branch/commit checked out
+<p>The construct <em>@{-&lt;n&gt;}</em> means the &lt;n&gt;th branch/commit checked out
 before the current one.</p>
 </dd>
 <dt class="hdlist1"><em>&lt;branchname&gt;@{upstream}</em>, e.g. <em>master@{upstream}</em>, <em>@{u}</em></dt>
@@ -622,7 +622,7 @@ equivalent to <em>&lt;rev&gt;^^^</em> which is equivalent to
 <em>&lt;rev&gt;^1^1^1</em>.  See below for an illustration of
 the usage of this form.</p>
 </dd>
-<dt class="hdlist1"><em>&lt;rev&gt;^\{&lt;type&gt;\}</em>, e.g. <em>v0.99.8^{commit}</em></dt>
+<dt class="hdlist1"><em>&lt;rev&gt;^{&lt;type&gt;}</em>, e.g. <em>v0.99.8^{commit}</em></dt>
 <dd>
 <p>A suffix <em>^</em> followed by an object type name enclosed in
 brace pair means dereference the object at <em>&lt;rev&gt;</em> recursively until
@@ -645,14 +645,14 @@ it does not have to be dereferenced even once to get to an object.</p>
 existing tag object.</p>
 </div>
 </dd>
-<dt class="hdlist1"><em>&lt;rev&gt;^\{\}</em>, e.g. <em>v0.99.8^\{\}</em></dt>
+<dt class="hdlist1"><em>&lt;rev&gt;^{}</em>, e.g. <em>v0.99.8^{}</em></dt>
 <dd>
 <p>A suffix <em>^</em> followed by an empty brace pair
 means the object could be a tag,
 and dereference the tag recursively until a non-tag object is
 found.</p>
 </dd>
-<dt class="hdlist1"><em>&lt;rev&gt;^\{/&lt;text&gt;\}</em>, e.g. <em>HEAD^{/fix nasty bug}</em></dt>
+<dt class="hdlist1"><em>&lt;rev&gt;^{/&lt;text&gt;}</em>, e.g. <em>HEAD^{/fix nasty bug}</em></dt>
 <dd>
 <p>A suffix <em>^</em> to a revision parameter, followed by a brace
 pair that contains a text led by a slash,
@@ -665,11 +665,12 @@ the <em>&lt;rev&gt;</em> before <em>^</em>.</p>
 <p>A colon, followed by a slash, followed by a text, names
 a commit whose commit message matches the specified regular expression.
 This name returns the youngest matching commit which is
-reachable from any ref.  If the commit message starts with a
-<em>!</em> you have to repeat that;  the special sequence <em>:/!</em>,
-followed by something else than <em>!</em>, is reserved for now.
-The regular expression can match any part of the commit message. To
-match messages starting with a string, one can use e.g. <em>:/^foo</em>.</p>
+reachable from any ref. The regular expression can match any part of the
+commit message. To match messages starting with a string, one can use
+e.g. <em>:/^foo</em>. The special sequence <em>:/!</em> is reserved for modifiers to what
+is matched. <em>:/!-foo</em> performs a negative match, while <em>:/!!foo</em> matches a
+literal <em>!</em> character, followed by <em>foo</em>. Any other sequence beginning with
+<em>:/!</em> is reserved for now.</p>
 </dd>
 <dt class="hdlist1"><em>&lt;rev&gt;:&lt;path&gt;</em>, e.g. <em>HEAD:README</em>, <em>:README</em>, <em>master:./README</em></dt>
 <dd>
@@ -854,7 +855,7 @@ F^! D            G H D F</pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-01-05 15:53:48 W. Europe Standard Time
+Last updated 2016-06-14 11:04:08 W. Europe Daylight Time
 </div>
 </div>
 </body>

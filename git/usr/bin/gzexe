@@ -13,7 +13,8 @@
 # On Ultrix, /bin/sh is too buggy, change the first line to: #!/bin/sh5
 
 
-# Copyright (C) 1998, 2002, 2004, 2006, 2007 Free Software Foundation
+# Copyright (C) 1998, 2002, 2004, 2006-2007, 2010-2016 Free Software
+# Foundation, Inc.
 # Copyright (C) 1993 Jean-loup Gailly
 
 # This program is free software; you can redistribute it and/or modify
@@ -35,8 +36,8 @@ nl='
 '
 IFS=" $tab$nl"
 
-version='gzexe (gzip) 1.6
-Copyright (C) 2007, 2011-2013 Free Software Foundation, Inc.
+version='gzexe (gzip) 1.7
+Copyright (C) 2007, 2011-2016 Free Software Foundation, Inc.
 This is free software.  You may redistribute copies of it under the terms of
 the GNU General Public License <http://www.gnu.org/licenses/gpl.html>.
 There is NO WARRANTY, to the extent permitted by law.
@@ -51,13 +52,6 @@ Rename each FILE with a compressed version of itself, renaming FILE to FILE~.
       --version  output version information and exit
 
 Report bugs to <bug-gzip@gnu.org>."
-
-
-bindir='/usr/bin'
-case $1 in
---__bindir) bindir=${2?}; shift; shift;;
-esac
-PATH=$bindir:$PATH
 
 decomp=0
 res=0
@@ -125,7 +119,7 @@ for i do
     mktemp_status=$?
   fi
   if test $mktemp_status -eq 0; then
-    tmp=`TMPDIR=$dir mktemp -t gzexeXXXXXX`
+    tmp=`TMPDIR=$dir mktemp`
   else
     tmp=$dir/gzexe$$
   fi && { cp -p "$file" "$tmp" 2>/dev/null || cp "$file" "$tmp"; } || {
@@ -163,7 +157,7 @@ trap 'res=$?
 ' 0 1 2 3 5 10 13 15
 
 if type mktemp >/dev/null 2>&1; then
-  gztmpdir=`mktemp -dt`
+  gztmpdir=`mktemp -d`
 else
   gztmpdir=/tmp/gztmp$$; mkdir $gztmpdir
 fi || { (exit 127); exit 127; }

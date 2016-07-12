@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 1.5.3">
+<meta name="generator" content="Asciidoctor 1.5.4">
 <title>git-ls-remote(1)</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
@@ -430,8 +430,9 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <h2 id="_synopsis">SYNOPSIS</h2>
 <div class="sectionbody">
 <div class="verseblock">
-<pre class="content"><em>git ls-remote</em> [--heads] [--tags]  [--upload-pack=&lt;exec&gt;]
-	      [--exit-code] &lt;repository&gt; [&lt;refs&gt;&#8230;&#8203;]</pre>
+<pre class="content"><em>git ls-remote</em> [--heads] [--tags] [--refs] [--upload-pack=&lt;exec&gt;]
+	      [-q | --quiet] [--exit-code] [--get-url]
+	      [--symref] [&lt;repository&gt; [&lt;refs&gt;&#8230;&#8203;]]</pre>
 </div>
 </div>
 </div>
@@ -459,6 +460,15 @@ These options are <em>not</em> mutually exclusive; when given
 both, references stored in refs/heads and refs/tags are
 displayed.</p>
 </dd>
+<dt class="hdlist1">--refs</dt>
+<dd>
+<p>Do not show peeled tags or pseudorefs like HEAD	in the output.</p>
+</dd>
+<dt class="hdlist1">-q</dt>
+<dt class="hdlist1">--quiet</dt>
+<dd>
+<p>Do not print remote URL to stderr.</p>
+</dd>
 <dt class="hdlist1">--upload-pack=&lt;exec&gt;</dt>
 <dd>
 <p>Specify the full path of <em>git-upload-pack</em> on the remote
@@ -478,6 +488,13 @@ found any matching refs.</p>
 <p>Expand the URL of the given remote repository taking into account any
 "url.&lt;base&gt;.insteadOf" config setting (See <a href="git-config.html">git-config</a>(1)) and
 exit without talking to the remote.</p>
+</dd>
+<dt class="hdlist1">--symref</dt>
+<dd>
+<p>In addition to the object pointed by it, show the underlying
+ref pointed by it when showing a symbolic ref.  Currently,
+upload-pack only shows the symref HEAD, so it will be the only
+one shown by ls-remote.</p>
 </dd>
 <dt class="hdlist1">&lt;repository&gt;</dt>
 <dd>
@@ -531,7 +548,7 @@ c5db5456ae3b0873fc659c19fafdde22313cc441	refs/tags/v0.99.2
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-01-05 15:53:48 W. Europe Standard Time
+Last updated 2016-06-14 11:04:07 W. Europe Daylight Time
 </div>
 </div>
 </body>

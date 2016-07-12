@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 1.5.3">
+<meta name="generator" content="Asciidoctor 1.5.4">
 <title>git-format-patch(1)</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
@@ -491,7 +491,11 @@ output, unless the <code>--stdout</code> option is specified.</p>
 </div>
 <div class="paragraph">
 <p>If <code>-o</code> is specified, output files are created in &lt;dir&gt;.  Otherwise
-they are created in the current working directory.</p>
+they are created in the current working directory. The default path
+can be set with the <em>format.outputDirectory</em> configuration option.
+The <code>-o</code> option takes precedence over <code>format.outputDirectory</code>.
+To store patches in the current working directory even when
+<code>format.outputDirectory</code> points elsewhere, use <code>-o .</code>.</p>
 </div>
 <div class="paragraph">
 <p>By default, the subject of a single patch is "[PATCH] " followed by
@@ -521,17 +525,19 @@ reference.</p>
 <dd>
 <p>Generate plain patches without any diffstats.</p>
 </dd>
-<dt class="hdlist1">-s</dt>
-<dt class="hdlist1">--no-patch</dt>
-<dd>
-<p>Suppress diff output. Useful for commands like <code>git show</code> that
-show the patch by default, or to cancel the effect of <code>--patch</code>.</p>
-</dd>
 <dt class="hdlist1">-U&lt;n&gt;</dt>
 <dt class="hdlist1">--unified=&lt;n&gt;</dt>
 <dd>
 <p>Generate diffs with &lt;n&gt; lines of context instead of
 the usual three.</p>
+</dd>
+<dt class="hdlist1">--compaction-heuristic</dt>
+<dt class="hdlist1">--no-compaction-heuristic</dt>
+<dd>
+<p>These are to help debugging and tuning an experimental
+heuristic (which is off by default) that shifts the hunk
+boundary in an attempt to make the resulting patch easier
+to read.</p>
 </dd>
 <dt class="hdlist1">--minimal</dt>
 <dd>
@@ -925,7 +931,8 @@ commit log message.</p>
 <dt class="hdlist1">--signoff</dt>
 <dd>
 <p>Add <code>Signed-off-by:</code> line to the commit message, using
-the committer identity of yourself.</p>
+the committer identity of yourself.
+See the signoff option in <a href="git-commit.html">git-commit</a>(1) for more information.</p>
 </dd>
 <dt class="hdlist1">--stdout</dt>
 <dd>
@@ -1103,6 +1110,12 @@ still useful for code review.</p>
 <dd>
 <p>Output an all-zero hash in each patch&#8217;s From header instead
 of the hash of the commit.</p>
+</dd>
+<dt class="hdlist1">--base=&lt;commit&gt;</dt>
+<dd>
+<p>Record the base tree information to identify the state the
+patch series applies to.  See the BASE TREE INFORMATION section
+below for details.</p>
 </dd>
 <dt class="hdlist1">--root</dt>
 <dd>
@@ -1453,6 +1466,74 @@ message, complete the addressing and subject fields, and press send.</p>
 </div>
 </div>
 <div class="sect1">
+<h2 id="_base_tree_information">BASE TREE INFORMATION</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The base tree information block is used for maintainers or third party
+testers to know the exact state the patch series applies to. It consists
+of the <em>base commit</em>, which is a well-known commit that is part of the
+stable part of the project history everybody else works off of, and zero
+or more <em>prerequisite patches</em>, which are well-known patches in flight
+that is not yet part of the <em>base commit</em> that need to be applied on top
+of <em>base commit</em> in topological order before the patches can be applied.</p>
+</div>
+<div class="paragraph">
+<p>The <em>base commit</em> is shown as "base-commit: " followed by the 40-hex of
+the commit object name.  A <em>prerequisite patch</em> is shown as
+"prerequisite-patch-id: " followed by the 40-hex <em>patch id</em>, which can
+be obtained by passing the patch through the <code>git patch-id --stable</code>
+command.</p>
+</div>
+<div class="paragraph">
+<p>Imagine that on top of the public commit P, you applied well-known
+patches X, Y and Z from somebody else, and then built your three-patch
+series A, B, C, the history would be like:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>---P---X---Y---Z---A---B---C</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>With <code>git format-patch --base=P -3 C</code> (or variants thereof, e.g. with
+<code>--cover-letter</code> of using <code>Z..C</code> instead of <code>-3 C</code> to specify the
+range), the base tree information block is shown at the end of the
+first message the command outputs (either the first patch, or the
+cover letter), like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>base-commit: P
+prerequisite-patch-id: X
+prerequisite-patch-id: Y
+prerequisite-patch-id: Z</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>For non-linear topology, such as</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>---P---X---A---M---C
+    \         /
+     Y---Z---B</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You can also use <code>git format-patch --base=P -3 C</code> to generate patches
+for A, B and C, and the identifiers for P, X, Y, Z are appended at the
+end of the first message.</p>
+</div>
+<div class="paragraph">
+<p>If set <code>--base=auto</code> in cmdline, it will track base commit automatically,
+the base commit will be the merge base of tip commit of the remote-tracking
+branch and revision-range specified in cmdline.
+For a local branch, you need to track a remote branch by <code>git branch
+--set-upstream-to</code> before using this option.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
 <h2 id="_examples">EXAMPLES</h2>
 <div class="sectionbody">
 <div class="ulist">
@@ -1534,7 +1615,7 @@ as e-mailable patches:</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-01-05 15:53:48 W. Europe Standard Time
+Last updated 2016-06-14 11:04:07 W. Europe Daylight Time
 </div>
 </div>
 </body>

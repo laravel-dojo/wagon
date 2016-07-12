@@ -5,7 +5,7 @@
 
 package warnings;
 
-our $VERSION = '1.32';
+our $VERSION = "1.34";
 
 # Verify that we're called correctly so that warnings will work.
 # see also strict.pm.
@@ -1025,8 +1025,10 @@ this snippet of code:
     package MyMod::Abc;
 
     sub open {
-        warnings::warnif("deprecated",
-                         "open is deprecated, use new instead");
+        if (warnings::enabled("deprecated")) {
+            warnings::warn("deprecated",
+                           "open is deprecated, use new instead");
+        }
         new(@_);
     }
 

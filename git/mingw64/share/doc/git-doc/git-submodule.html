@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 1.5.3">
+<meta name="generator" content="Asciidoctor 1.5.4">
 <title>git-submodule(1)</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
@@ -434,10 +434,10 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 	      [--reference &lt;repository&gt;] [--depth &lt;depth&gt;] [--] &lt;repository&gt; [&lt;path&gt;]
 <em>git submodule</em> [--quiet] status [--cached] [--recursive] [--] [&lt;path&gt;&#8230;&#8203;]
 <em>git submodule</em> [--quiet] init [--] [&lt;path&gt;&#8230;&#8203;]
-<em>git submodule</em> [--quiet] deinit [-f|--force] [--] &lt;path&gt;&#8230;&#8203;
+<em>git submodule</em> [--quiet] deinit [-f|--force] (--all|[--] &lt;path&gt;&#8230;&#8203;)
 <em>git submodule</em> [--quiet] update [--init] [--remote] [-N|--no-fetch]
 	      [-f|--force] [--rebase|--merge] [--reference &lt;repository&gt;]
-	      [--depth &lt;depth&gt;] [--recursive] [--] [&lt;path&gt;&#8230;&#8203;]
+	      [--depth &lt;depth&gt;] [--recursive] [--jobs &lt;n&gt;] [--] [&lt;path&gt;&#8230;&#8203;]
 <em>git submodule</em> [--quiet] summary [--cached|--files] [(-n|--summary-limit) &lt;n&gt;]
 	      [commit] [--] [&lt;path&gt;&#8230;&#8203;]
 <em>git submodule</em> [--quiet] foreach [--recursive] &lt;command&gt;
@@ -583,12 +583,16 @@ any submodule locations.</p>
 tree. Further calls to <code>git submodule update</code>, <code>git submodule foreach</code>
 and <code>git submodule sync</code> will skip any unregistered submodules until
 they are initialized again, so use this command if you don&#8217;t want to
-have a local checkout of the submodule in your work tree anymore. If
+have a local checkout of the submodule in your working tree anymore. If
 you really want to remove a submodule from the repository and commit
 that use <a href="git-rm.html">git-rm</a>(1) instead.</p>
 <div class="paragraph">
-<p>If <code>--force</code> is specified, the submodule&#8217;s work tree will be removed even if
-it contains local modifications.</p>
+<p>When the command is run without pathspec, it errors out,
+instead of deinit-ing everything, to prevent mistakes.</p>
+</div>
+<div class="paragraph">
+<p>If <code>--force</code> is specified, the submodule&#8217;s working tree will
+be removed even if it contains local modifications.</p>
 </div>
 </dd>
 <dt class="hdlist1">update</dt>
@@ -727,6 +731,11 @@ registered submodules, and sync any nested submodules within.</p>
 <dd>
 <p>Only print error messages.</p>
 </dd>
+<dt class="hdlist1">--all</dt>
+<dd>
+<p>This option is only valid for the deinit command. Unregister all
+submodules in the working tree.</p>
+</dd>
 <dt class="hdlist1">-b</dt>
 <dt class="hdlist1">--branch</dt>
 <dd>
@@ -739,8 +748,8 @@ The name of the branch is recorded as <code>submodule.&lt;name&gt;.branch</code>
 <dd>
 <p>This option is only valid for add, deinit and update commands.
 When running add, allow adding an otherwise ignored submodule path.
-When running deinit the submodule work trees will be removed even if
-they contain local changes.
+When running deinit the submodule working trees will be removed even
+if they contain local changes.
 When running update (only effective with the checkout procedure),
 throw away local changes in submodules when switching to a
 different commit; and always run a checkout operation in the
@@ -876,6 +885,13 @@ in any nested submodules inside those submodules (and so on).</p>
 clone with a history truncated to the specified number of revisions.
 See <a href="git-clone.html">git-clone</a>(1)</p>
 </dd>
+<dt class="hdlist1">-j &lt;n&gt;</dt>
+<dt class="hdlist1">--jobs &lt;n&gt;</dt>
+<dd>
+<p>This option is only valid for the update command.
+Clone new submodules in parallel with as many jobs.
+Defaults to the <code>submodule.fetchJobs</code> option.</p>
+</dd>
 <dt class="hdlist1">&lt;path&gt;&#8230;&#8203;</dt>
 <dd>
 <p>Paths to submodule(s). When specified this will restrict the command
@@ -909,7 +925,7 @@ for details.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-01-05 15:53:48 W. Europe Standard Time
+Last updated 2016-06-14 11:04:08 W. Europe Daylight Time
 </div>
 </div>
 </body>

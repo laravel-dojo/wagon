@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 1.5.3">
+<meta name="generator" content="Asciidoctor 1.5.4">
 <title>git-pull(1)</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
@@ -640,14 +640,26 @@ strategy.</p>
 <dt class="hdlist1">--verify-signatures</dt>
 <dt class="hdlist1">--no-verify-signatures</dt>
 <dd>
-<p>Verify that the commits being merged have good and trusted GPG signatures
-and abort the merge in case they do not.</p>
+<p>Verify that the tip commit of the side branch being merged is
+signed with a valid key, i.e. a key that has a valid uid: in the
+default trust model, this means the signing key has been signed by
+a trusted key.  If the tip commit of the side branch is not signed
+with a valid key, the merge is aborted.</p>
 </dd>
 <dt class="hdlist1">--summary</dt>
 <dt class="hdlist1">--no-summary</dt>
 <dd>
 <p>Synonyms to --stat and --no-stat; these are deprecated and will be
 removed in the future.</p>
+</dd>
+<dt class="hdlist1">--allow-unrelated-histories</dt>
+<dd>
+<p>By default, <code>git merge</code> command refuses to merge histories
+that do not share a common ancestor.  This option can be
+used to override this safety when merging histories of two
+projects that started their lives independently. As that is
+a very rare occasion, no configuration variable to enable
+this by default exists and will not be added.</p>
 </dd>
 <dt class="hdlist1">-r</dt>
 <dt class="hdlist1">--rebase[=false|true|preserve|interactive]</dt>
@@ -692,6 +704,17 @@ unless you have read <a href="git-rebase.html">git-rebase</a>(1) carefully.
 <dd>
 <p>Override earlier --rebase.</p>
 </dd>
+<dt class="hdlist1">--autostash</dt>
+<dt class="hdlist1">--no-autostash</dt>
+<dd>
+<p>Before starting rebase, stash local modifications away (see
+<a href="git-stash.html">git-stash</a>(1)) if needed, and apply the stash when
+done. <code>--no-autostash</code> is useful to override the <code>rebase.autoStash</code>
+configuration variable (see <a href="git-config.html">git-config</a>(1)).</p>
+<div class="paragraph">
+<p>This option is only valid when "--rebase" is used.</p>
+</div>
+</dd>
 </dl>
 </div>
 </div>
@@ -712,10 +735,11 @@ option old data in <code>.git/FETCH_HEAD</code> will be overwritten.</p>
 </dd>
 <dt class="hdlist1">--depth=&lt;depth&gt;</dt>
 <dd>
-<p>Deepen or shorten the history of a <em>shallow</em> repository created by
-<code>git clone</code> with <code>--depth=&lt;depth&gt;</code> option (see <a href="git-clone.html">git-clone</a>(1))
-to the specified number of commits from the tip of each remote
-branch history. Tags for the deepened commits are not fetched.</p>
+<p>Limit fetching to the specified number of commits from the tip of
+each remote branch history. If fetching to a <em>shallow</em> repository
+created by <code>git clone</code> with <code>--depth=&lt;depth&gt;</code> option (see
+<a href="git-clone.html">git-clone</a>(1)), deepen or shorten the history to the specified
+number of commits. Tags for the deepened commits are not fetched.</p>
 </dd>
 <dt class="hdlist1">--unshallow</dt>
 <dd>
@@ -779,6 +803,16 @@ run on the other end.</p>
 by default when it is attached to a terminal, unless -q
 is specified. This flag forces progress status even if the
 standard error stream is not directed to a terminal.</p>
+</dd>
+<dt class="hdlist1">-4</dt>
+<dt class="hdlist1">--ipv4</dt>
+<dd>
+<p>Use IPv4 addresses only, ignoring IPv6 addresses.</p>
+</dd>
+<dt class="hdlist1">-6</dt>
+<dt class="hdlist1">--ipv6</dt>
+<dd>
+<p>Use IPv6 addresses only, ignoring IPv4 addresses.</p>
 </dd>
 <dt class="hdlist1">&lt;repository&gt;</dt>
 <dd>
@@ -877,9 +911,8 @@ absent.</p>
 </div>
 <div class="paragraph">
 <p>Git supports ssh, git, http, and https protocols (in addition, ftp,
-and ftps can be used for fetching and rsync can be used for fetching
-and pushing, but these are inefficient and deprecated; do not use
-them).</p>
+and ftps can be used for fetching, but this is inefficient and
+deprecated; do not use it).</p>
 </div>
 <div class="paragraph">
 <p>The native transport (i.e. git:// URL) does no authentication and
@@ -901,9 +934,6 @@ should be used with caution on unsecured networks.</p>
 </li>
 <li>
 <p>ftp[s]://host.xz[:port]/path/to/repo.git/</p>
-</li>
-<li>
-<p>rsync://host.xz/path/to/repo.git/</p>
 </li>
 </ul>
 </div>
@@ -1250,10 +1280,20 @@ branches with differing checkin/checkout attributes" in
 <p>Disables the <code>renormalize</code> option.  This overrides the
 <code>merge.renormalize</code> configuration variable.</p>
 </dd>
+<dt class="hdlist1">no-renames</dt>
+<dd>
+<p>Turn off rename detection.
+See also <a href="git-diff.html">git-diff</a>(1) <code>--no-renames</code>.</p>
+</dd>
+<dt class="hdlist1">find-renames[=&lt;n&gt;]</dt>
+<dd>
+<p>Turn on rename detection, optionally setting the similarity
+threshold.  This is the default.
+See also <a href="git-diff.html">git-diff</a>(1) <code>--find-renames</code>.</p>
+</dd>
 <dt class="hdlist1">rename-threshold=&lt;n&gt;</dt>
 <dd>
-<p>Controls the similarity threshold used for rename detection.
-See also <a href="git-diff.html">git-diff</a>(1) <code>-M</code>.</p>
+<p>Deprecated synonym for <code>find-renames=&lt;n&gt;</code>.</p>
 </dd>
 <dt class="hdlist1">subtree[=&lt;path&gt;]</dt>
 <dd>
@@ -1453,7 +1493,7 @@ version.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-01-05 15:53:48 W. Europe Standard Time
+Last updated 2016-06-14 11:04:07 W. Europe Daylight Time
 </div>
 </div>
 </body>

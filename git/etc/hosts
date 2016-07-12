@@ -21,3 +21,5 @@
 #	::1             localhost
 
 192.168.10.10	homestead.app
+192.168.10.10	adminer.app
+192.168.10.10	todo.app

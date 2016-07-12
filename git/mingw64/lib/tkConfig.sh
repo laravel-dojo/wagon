@@ -1,5 +1,5 @@
 # tkConfig.sh --
-# 
+#
 # This shell script (for sh) is generated automatically by Tk's
 # configure script.  It will create shell variables for most of
 # the configuration options discovered by the configure script.
@@ -17,7 +17,7 @@ TK_DLL_FILE="tk86.dll"
 TK_VERSION='8.6'
 TK_MAJOR_VERSION='8'
 TK_MINOR_VERSION='6'
-TK_PATCH_LEVEL='.4'
+TK_PATCH_LEVEL='.5'
 
 # -D flags for use with the C compiler.
 TK_DEFS='-DPACKAGE_NAME=\"\" -DPACKAGE_TARNAME=\"\" -DPACKAGE_VERSION=\"\" -DPACKAGE_STRING=\"\" -DPACKAGE_BUGREPORT=\"\" -DPACKAGE_URL=\"\" -DSTDC_HEADERS=1 -DTCL_THREADS=1 -DUSE_THREAD_ALLOC=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_STDLIB_H=1 -DHAVE_STRING_H=1 -DHAVE_MEMORY_H=1 -DHAVE_STRINGS_H=1 -DHAVE_INTTYPES_H=1 -DHAVE_STDINT_H=1 -DHAVE_UNISTD_H=1 -DMODULE_SCOPE=extern -DTCL_CFG_DO64BIT=1 -DHAVE_NO_SEH=1 -DHAVE_CAST_TO_UNION=1 -DHAVE_UXTHEME_H=1 -DHAVE_VSSYM32_H=1 -DNDEBUG=1 -DTCL_CFG_OPTIMIZED=1'
@@ -32,7 +32,7 @@ TK_DBGX=
 TK_LIB_FILE='libtk86.dll.a'
 
 # Additional libraries to use when linking Tk.
-TK_LIBS='-lnetapi32 -lkernel32 -luser32 -ladvapi32 -lws2_32 -lgdi32 -lcomdlg32 -limm32 -lcomctl32 -lshell32 -luuid -lole32 -loleaut32'
+TK_LIBS='-lnetapi32 -lkernel32 -luser32 -ladvapi32 -luserenv -lws2_32 -lgdi32 -lcomdlg32 -limm32 -lcomctl32 -lshell32 -luuid -lole32 -loleaut32'
 
 # Top-level directory in which Tcl's platform-independent files are
 # installed.

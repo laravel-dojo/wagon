@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 1.5.3">
+<meta name="generator" content="Asciidoctor 1.5.4">
 <title>git-init(1)</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
@@ -585,7 +585,14 @@ the <code>$GIT_DIR</code> after it is created.</p>
 </div>
 <div class="paragraph">
 <p>The default template directory includes some directory structure, suggested
-"exclude patterns" (see <a href="gitignore.html">gitignore</a>(5)), and sample hook files (see <a href="githooks.html">githooks</a>(5)).</p>
+"exclude patterns" (see <a href="gitignore.html">gitignore</a>(5)), and sample hook files.</p>
+</div>
+<div class="paragraph">
+<p>The sample hooks are all disabled by default, To enable one of the
+sample hooks rename it by removing its <code>.sample</code> suffix.</p>
+</div>
+<div class="paragraph">
+<p>See <a href="githooks.html">githooks</a>(5) for more general info on hook execution.</p>
 </div>
 </div>
 </div>
@@ -633,7 +640,7 @@ $ git commit    <b class="conum">(3)</b></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-01-05 15:53:48 W. Europe Standard Time
+Last updated 2016-06-14 11:04:07 W. Europe Daylight Time
 </div>
 </div>
 </body>

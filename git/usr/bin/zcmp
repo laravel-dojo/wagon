@@ -1,7 +1,7 @@
 #!/bin/sh
 # Compare the uncompressed contents of compressed files, byte by byte.
 
-# Copyright (C) 2007, 2010-2013 Free Software Foundation, Inc.
+# Copyright (C) 2007, 2010-2016 Free Software Foundation, Inc.
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,13 +17,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-bindir='/usr/bin'
-case $1 in
---__bindir) bindir=${2?}; shift; shift;;
-esac
-PATH=$bindir:$PATH
-
-version="zcmp (gzip) 1.6
+version="zcmp (gzip) 1.7
 Copyright (C) 2010 Free Software Foundation, Inc.
 This is free software.  You may redistribute copies of it under the terms of
 the GNU General Public License <http://www.gnu.org/licenses/gpl.html>.
@@ -48,4 +42,4 @@ case $1 in
 --version) echo "$version" || st=2; exit $st;;
 esac
 
-exec zdiff --__bindir "$bindir" --__cmp "$@"
+exec zdiff --__cmp "$@"

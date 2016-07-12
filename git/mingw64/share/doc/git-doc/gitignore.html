@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 1.5.3">
+<meta name="generator" content="Asciidoctor 1.5.4">
 <title>gitignore(5)</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
@@ -534,12 +534,12 @@ that begin with a hash.</p>
 <li>
 <p>An optional prefix "<code>!</code>" which negates the pattern; any
 matching file excluded by a previous pattern will become
-included again.
+included again. It is not possible to re-include a file if a parent
+directory of that file is excluded. Git doesn&#8217;t list excluded
+directories for performance reasons, so any patterns on contained
+files have no effect, no matter where they are defined.
 Put a backslash ("<code>\</code>") in front of the first "<code>!</code>" for patterns
-that begin with a literal "<code>!</code>", for example, "<code>\!important!.txt</code>".
-It is possible to re-include a file if a parent directory of that
-file is excluded if certain conditions are met. See section NOTES
-for detail.</p>
+that begin with a literal "<code>!</code>", for example, "<code>\!important!.txt</code>".</p>
 </li>
 <li>
 <p>If the pattern ends with a slash, it is removed for the
@@ -611,30 +611,6 @@ not tracked by Git remain untracked.</p>
 <div class="paragraph">
 <p>To stop tracking a file that is currently tracked, use
 <em>git rm --cached</em>.</p>
-</div>
-<div class="paragraph">
-<p>To re-include files or directories when their parent directory is
-excluded, the following conditions must be met:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>The rules to exclude a directory and re-include a subset back must
-be in the same .gitignore file.</p>
-</li>
-<li>
-<p>The directory part in the re-include rules must be literal (i.e. no
-wildcards)</p>
-</li>
-<li>
-<p>The rules to exclude the parent directory must not end with a
-trailing slash.</p>
-</li>
-<li>
-<p>The rules to exclude the parent directory must have at least one
-slash.</p>
-</li>
-</ul>
 </div>
 </div>
 </div>
@@ -723,7 +699,7 @@ everything within <code>foo/bar</code>):</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-01-05 15:53:48 W. Europe Standard Time
+Last updated 2016-06-14 11:04:08 W. Europe Daylight Time
 </div>
 </div>
 </body>

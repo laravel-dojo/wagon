@@ -1,7 +1,7 @@
 " Vim support file to detect file types
 "
 " Maintainer:	Bram Moolenaar <Bram@vim.org>
-" Last Change:	2015 Sep 08
+" Last Change:	2015 Dec 03
 
 " Listen very carefully, I will say this only once
 if exists("did_load_filetypes")
@@ -143,7 +143,7 @@ au BufNewFile,BufRead .arch-inventory,=tagging-method	setf arch
 au BufNewFile,BufRead *.art			setf art
 
 " AsciiDoc
-au BufNewFile,BufRead *.asciidoc		setf asciidoc
+au BufNewFile,BufRead *.asciidoc,*.adoc		setf asciidoc
 
 " ASN.1
 au BufNewFile,BufRead *.asn,*.asn1		setf asn
@@ -307,6 +307,9 @@ au BufNewFile,BufRead *.bl			setf blank
 
 " Blkid cache file
 au BufNewFile,BufRead */etc/blkid.tab,*/etc/blkid.tab.old   setf xml
+
+" Bazel (http://bazel.io)
+autocmd BufRead,BufNewFile *.bzl,BUILD,WORKSPACE setfiletype bzl
 
 " C or lpc
 au BufNewFile,BufRead *.c			call s:FTlpc()
@@ -826,7 +829,7 @@ au BufNewFile,BufRead *.gs			setf grads
 au BufNewFile,BufRead *.gretl			setf gretl
 
 " Groovy
-au BufNewFile,BufRead *.groovy			setf groovy
+au BufNewFile,BufRead *.gradle,*.groovy		setf groovy
 
 " GNU Server Pages
 au BufNewFile,BufRead *.gsp			setf gsp
@@ -1397,7 +1400,7 @@ else
   au BufNewFile,BufRead *.pl			call s:FTpl()
 endif
 au BufNewFile,BufRead *.plx,*.al		setf perl
-au BufNewFile,BufRead *.p6,*.pm6		setf perl6
+au BufNewFile,BufRead *.p6,*.pm6,*.pl6		setf perl6
 
 func! s:FTpl()
   if exists("g:filetype_pl")
@@ -1426,6 +1429,7 @@ au BufNewFile,BufRead *.pm
 
 " Perl POD
 au BufNewFile,BufRead *.pod			setf pod
+au BufNewFile,BufRead *.pod6			setf pod6
 
 " Php, php3, php4, etc.
 " Also Phtml (was used for PHP 2 in the past)
@@ -2113,6 +2117,9 @@ au BufNewFile,BufRead *.cm			setf voscm
 
 " Sysctl
 au BufNewFile,BufRead */etc/sysctl.conf,*/etc/sysctl.d/*.conf	setf sysctl
+
+" Systemd unit files
+au BufNewFile,BufRead */systemd/*.{automount,mount,path,service,socket,swap,target,timer}	setf systemd
 
 " Synopsys Design Constraints
 au BufNewFile,BufRead *.sdc			setf sdc

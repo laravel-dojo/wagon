@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 1.5.3">
+<meta name="generator" content="Asciidoctor 1.5.4">
 <title>git-clone(1)</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
@@ -435,8 +435,8 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 	  [-o &lt;name&gt;] [-b &lt;name&gt;] [-u &lt;upload-pack&gt;] [--reference &lt;repository&gt;]
 	  [--dissociate] [--separate-git-dir &lt;git dir&gt;]
 	  [--depth &lt;depth&gt;] [--[no-]single-branch]
-	  [--recursive | --recurse-submodules] [--] &lt;repository&gt;
-	  [&lt;directory&gt;]</pre>
+	  [--recursive | --recurse-submodules] [--[no-]shallow-submodules]
+	  [--jobs &lt;n&gt;] [--] &lt;repository&gt; [&lt;directory&gt;]</pre>
 </div>
 </div>
 </div>
@@ -556,8 +556,7 @@ borrowing.</p>
 <dt class="hdlist1">-q</dt>
 <dd>
 <p>Operate quietly.  Progress is not reported to the standard
-error stream. This flag is also passed to the &#8216;rsync&#8217;
-command when given.</p>
+error stream.</p>
 </dd>
 <dt class="hdlist1">--verbose</dt>
 <dt class="hdlist1">-v</dt>
@@ -642,16 +641,17 @@ additional fetch refspecs to the origin remote.</p>
 <dt class="hdlist1">--depth &lt;depth&gt;</dt>
 <dd>
 <p>Create a <em>shallow</em> clone with a history truncated to the
-specified number of revisions.</p>
+specified number of commits. Implies <code>--single-branch</code> unless
+<code>--no-single-branch</code> is given to fetch the histories near the
+tips of all branches. This implies <code>--shallow-submodules</code>. If
+you want to have a shallow superproject clone, but full submodules,
+also pass <code>--no-shallow-submodules</code>.</p>
 </dd>
 <dt class="hdlist1">--[no-]single-branch</dt>
 <dd>
 <p>Clone only the history leading to the tip of a single branch,
 either specified by the <code>--branch</code> option or the primary
-branch remote&#8217;s <code>HEAD</code> points at. When creating a shallow
-clone with the <code>--depth</code> option, this is the default, unless
-<code>--no-single-branch</code> is given to fetch the histories near the
-tips of all branches.
+branch remote&#8217;s <code>HEAD</code> points at.
 Further fetches into the resulting repository will only update the
 remote-tracking branch for the branch this option was used for the
 initial cloning.  If the HEAD at the remote did not point at any
@@ -668,6 +668,10 @@ the clone is finished. This option is ignored if the cloned
 repository does not have a worktree/checkout (i.e. if any of
 <code>--no-checkout</code>/<code>-n</code>, <code>--bare</code>, or <code>--mirror</code> is given)</p>
 </dd>
+<dt class="hdlist1">--[no-]shallow-submodules</dt>
+<dd>
+<p>All submodules which are cloned will be shallow with a depth of 1.</p>
+</dd>
 <dt class="hdlist1">--separate-git-dir=&lt;git dir&gt;</dt>
 <dd>
 <p>Instead of placing the cloned repository where it is supposed
@@ -675,6 +679,12 @@ to be, place the cloned repository at the specified directory,
 then make a filesystem-agnostic Git symbolic link to there.
 The result is Git repository can be separated from working
 tree.</p>
+</dd>
+<dt class="hdlist1">-j &lt;n&gt;</dt>
+<dt class="hdlist1">--jobs &lt;n&gt;</dt>
+<dd>
+<p>The number of submodules fetched at the same time.
+Defaults to the <code>submodule.fetchJobs</code> option.</p>
 </dd>
 <dt class="hdlist1">&lt;repository&gt;</dt>
 <dd>
@@ -705,9 +715,8 @@ absent.</p>
 </div>
 <div class="paragraph">
 <p>Git supports ssh, git, http, and https protocols (in addition, ftp,
-and ftps can be used for fetching and rsync can be used for fetching
-and pushing, but these are inefficient and deprecated; do not use
-them).</p>
+and ftps can be used for fetching, but this is inefficient and
+deprecated; do not use it).</p>
 </div>
 <div class="paragraph">
 <p>The native transport (i.e. git:// URL) does no authentication and
@@ -729,9 +738,6 @@ should be used with caution on unsecured networks.</p>
 </li>
 <li>
 <p>ftp[s]://host.xz[:port]/path/to/repo.git/</p>
-</li>
-<li>
-<p>rsync://host.xz/path/to/repo.git/</p>
 </li>
 </ul>
 </div>
@@ -915,7 +921,7 @@ $ cd my-linux</pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-01-05 15:53:48 W. Europe Standard Time
+Last updated 2016-06-14 11:04:07 W. Europe Daylight Time
 </div>
 </div>
 </body>

@@ -1,6 +1,7 @@
 #!/bin/sh
 
-# Copyright (C) 1998, 2002, 2004, 2007, 2010 Free Software Foundation
+# Copyright (C) 1998, 2002, 2004, 2007, 2010-2016 Free Software Foundation,
+# Inc.
 # Copyright (C) 1993 Jean-loup Gailly
 
 # This program is free software; you can redistribute it and/or modify
@@ -17,14 +18,8 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-bindir='/usr/bin'
-case $1 in
---__bindir) bindir=${2?}; shift; shift;;
-esac
-PATH=$bindir:$PATH; export PATH
-
-version="znew (gzip) 1.6
-Copyright (C) 2010-2013 Free Software Foundation, Inc.
+version="znew (gzip) 1.7
+Copyright (C) 2010-2016 Free Software Foundation, Inc.
 This is free software.  You may redistribute copies of it under the terms of
 the GNU General Public License <http://www.gnu.org/licenses/gpl.html>.
 There is NO WARRANTY, to the extent permitted by law.
@@ -58,33 +53,9 @@ new=0
 block=1024
 # block is the disk block size (best guess, need not be exact)
 
-warn="(does not preserve modes and timestamp)"
-tmp=${TMPDIR-/tmp}/zfoo.$$
-set -C
-echo hi > $tmp || exit
-if test -z "`(${CPMOD-cpmod} $tmp $tmp) 2>&1`"; then
-  cpmod=${CPMOD-cpmod}
-  warn=""
-fi
-
-if test -z "$cpmod" && ${TOUCH-touch} -r $tmp $tmp 2>/dev/null; then
-  cpmod="${TOUCH-touch}"
-  cpmodarg="-r"
-  warn="(does not preserve file modes)"
-fi
-
-# check if GZIP env. variable uses -S or --suffix
-gzip -q $tmp
-ext=`echo $tmp* | sed "s|$tmp||"`
-rm -f $tmp*
-if test -z "$ext"; then
-  echo znew: error determining gzip extension
-  exit 1
-fi
-if test "$ext" = ".Z"; then
-  echo znew: cannot use .Z as gzip extension.
-  exit 1
-fi
+# Beware -s or --suffix in $GZIP.
+unset GZIP
+ext=.gz
 
 for arg
 do
@@ -116,26 +87,27 @@ if test -n "$opt"; then
 fi
 
 for i do
-  n=`echo $i | sed 's/.Z$//'`
+  n=`echo "$i" | sed 's/.Z$//'`
   if test ! -f "$n.Z" ; then
-    echo $n.Z not found
+    echo "$n.Z not found"
     res=1; continue
   fi
   test $keep -eq 1 && old=`wc -c < "$n.Z"`
   if test $pipe -eq 1; then
     if gzip -d < "$n.Z" | gzip $opt > "$n$ext"; then
       # Copy file attributes from old file to new one, if possible.
-      test -n "$cpmod" && $cpmod $cpmodarg "$n.Z" "$n$ext" 2> /dev/null
+      touch -r"$n.Z" -- "$n$ext" 2>/dev/null
+      chmod --reference="$n.Z" -- "$n$ext" 2>/dev/null
     else
-      echo error while recompressing $n.Z
+      echo "error while recompressing $n.Z"
       res=1; continue
     fi
   else
     if test $check -eq 1; then
-      if cp -p "$n.Z" "$n.$$" 2> /dev/null || cp "$n.Z" "$n.$$"; then
+      if cp -p "$n.Z" "$n.$$"; then
         :
       else
-        echo cannot backup "$n.Z"
+        echo "cannot backup $n.Z"
         res=1; continue
       fi
     fi
@@ -143,7 +115,7 @@ for i do
       :
     else
       test $check -eq 1 && mv "$n.$$" "$n.Z"
-      echo error while uncompressing $n.Z
+      echo "error while uncompressing $n.Z"
       res=1; continue
     fi
     if gzip $opt "$n"; then
@@ -151,10 +123,10 @@ for i do
     else
       if test $check -eq 1; then
         mv "$n.$$" "$n.Z" && rm -f "$n"
-        echo error while recompressing $n
+        echo "error while recompressing $n"
       else
         # compress $n  (might be dangerous if disk full)
-        echo error while recompressing $n, left uncompressed
+        echo "error while recompressing $n, left uncompressed"
       fi
       res=1; continue
     fi
@@ -175,7 +147,7 @@ for i do
     else
       test $pipe -eq 0 && mv "$n.$$" "$n.Z"
       rm -f "$n$ext"
-      echo error while testing $n$ext, $n.Z unchanged
+      echo "error while testing $n$ext, $n.Z unchanged"
       res=1; continue
     fi
   elif test $pipe -eq 1; then

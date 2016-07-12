@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 1.5.3">
+<meta name="generator" content="Asciidoctor 1.5.4">
 <title>git-rev-list(1)</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
@@ -1455,6 +1455,22 @@ in <code>X</code> and we are outputting in <code>X</code>, we will output the ob
 verbatim; this means that invalid sequences in the original
 commit may be copied to the output.</p>
 </dd>
+<dt class="hdlist1">--expand-tabs=&lt;n&gt;</dt>
+<dt class="hdlist1">--expand-tabs</dt>
+<dt class="hdlist1">--no-expand-tabs</dt>
+<dd>
+<p>Perform a tab expansion (replace each tab with enough spaces
+to fill to the next display column that is multiple of <em>&lt;n&gt;</em>)
+in the log message before showing it in the output.
+<code>--expand-tabs</code> is a short-hand for <code>--expand-tabs=8</code>, and
+<code>--no-expand-tabs</code> is a short-hand for <code>--expand-tabs=0</code>,
+which disables tab expansion.</p>
+<div class="paragraph">
+<p>By default, tabs are expanded in pretty formats that indent the log
+message by 4 spaces (i.e.  <em>medium</em>, which is the default, <em>full</em>,
+and <em>fuller</em>).</p>
+</div>
+</dd>
 <dt class="hdlist1">--show-signature</dt>
 <dd>
 <p>Check the validity of a signed commit object by passing the signature
@@ -1900,8 +1916,8 @@ or <a href="git-blame.html">git-blame</a>(1))</p>
 <p><em>%GG</em>: raw verification message from GPG for a signed commit</p>
 </li>
 <li>
-<p><em>%G?</em>: show "G" for a Good signature, "B" for a Bad signature, "U" for a good,
-untrusted signature and "N" for no signature</p>
+<p><em>%G?</em>: show "G" for a good (valid) signature, "B" for a bad signature,
+"U" for a good signature with unknown validity and "N" for no signature</p>
 </li>
 <li>
 <p><em>%GS</em>: show the name of the signer for a signed commit</p>
@@ -2082,7 +2098,7 @@ $ git log -2 --pretty=%h 4da45bef</pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-01-05 15:53:48 W. Europe Standard Time
+Last updated 2016-06-14 11:04:07 W. Europe Daylight Time
 </div>
 </div>
 </body>

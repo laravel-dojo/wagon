@@ -87,7 +87,10 @@ preserve_merges=
 autosquash=
 keep_empty=
 test "$(git config --bool rebase.autosquash)" = "true" && autosquash=t
-gpg_sign_opt=
+case "$(git config --bool commit.gpgsign)" in
+true)	gpg_sign_opt=-S ;;
+*)	gpg_sign_opt= ;;
+esac
 
 read_basic_state () {
 	test -f "$state_dir/head-name" &&
@@ -176,7 +179,7 @@ You can run "git stash pop" or "git stash drop" at any time.
 
 finish_rebase () {
 	apply_autostash &&
-	git gc --auto &&
+	{ git gc --auto || true; } &&
 	rm -rf "$state_dir"
 }
 
@@ -248,6 +251,7 @@ do
 		;;
 	--exec=*)
 		cmd="${cmd}exec ${1#--exec=}${LF}"
+		test -z "$interactive_rebase" && interactive_rebase=implied
 		;;
 	--interactive)
 		interactive_rebase=explicit
@@ -347,12 +351,6 @@ do
 	shift
 done
 test $# -gt 2 && usage
-
-if test -n "$cmd" &&
-   test "$interactive_rebase" != explicit
-then
-	die "$(gettext "The --exec option must be used with the --interactive option")"
-fi
 
 if test -n "$action"
 then

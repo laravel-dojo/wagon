@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 1.5.3">
+<meta name="generator" content="Asciidoctor 1.5.4">
 <title>git-push(1)</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
@@ -431,7 +431,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="sectionbody">
 <div class="verseblock">
 <pre class="content"><em>git push</em> [--all | --mirror | --tags] [--follow-tags] [--atomic] [-n | --dry-run] [--receive-pack=&lt;git-receive-pack&gt;]
-	   [--repo=&lt;repository&gt;] [-f | --force] [--prune] [-v | --verbose]
+	   [--repo=&lt;repository&gt;] [-f | --force] [-d | --delete] [--prune] [-v | --verbose]
 	   [-u | --set-upstream]
 	   [--[no-]signed|--sign=(true|false|if-asked)]
 	   [--force-with-lease[=&lt;refname&gt;[:&lt;expect&gt;]]]
@@ -463,6 +463,14 @@ arguments or <code>--all</code>, <code>--mirror</code>, <code>--tags</code> opti
 the default <code>&lt;refspec&gt;</code> by consulting <code>remote.*.push</code> configuration,
 and if it is not found, honors <code>push.default</code> configuration to decide
 what to push (See <a href="git-config.html">git-config</a>(1) for the meaning of <code>push.default</code>).</p>
+</div>
+<div class="paragraph">
+<p>When neither the command-line nor the configuration specify what to
+push, the default behavior is used, which corresponds to the <code>simple</code>
+value for <code>push.default</code>: the current branch is pushed to the
+corresponding upstream branch, but as a safety measure, the push is
+aborted if the upstream branch does not have the same name as the
+local one.</p>
 </div>
 </div>
 </div>
@@ -747,6 +755,16 @@ recursion is required.</p>
 default is --verify, giving the hook a chance to prevent the
 push.  With --no-verify, the hook is bypassed completely.</p>
 </dd>
+<dt class="hdlist1">-4</dt>
+<dt class="hdlist1">--ipv4</dt>
+<dd>
+<p>Use IPv4 addresses only, ignoring IPv6 addresses.</p>
+</dd>
+<dt class="hdlist1">-6</dt>
+<dt class="hdlist1">--ipv6</dt>
+<dd>
+<p>Use IPv6 addresses only, ignoring IPv4 addresses.</p>
+</dd>
 </dl>
 </div>
 </div>
@@ -762,9 +780,8 @@ absent.</p>
 </div>
 <div class="paragraph">
 <p>Git supports ssh, git, http, and https protocols (in addition, ftp,
-and ftps can be used for fetching and rsync can be used for fetching
-and pushing, but these are inefficient and deprecated; do not use
-them).</p>
+and ftps can be used for fetching, but this is inefficient and
+deprecated; do not use it).</p>
 </div>
 <div class="paragraph">
 <p>The native transport (i.e. git:// URL) does no authentication and
@@ -786,9 +803,6 @@ should be used with caution on unsecured networks.</p>
 </li>
 <li>
 <p>ftp[s]://host.xz[:port]/path/to/repo.git/</p>
-</li>
-<li>
-<p>rsync://host.xz/path/to/repo.git/</p>
 </li>
 </ul>
 </div>
@@ -1381,7 +1395,7 @@ a <code>git gc</code> command on the origin repository.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-01-05 15:53:48 W. Europe Standard Time
+Last updated 2016-06-14 11:04:07 W. Europe Daylight Time
 </div>
 </div>
 </body>

@@ -1,7 +1,7 @@
 #!/bin/sh
 # sh is buggy on RS/6000 AIX 3.2. Replace above line with #!/bin/ksh
 
-# Copyright (C) 1998, 2002, 2006, 2007, 2009 Free Software Foundation
+# Copyright (C) 1998, 2002, 2006-2007, 2009-2016 Free Software Foundation, Inc.
 # Copyright (C) 1993 Jean-loup Gailly
 
 # This program is free software; you can redistribute it and/or modify
@@ -18,20 +18,14 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-bindir='/usr/bin'
-case $1 in
---__bindir) bindir=${2?}; shift; shift;;
-esac
-PATH=$bindir:$PATH
-
 case $1 in
   --__cmp) shift
         prog=cmp;  cmp='${CMP-cmp}'  ;;
   *)    prog=diff; cmp='${DIFF-diff}';;
 esac
 
-version="z$prog (gzip) 1.6
-Copyright (C) 2009, 2011-2013 Free Software Foundation, Inc.
+version="z$prog (gzip) 1.7
+Copyright (C) 2009, 2011-2016 Free Software Foundation, Inc.
 This is free software.  You may redistribute copies of it under the terms of
 the GNU General Public License <http://www.gnu.org/licenses/gpl.html>.
 There is NO WARRANTY, to the extent permitted by law.
@@ -117,15 +111,15 @@ elif test $# -eq 2; then
                         esac
                         (exit $cmp_status)
                     else
-                        F=`expr "/$2" : '.*/\(.*\)[-.][zZtga]*$'` || F=$prog
                         tmp=
                         trap '
                           test -n "$tmp" && rm -f "$tmp"
                           (exit 2); exit 2
                         ' HUP INT PIPE TERM 0
                         if type mktemp >/dev/null 2>&1; then
-                          tmp=`mktemp -t -- "$F.XXXXXX"` || exit 2
+                          tmp=`mktemp` || exit 2
                         else
+                          F=`expr "/$2" : '.*/\(.*\)[-.][zZtga]*$'` || F=$prog
                           set -C
                           tmp=${TMPDIR-/tmp}/$F.$$
                         fi

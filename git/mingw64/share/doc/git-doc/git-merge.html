@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 1.5.3">
+<meta name="generator" content="Asciidoctor 1.5.4">
 <title>git-merge(1)</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
@@ -432,6 +432,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="verseblock">
 <pre class="content"><em>git merge</em> [-n] [--stat] [--no-commit] [--squash] [--[no-]edit]
 	[-s &lt;strategy&gt;] [-X &lt;strategy-option&gt;] [-S[&lt;keyid&gt;]]
+	[--[no-]allow-unrelated-histories]
 	[--[no-]rerere-autoupdate] [-m &lt;msg&gt;] [&lt;commit&gt;&#8230;&#8203;]
 <em>git merge</em> &lt;msg&gt; HEAD &lt;commit&gt;&#8230;&#8203;
 <em>git merge</em> --abort</pre>
@@ -603,8 +604,11 @@ strategy.</p>
 <dt class="hdlist1">--verify-signatures</dt>
 <dt class="hdlist1">--no-verify-signatures</dt>
 <dd>
-<p>Verify that the commits being merged have good and trusted GPG signatures
-and abort the merge in case they do not.</p>
+<p>Verify that the tip commit of the side branch being merged is
+signed with a valid key, i.e. a key that has a valid uid: in the
+default trust model, this means the signing key has been signed by
+a trusted key.  If the tip commit of the side branch is not signed
+with a valid key, the merge is aborted.</p>
 </dd>
 <dt class="hdlist1">--summary</dt>
 <dt class="hdlist1">--no-summary</dt>
@@ -629,6 +633,15 @@ removed in the future.</p>
 progress is shown if standard error is connected to a terminal.
 Note that not all merge strategies may support progress
 reporting.</p>
+</dd>
+<dt class="hdlist1">--allow-unrelated-histories</dt>
+<dd>
+<p>By default, <code>git merge</code> command refuses to merge histories
+that do not share a common ancestor.  This option can be
+used to override this safety when merging histories of two
+projects that started their lives independently. As that is
+a very rare occasion, no configuration variable to enable
+this by default exists and will not be added.</p>
 </dd>
 <dt class="hdlist1">-S[&lt;keyid&gt;]</dt>
 <dt class="hdlist1">--gpg-sign[=&lt;keyid&gt;]</dt>
@@ -1087,10 +1100,20 @@ branches with differing checkin/checkout attributes" in
 <p>Disables the <code>renormalize</code> option.  This overrides the
 <code>merge.renormalize</code> configuration variable.</p>
 </dd>
+<dt class="hdlist1">no-renames</dt>
+<dd>
+<p>Turn off rename detection.
+See also <a href="git-diff.html">git-diff</a>(1) <code>--no-renames</code>.</p>
+</dd>
+<dt class="hdlist1">find-renames[=&lt;n&gt;]</dt>
+<dd>
+<p>Turn on rename detection, optionally setting the similarity
+threshold.  This is the default.
+See also <a href="git-diff.html">git-diff</a>(1) <code>--find-renames</code>.</p>
+</dd>
 <dt class="hdlist1">rename-threshold=&lt;n&gt;</dt>
 <dd>
-<p>Controls the similarity threshold used for rename detection.
-See also <a href="git-diff.html">git-diff</a>(1) <code>-M</code>.</p>
+<p>Deprecated synonym for <code>find-renames=&lt;n&gt;</code>.</p>
 </dd>
 <dt class="hdlist1">subtree[=&lt;path&gt;]</dt>
 <dd>
@@ -1248,6 +1271,9 @@ that a corresponding mergetool.&lt;tool&gt;.cmd variable is defined.</p>
 <p>emerge</p>
 </li>
 <li>
+<p>examdiff</p>
+</li>
+<li>
 <p>gvimdiff</p>
 </li>
 <li>
@@ -1351,7 +1377,7 @@ values containing whitespace characters are currently not supported.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-01-05 15:53:48 W. Europe Standard Time
+Last updated 2016-06-14 11:04:07 W. Europe Daylight Time
 </div>
 </div>
 </body>
