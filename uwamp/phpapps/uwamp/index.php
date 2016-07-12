@@ -119,9 +119,14 @@ else
 	$data = fread ($fp, filesize ($apacheconffile));
 	fclose ($fp);	
 	preg_match_all("/Alias[\\t ]*\"([^\"\']+)\"[\\t ]\"([^\"\']+)\"/i",$data,$matches,PREG_SET_ORDER);	
+	$lists = array();
 	foreach ($matches as $val)
 	{
-		echo "<li><a class=\"afolder\" href=\"$val[1]\">$val[1]</a></li>";
+		if (!in_array($val, $lists))
+		{
+			$lists[] = $val;
+			echo "<li><a class=\"afolder\" href=\"$val[1]\">$val[1]</a></li>";
+		}	
 	}
 }
 
@@ -135,7 +140,7 @@ $count=0;
 while ($file = readdir($handle)) 
 {	
 	if ($file=="." || $file=="..") continue;
-	if (is_dir($file))
+	if (is_dir($UWAMPFOLDER."www/".$file))
 	{		
 		$count++;
 		echo "<li><a class=\"afolder\" href=\"/$file\">$file</a></li>";
@@ -150,7 +155,7 @@ if ($count==0)
 
 <br><br>
 <hr>
-<center><a href="http://www.uwamp.com">UwAmp Home</a></center>
+<center><a href="http://www.uwamp.com">UwAmp Home</a> - <a href="http://www.ubugtrack.com">uBugtrack</a></center>
 
 
 </div>
