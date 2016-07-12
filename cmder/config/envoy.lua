@@ -41,7 +41,8 @@ envoy_basic_parser:set_arguments({
 	"ssh" .. flags(
 						"--user",
 						envoy_basic_options
-						)  
+						),
+	"tasks" .. flags(envoy_basic_options),   
 })
 
 clink.arg.register_parser("envoy", envoy_basic_parser)
