@@ -56,7 +56,13 @@
 :: Enhance Path
 @set CMDER_START=%WAGON_ROOT%\uwamp\www
 @set COMPOSER_HOME=%WAGON_ROOT%\composer
-@set PHP_INSTSLL_ROOT=%WAGON_ROOT%\uwamp\bin\php\php-7.0.3
+@for /f "tokens=2 delims=[]" %%G in ('ver') do @set _version=%%G
+@for /f "tokens=2,3,4 delims=. " %%G in ('echo %_version%') do @set _major=%%G& @set _minor=%%H& @set _build=%%I
+@if "%_major%"=="10" (
+    set PHP_INSTSLL_ROOT=%WAGON_ROOT%\uwamp\bin\php\php-7.0.3
+) else (
+    set PHP_INSTSLL_ROOT=%WAGON_ROOT%\uwamp\bin\php\php-5.6.18
+)
 @set SQLITE_ROOT=%CMDER_ROOT%\vendor\sqlite
 
 @set PATH=%PHP_INSTSLL_ROOT%;%COMPOSER_HOME%;%COMPOSER_HOME%\vendor\bin;%SQLITE_ROOT%;%CMDER_ROOT%\bin;%PATH%;%CMDER_ROOT%
