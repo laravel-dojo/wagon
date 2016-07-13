@@ -16,19 +16,19 @@
 
 在 wagon 裡已經幫您整合好以下軟體，皆為免安裝版本：
 
-* [cmder](http://bliker.github.io/cmder/) 1.2.9
-* [UwAmp](http://www.uwamp.com/en/) 3.0.2 (Apache, MySQL, [php-5.6.17-Win32-VC11-x86](http://windows.php.net/download/))
-* [msysgit](https://msysgit.github.io/) 2.7.0
-* [SQLite](https://www.sqlite.org/download.html) 3.8.11.1
-* [composer](https://getcomposer.org/doc/00-intro.md#manual-installation) 1.0-dev
+* [cmder](http://cmder.net/) 1.2.9
+* [UwAmp](http://www.uwamp.com/en/) 3.1.0 (Apache, MySQL, PHP 5.6.18, PHP 7.0.3)
+* [git for windows](https://github.com/git-for-windows/git) 2.9.0
+* [SQLite](https://www.sqlite.org/) 3.13.0
+* [composer](https://getcomposer.org/) 1.2.0-RC
 * [laravel/installer](https://packagist.org/packages/laravel/installer) ^1.3
-* [laravel/envoy](https://packagist.org/packages/laravel/envoy) ^1.0
-* [laravel/laravel](https://packagist.org/packages/laravel/laravel) 5.2.10
+* [laravel/envoy](https://packagist.org/packages/laravel/envoy) ^1.2
+* [laravel/laravel](https://packagist.org/packages/laravel/laravel) (4.2.19, 5.0.35, 5.1.40, 5.2.39)
 
 ## 使用方式
 
-* 請先下載/安裝 [Visual C++ 可轉散發套件 2012](http://www.microsoft.com/zh-tw/download/details.aspx?id=30679)
-* * 請先下載/安裝 [Visual C++ 可轉散發套件 2015](https://www.microsoft.com/zh-TW/download/details.aspx?id=48145)
+* 請先下載/安裝 [Visual C++ 可轉散發套件 2012](http://www.microsoft.com/zh-tw/download/details.aspx?id=30679) (32bits, 64bits)
+* 請先下載/安裝 [Visual C++ 可轉散發套件 2015](https://www.microsoft.com/zh-TW/download/details.aspx?id=48145) (32bits, 64bits)
 * 下載 wagon
 * 解壓縮至您想要的位置，如 `c:\wagon`
 * 依以下預設設定啟動對應的軟體即可開始使用
@@ -36,7 +36,7 @@
 ## 環境預設設定
 
 * cmder 放置於，`wagon\cmder\Cmder.exe`，點擊兩次即可啟動，啟動時會自動載入獨立環境變數，並把當前位置設定在 `wagon\uwamp\www`，包括：
-	* PHP 5.6.17：`wagon\uwamp\bin\php\php-5.6.17-Win32-VC11-x86\php.exe`
+	* PHP 7.0.3：`wagon\uwamp\bin\php\php-7.0.3\php.exe`
 	* Composer：`wagon\composer\composer.bat`
 	* Composer Packages：`wagon\composer\verdor\bin`
 	* Git：`wagon\git\bin`
@@ -44,7 +44,7 @@
 	* Apache 已啟用 rewrite module、Document Root 設定在 `wagon\uwamp\www\default`、port 改設定為 `8000`
 	* MySQL port 改設定為 `33060`，可用 `root`/`root` 登入
 	* adminer 位置為 `http://localhost:8000/adminer`
-* laravel 放置於 `wagon\uwamp\www\laravel`
+* laravel 放置於 `wagon\laravel`
 
 ## 注意事項
 
