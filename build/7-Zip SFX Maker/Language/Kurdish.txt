@@ -1,0 +1,153 @@
+﻿
+; Language: Kurdish
+; Translator: Occo Mahabad
+; Email: occo74@hotmail.com
+
+; ========= TRANSLATING THIS FILE TO ANOTHER LANGUAGE ========
+
+; Replace the text in each numbered line.
+; The text should not contain a new line character.
+; Save this file with name of the language.
+; This file should be saved with UTF-8 encoding.
+
+; ============================================================
+
+; Tab page titles
+
+1000= Klasor
+1001= Giştî
+1002= Nivîsar
+1003= Sîmge
+1004= Kurterê
+1005= Sazkirin
+1006= Ferman
+1007= Der Barê De
+
+;Menu text
+
+1100= Dosya
+1101= Teşe
+1102= Ziman
+1103= Dosyaya 7z'yê Hilbijêre...
+1104= Eyaran Bar Bike ...
+1105= Eyaran Qeyd Bike ...
+1106= Cureyê Nivîsê...
+1107= SFX Çêke
+
+;Files page
+
+1200= Arşîva Sfx'ê di heman dosyayê de dê were çêkirin.
+1201= Mînak.arşîva bi navê 7z Mînak.wek sfx.exe tê qeydkirin.
+1202= Heger navê dosyayê bi navê dosyayekî din ve eynî be dê li ser were nivîsandin.
+
+;General page
+
+1300= Rêya derxistinê
+1301= Derxe klasora demî 
+1302= Dosyayê derxe cihê diyarkirî 
+1303= C:\Klasora nû
+1304= Rêya bikarhêner(ê)  biguherîne
+1305= Moda sernivîsandinê 
+1306= Li ser hemû dosyayan binivîse 
+1307= Dosyayên heyî baz de 
+1308= Li ser dosyayên heyî binivîse 
+1309= Karê derxistinê veşêre
+1310= Piştî derxistinê dosyaya sfx'ê jê bibe
+1311= Stîla Xp'yê bi kar bîne
+1312= Bi Upx'ê modûla Sfx'ê bişidîne
+
+;Text page
+
+1400= Peyam
+1401= Destpêkirin
+1402= Betalkirin
+1403= Temambûn
+1404= Derxe 
+1405= Hûn dixwazin bidin sekinandin?
+1406= Dosya bi serkeftî hatin derxistin 
+1407= Nivîsara din
+1408= Sernav
+1409= Nivîsara rêya derxistinê 
+1410= Nivîsara betalkirina derxistinê
+1411= Arşîva 7-ZIP SFX
+1412= Rêya derxistinê hilbijêre
+1413= Bisekinîne
+
+;Icon page
+
+1500= Sîmgeya SFX'ê (bo hilbijartinê bitikîne)
+1501= Ji bo bikaranîna sîmgeyên din 
+1502= dosyayên sîmgeyan kopî bike dosyaya çavkaniyê 
+
+;Run dialog
+
+1600= Piştî derxistinê bernameyê bixebitîne
+1601= Bername *
+1602= Ferman
+
+;Shortcuts dialog
+
+1700= Kurterêyê çêke
+1701= Li ku çêkirin 
+1702= Ji bo çêkirinê
+1703= Parametre
+1704= Sermase
+1705= Menûya Destpêkê
+1706= Menûya Destpêkê/Bernameyan
+1707= Destpêk
+1708= Hemû bikarhêneran
+1709= Bikarhênera demî
+1710= Dosyaya çavkaniyê *
+1711= Ferman
+1712= Navê kurterêyê
+1713= Daxuyaniya kurterêyê
+1714= Dosyaya hedefê
+1715= Rêbera xebatê 
+1716= Dosyaya sîmgeyê
+1717= Endeksa sîmgeyê
+
+;Environment variables dialog
+
+1800= Fermanên nîvengê çêke 
+1801= Nav
+1802= Nirx
+
+;Context menu
+
+1900= Kopî bike
+1901= Pê ve bike
+1902= %%T (Rêya derxistinê)
+1903= %%S (Rêya SFX'ê)
+1904= %SystemDrive%
+1905= %SystemRoot%
+1906= %ProgramFiles%
+1907= %CommonDesktop%
+1908= %CommonDocuments%
+1909= %AllUsersProfile%
+1910= %UserDesktop%
+1911= %UserDocuments%
+1912= %UserProfile%
+
+;Common
+
+2000= Erê
+2001= Betal
+2002= * %%T = Rêya derxistinê
+2003=  Ji bo rê fermanên din bi tikandina rastê lê zêde bike
+
+;Messages
+
+2100= Bernameya Resource Hacker nehat dîtin!
+2101= Hin vebijêrkan dê neyên lêzêdekirin.
+2102= Dosya winda ye!
+2103= ResHacker.exe winda ye! Sîmgeya Sfx'ê nehat guherandin.
+2104= Bernameya UPX nehat dîtin!
+2105= Bernameya Join.exe  nehat dîtin! Nayê dewamkirin .
+2106= Ji kerema xwe bi tenê dosyaya 7-ZIP'ê (*.7z) hilbijêrin
+2107= Ji bo lîsteya dosyayê berê dosyayên 7-ZIP'ê hilbijêrin.
+2108= Paşê eyaran hilbijêrin.
+2109= Dawiyê li ser bişkoka SFX ÇÊKE bitikînin.
+2110= Hinek dosya têxin 
+2111= Modûla SFX'ê tê amadekirin...
+2112= Qediya
+2113= Dosya tê nivîsandin...

@@ -1,0 +1,188 @@
+﻿; Language: French
+; Translator: Jonathan
+; Email: maddogvachon@hotmail.ca
+
+; ========= TRANSLATING THIS FILE TO ANOTHER LANGUAGE ========
+
+; Replace the text in each numbered line.
+; The text should not contain a new line character.
+; Save this file with name of the language.
+; This file should be saved with UTF-8 encoding.
+
+; ============================================================
+
+; Tab page titles
+
+1000= Fichier
+1001= Géneral
+1002= Texte
+1003= Icone
+1004= Raccourcis
+1005= Exécuter
+1006= Variables
+1007= À propos
+1008= Métadonnées
+1009= Tâches
+
+;Menu text
+
+1100= Fichier
+1101= Options
+1102= Langue
+1103= Ajouter le fichier 7z...
+1104= Charger les paramètres...
+1105= Enregistrer les paramètres...
+1106= Police de l'interface...
+1107= Créer l'autoexécutable 'SFX'
+1108= Rafraîchir le cache des icones de Windows
+1109= Chargement rapide
+
+;Files page
+
+1200= L'archive autoexécutable sera créée dans le même dossier.
+1201= Une archive nommée 'Example.7z' sera enregistrée sous 'Example.sfx.exe'.
+1202= Les fichiers ayant le même nom seront écrasés.
+
+;General page
+
+1300= Dossier d'extraction
+1301= Extraire dans un dossier temporaire
+1302= Extraire dans un dossier spécifique
+1303= C:\Nouveau_Dossier
+1304= Permettre à l'utilisateur de changer de dossier
+1305= Mode d'écrasement
+1306= Écraser tous les fichiers
+1307= Ne pas écraser
+1308= Écraser les vieux fichiers
+1309= Cacher la barre de progression
+1310= Effacer l'autoexécutable 'SFX' après l'extraction
+1311= Utiliser le style XP
+1312= Compresser le 'SFX stub' avec UPX
+
+;Text page
+
+1400= Messages
+1401= Message de départ
+1402= Message d'annulation
+1403= Message final
+1404= Démarrer l'extraction
+1405= Voulez-vous vraiment annuler ?
+1406= Les fichiers ont été extraits avec succès
+1407= Autre texte
+1408= Titre
+1409= Texte pour le dossier d'extraction
+1410= Texte pour annuler l'extraction
+1411= Archive autoexécutable 7-ZIP SFX
+1412= Sélectionnez le dossier d'extraction
+1413= Interrompre
+1414= Fenêtre de progression
+1415= Titre
+1416= Extraction
+1417= Dialogue
+1418= Afficher à gauche
+1419= Afficher à droite
+1420= Cacher
+1421= Montrer l'icone
+1422= Cacher l'icone dans la barre de titre de toutes les fenêtres
+1423= Désactiver les bouttons Annuler et Fermer
+1424= Montrer l'icone du SFX au début, à la fin et à la demande d'annulation
+
+;Icon page
+
+1500= Icone pour l'autoexécutable (Cliquer pour sélectionner)
+1501= Pour utiliser d'autre icone, copier l'icone dans le dossier 'Resources'
+
+;Run dialog
+
+1600= Exécuter ce programme après l'extraction
+1601= Programme *
+1602= Arguments
+1603= Ne pas attendre que le programme termine
+1604= Cacher la fenêtre de console
+1605= Le dossier entier (ou le fichier) sera effacé après l'extraction sans aucun avertissement
+
+;Shortcuts dialog
+
+1700= Créer un raccourcis
+1701= Où créer
+1702= Créer pour
+1703= Paramètres
+1704= Bureau
+1705= Menu Démarrer
+1706= Menu Démarrer/Programmes
+1707= Démarrer
+1708= Tous les utilisateurs
+1709= L'utilisateur actuel
+1710= Fichier source *
+1711= Arguments
+1712= Nom du raccourcis
+1713= Description du raccourcis
+1714= Dossier de destination
+1715= Dossier de travail
+1716= Icon du fichier
+1717= Icon de l'index
+
+;Environment variables dialog
+
+1800= Crérer une variable
+1801= Nom
+1802= Valeur
+
+;Context menu
+
+1900= Copier
+1901= Coller
+1902= %%T (Dossier d'extraction)
+1903= %%S (Dossier de l'exécutable)
+1904= %SystemDrive% (Dossier racine du système)
+1905= %SystemRoot% (Dossier système)
+1906= %ProgramFiles% (Dossier Programmes)
+1907= %CommonDesktop% (Bureau partagé)
+1908= %CommonDocuments% (Documents partagés)
+1909= %AllUsersProfile% (Profile pour tous les utilisateurs)
+1910= %UserDesktop% (Bureau)
+1911= %UserDocuments% (Documents)
+1912= %UserProfile% (Profile utlisateur)
+
+;Common
+
+2000= OK
+2001= Annuler
+2002= * %%T = Dossier d'extraction (Clique droit pour sélectionner un autre dossier)
+
+;Messages
+
+2100= 'Resource Hacker' est introuvable!
+2101= Certaines options ne seront pas disponibles.
+2102= Fichier manquant!
+2103= 'ResHacker.exe' est manquant! L'icone de l'autoexécutable ne sera pas changée.
+2104= UPX est introuvable!
+2105= 'Join.exe' est introuvable! Impossible de continuer.
+2106= S.V.P. ajouter des fichiers 7-ZIP seulement (*.7z)
+2107= D'abord, ajoutez quelques fichiers 7-ZIP à la liste de fichiers.
+2108= Ensuite choisissez les réglages.
+2109= Finalement cliquez sur le bouton "Créer l'autoexécutable 'SFX'".
+2110= Ajoutez quelques fichiers
+2111= Module 'SFX' en préparation...
+2112= Terminé
+2113= Écriture du fichier...
+2114= Le programme à exécuter doit être spécifié
+2115= L'item à effacer doit être spécifié
+2116= Le fichier source doit être spécifié
+2117= Le nom doit être spécifié
+2118= Erreur dans le fichier de langue
+2119= ResHacker.exe est manquant! Les métadonnées SFX ne peuvent être changées.
+
+;Metadata tab
+
+2200= Champ nom
+2201= Champ valeur
+
+;Add Task window
+
+2300= Nouvelle tâche
+2301= Sélectionner une tâche à accomplir après l'extraction
+2302= Créer un raccourci
+2303= Exécuter un programme
+2304= Effacer un fichier
+2305= Définir un environnement

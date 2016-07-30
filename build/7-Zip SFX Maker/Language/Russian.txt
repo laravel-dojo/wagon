@@ -1,0 +1,185 @@
+﻿; Language: Russian
+; Translator: Evgeny V. Lavrov
+; Email: EvgenyLavrov@gmail.com
+
+; ========= TRANSLATING THIS FILE TO ANOTHER LANGUAGE ========
+
+; Replace the text in each numbered line.
+; The text should not contain a new line character.
+; Save this file with name of the language.
+; This file should be saved with UTF-8 encoding.
+
+; ============================================================
+
+; Tab page titles
+
+1000= Файлы
+1001= Основное
+1002= Текст
+1003= Иконка
+1007= О программе
+1008= Metadata
+1009= Tasks
+
+;Menu text
+
+1100= Файл
+1101= Настройки
+1102= Язык
+1103= Добавить 7z-файл...
+1104= Загрузить настройки...
+1105= Сохранить настройки...
+1106= Шрифт GUI...
+1107= Создать SFX
+1108= Refresh Windows Icon Cache
+1109= Quick Load
+
+;Files page
+
+1200= SFX-архив будет создан в той же папке.
+1201= Архив Example.7z будет сохранен как Example.sfx.exe.
+1202= Существующие файлы с таким же именем будут замещены.
+
+;General page
+
+1300= Путь извлечения
+1301= Извлекать в каталог временных файлов
+1302= Извлекать в следующий каталог
+1303= C:\Новая папка
+1304= Разрешить пользователю изменять путь
+1305= Режим перезаписи
+1306= Перезаписывать все файлы
+1307= Не перезаписывать
+1308= Перезаписывать старые файлы
+1309= Show extraction progress
+1310= Удалить SFX-архив после извлечения
+1311= Использовать стиль Windows XP
+1312= Сжимать SFX с помощью UPX
+
+;Text page
+
+1400= Сообщения
+1401= Текст начала
+1402= Текст отмены
+1403= Финальное сообщение
+1404= Извлечь
+1405= Вы действительно хотите прервать процесс извлечения?
+1406= Файлы успешно извлечены
+1407= Другое
+1408= Заголовок
+1409= Текст выбора каталога
+1410= Текст отмены выбора
+1411= 7-ZIP SFX archive
+1412= Выберите путь распаковки
+1413= Отменить
+1414= Progress Window
+1415= Title Text
+1416= Extracting
+1417= Dialog Text
+1418= Show Left
+1419= Show Right
+1420= Hide
+1421= Show Icon
+1422= Hide icon in titlebar of all windows
+1423= Disable Cancel and Close buttons
+1424= Show SFX icon in Begin, Finish and Cancel Prompt
+
+;Icon page
+
+1500= Иконка SFX-файла (нажмите для выбора)
+1501= Чтобы использовать другую иконку скопируйте файл иконки в каталог Resources
+
+;Run dialog
+
+1600= Запуск программы после извлечения
+1601= Программа *
+1602= Параметры
+1603= Do not wait for program to finish
+1604= Hide console windows
+1605= The entire folder (or file) will be deleted after extraction without any warning
+
+;Shortcuts dialog
+
+1700= Создать ярлык
+1701= Место создания
+1702= Создать для
+1703= Параметры
+1704= Рабочий стол
+1705= Меню "Пуск"
+1706= Меню "Пуск" / Программы
+1707= Автозагрузка
+1708= Для всех пользователей
+1709= Для текущего пользователя
+1710= Исходный файл *
+1711= Параметры
+1712= Название ярлыка
+1713= Описание ярлыка
+1714= Каталог назначения
+1715= Рабочий каталог
+1716= Файл иконки
+1717= Индекс иконки
+
+;Environment variables dialog
+
+1800= Создать переменную окружения
+1801= Имя
+1802= Значение
+
+;Context menu
+
+1900= Копировать
+1901= Вставить
+1902= %%T (Путь извлечения)
+1903= %%S (Путь SFX)
+1904= %SystemDrive%
+1905= %SystemRoot%
+1906= %ProgramFiles%
+1907= %CommonDesktop%
+1908= %CommonDocuments%
+1909= %AllUsersProfile%
+1910= %UserDesktop%
+1911= %UserDocuments%
+1912= %UserProfile%
+
+;Common
+
+2000= OK
+2001= Отмена
+2002= * %%T = Путь извлечения (Нажмите правой кнопкой, чтобы выбрать другой путь)
+
+;Messages
+
+2100= Resource Hacker не найден!
+2101= Некоторые настройки будут недоступны.
+2102= Файл не найден!
+2103= ResHacker.exe не найден! Иконка SFX не будет изменена.
+2104= UPX не был найден!
+2105= Join.exe не был найден! Продолжение невозможно.
+2106= Пожалуйста добавляйте только 7-ZIP-файлы (*.7z)
+2107= Сначала добавьте 7-ZIP-файл в список файлов.
+2108= Затем укажите настройки.
+2109= И нажмите кнопку "Создать SFX".
+2110= Добавление файлов
+2111= Подготовка модуля SFX...
+2112= Завершено
+2113= Запись файла...
+2114= Program to run must be specified
+2115= Item to delete must be specified
+2116= Source file must be specified
+2117= Variable name must be specified
+2118= Error in language file
+2119= ResHacker.exe is missing! SFX metadata cannot be changed.
+
+;Metadata tab
+
+2200= Field Name
+2201= Field Value
+
+;Add Task window
+
+2300= New Task
+2301= Select task to perform after extraction
+2302= Create Shortcut
+2303= Run Program
+2304= Delete File or Folder
+2305= Set Environment Variable

@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<Settings>
+  <General>
+    <ExtractMode Path="%UserDesktop%" AllowEdit="True">Custom</ExtractMode>
+    <HideProgress>False</HideProgress>
+    <ProgressDisableCancel>False</ProgressDisableCancel>
+    <SelfDelete>False</SelfDelete>
+    <CompressStub>True</CompressStub>
+    <XPStyles>True</XPStyles>
+    <HideTitleIcon>False</HideTitleIcon>
+    <PromptShowSFXIcon>True</PromptShowSFXIcon>
+    <Overwrite>All</Overwrite>
+    <MessageBegin Show="False">開始安裝</MessageBegin>
+    <MessageCancel Show="True">你確定要取消嗎？</MessageCancel>
+    <MessageFinish Show="True">wagon 已經成功安裝</MessageFinish>
+    <TitleText>wagon</TitleText>
+    <ExtractPathText>選擇安裝路徑</ExtractPathText>
+    <ExtractCancelText>終止</ExtractCancelText>
+    <ExtractDialogText />
+    <ExtractTitleText>正在進行安裝</ExtractTitleText>
+    <ExtractShowIcon>False</ExtractShowIcon>
+    <ProgressPercent>0</ProgressPercent>
+    <ProgressShowIcon>False</ProgressShowIcon>
+    <Icon />
+  </General>
+  <Tasks>
+    <Item Enabled="True">RunProgram="hidcon:\"%%T\\wagon\\vc_redist\\install.cmd\""</Item>
+  </Tasks>
+  <VersionString />
+</Settings>
