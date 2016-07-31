@@ -1,0 +1,12 @@
+;!@Install@!UTF-8!
+Title="wagon"
+GUIFlags="1+4+64+256"
+ExtractTitle="正在進行安裝"
+BeginPrompt="請選擇安裝路徑"
+ExtractPathText="安裝路徑"
+CancelPrompt="確定取消安裝？"
+ExtractCancelText="取消安裝"
+FinishMessage="wagon 安裝完成"
+RunProgram="hidcon:vc_redist\\install.cmd"
+InstallPath="C:\\wagon\\"
+;!@InstallEnd@!
