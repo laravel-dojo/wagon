@@ -15,6 +15,9 @@
     for /f "delims=" %%i in ("%ConEmuDir%\..\..\..") do @set WAGON_ROOT=%%~fi
 )
 
+:: Find php dir
+@for /f "delims=" %%x in ('grep -o """.*""" %ConEmuDir%\..\..\..\uwamp\uwamp.ini ^|grep php ^|tr -d """" ') do @set PHP_VERSION=%%~x
+
 :: Change the prompt style
 :: Mmm tasty lamb
 @prompt $E[1;32;40m$P$S{git}{hg}$S$_$E[1;30;40m{lamb}$S$E[0m
