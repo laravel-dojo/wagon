@@ -1,0 +1,185 @@
+﻿; Language: Traditional Chinese (正體中文) 
+; Translator: t7yang (陳嚮陽) 
+; Email: t7yang@ymail.com 
+
+; ========= TRANSLATING THIS FILE TO ANOTHER LANGUAGE ======== 
+
+; Replace the text in each numbered line.
+; The text should not contain a new line character.
+; Save this file with name of the language.
+; This file should be saved with UTF-8 encoding.
+
+; ============================================================ 
+
+; Tab page titles 
+
+1000= 檔案 
+1001= 一般 
+1002= 文字 
+1003= 圖示 
+1007= 關於 
+1008= Metadata
+1009= Tasks
+
+;Menu text 
+
+1100= 檔案 
+1101= 選項 
+1102= 語言 
+1103= 加入 7z 檔... 
+1104= 載入設定... 
+1105= 儲存設定... 
+1106= 圖形介面字型... 
+1107= 製作 SFX 
+1108= Refresh Windows Icon Cache
+1109= Quick Load
+
+;Files page 
+
+1200= 壓縮後的 SFX 會存放在相同的資料夾中。 
+1201= 壓縮檔檔名 Example.7z 會被另存為 Example.sfx.exe。 
+1202= 相同檔名的檔案會被覆寫。 
+
+;General page 
+
+1300= 解壓縮路徑 
+1301= 解壓縮到暫存資料夾 
+1302= 解壓縮到指定資料夾 
+1303= %UserDesktop% 
+1304= 允許使用者改變路徑 
+1305= 覆寫模式 
+1306= 覆寫所有檔案 
+1307= 不要覆寫 
+1308= 覆寫就的檔案 
+1309= Show extraction progress
+1310= 解壓縮完成後刪除 SFX 檔 
+1311= 使用 XP 樣式 
+1312= 使用 UPX 壓縮 SFX stub 
+
+;Text page 
+
+1400= 訊息 
+1401= 開始提示 
+1402= 取消提示 
+1403= 完成提示 
+1404= 開始解壓縮 
+1405= 你確定要取消嗎？ 
+1406= 檔案已經成功解壓縮 
+1407= 其他文字 
+1408= 標題 
+1409= 解壓縮路徑文字 
+1410= 解壓縮取消文字 
+1411= 7-ZIP SFX 壓縮 
+1412= 選擇壓縮路徑 
+1413= 終止 
+1414= Progress Window
+1415= Title Text
+1416= Extracting
+1417= Dialog Text
+1418= Show Left
+1419= Show Right
+1420= Hide
+1421= Show Icon
+1422= Hide icon in titlebar of all windows
+1423= Disable Cancel and Close buttons
+1424= Show SFX icon in Begin, Finish and Cancel Prompt
+
+;Icon page 
+
+1500= SFX 圖示 (點選後選擇) 
+1501= 使用其他圖示 複製圖示檔到資源資料夾 
+
+;Run dialog 
+
+1600= 解壓縮後執行程式 
+1601= 程式 * 
+1602= 引數 
+1603= Do not wait for program to finish
+1604= Hide console windows
+1605= The entire folder (or file) will be deleted after extraction without any warning
+
+;Shortcuts dialog 
+
+1700= 建立捷徑 
+1701= 在哪裡建立 
+1702= 建立對象 
+1703= 參數 
+1704= 桌面 
+1705= 開始選單 
+1706= 開始選單/Programs 
+1707= 啟動 
+1708= 所有使用者 
+1709= 目前使用者 
+1710= 來源檔案 * 
+1711= 引數 
+1712= 捷徑名稱 
+1713= 捷徑描述 
+1714= 目標資料夾 
+1715= 執行目錄 
+1716= 圖示檔 
+1717= 圖示索引 
+
+;Environment variables dialog 
+
+1800= 建立環境變數 
+1801= 名稱 
+1802= 值 
+
+;Context menu 
+
+1900= 複製 
+1901= 貼上 
+1902= %%T (解壓縮路徑) 
+1903= %%S (SFX 路徑) 
+1904= %SystemDrive% 
+1905= %SystemRoot% 
+1906= %ProgramFiles% 
+1907= %CommonDesktop% 
+1908= %CommonDocuments% 
+1909= %AllUsersProfile% 
+1910= %UserDesktop% 
+1911= %UserDocuments% 
+1912= %UserProfile% 
+
+;Common 
+
+2000= 確定 
+2001= 取消 
+2002= * %%T = 解壓縮路徑 (右鍵點選加入其他的路徑變數)
+
+;Messages
+
+2100= Resource Hacker was not found!
+2101= Some options will not be available.
+2102= File missing!
+2103= ResHacker.exe is missing! The sfx icon cannot be changed.
+2104= UPX was not found!
+2105= Join.exe was not found! Impossible to continue.
+2106= Please add 7-ZIP files only (*.7z)
+2107= First add some 7-ZIP files to the file list.
+2108= Then choose settings.
+2109= Finally click the MakeSFX button.
+2110= Add some files
+2111= Preparing SFX module...
+2112= Finished
+2113= Writing file...
+2114= Program to run must be specified
+2115= Item to delete must be specified
+2116= Source file must be specified
+2117= Variable name must be specified
+2118= Error in language file
+2119= ResHacker.exe is missing! SFX metadata cannot be changed.
+
+;Metadata tab
+
+2200= Field Name
+2201= Field Value
+
+;Add Task window
+
+2300= New Task
+2301= Select task to perform after extraction
+2302= Create Shortcut
+2303= Run Program
+2304= Delete File or Folder
+2305= Set Environment Variable
