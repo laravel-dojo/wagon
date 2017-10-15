@@ -41,9 +41,9 @@ function set_prompt_filter()
     local cmder_prompt = "\x1b[1;32;40m{cwd} {git}{hg} \n\x1b[1;30;40m{lamb} \x1b[0m"
     cmder_prompt = string.gsub(cmder_prompt, "{cwd}", cwd)
     if env == nil then
-        lambda = "λ"
+        lambda = "$"
     else
-        lambda = "("..env..") λ"
+        lambda = "("..env..") $"
     end
     clink.prompt.value = string.gsub(cmder_prompt, "{lamb}", lambda)
 end
