@@ -12,7 +12,7 @@ if not defined WAGON_ROOT (
 :: Define environment variables
 set CMDER_START=%WAGON_ROOT%\uwamp\www
 set COMPOSER_HOME=%WAGON_ROOT%\composer
-set PHP_INSTSLL_ROOT=%WAGON_ROOT%\uwamp\bin\php\php-7.1.9
+set PHP_INSTSLL_ROOT=%WAGON_ROOT%\uwamp\bin\php\php-7.1.10
 set SQLITE_ROOT=%CMDER_ROOT%\vendor\sqlite
 set GIT_INSTALL_ROOT=%WAGON_ROOT%\git
 
