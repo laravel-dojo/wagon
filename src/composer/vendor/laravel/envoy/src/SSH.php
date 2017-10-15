@@ -13,7 +13,8 @@ class SSH extends RemoteProcessor
      * Run the given task over SSH.
      *
      * @param  \Laravel\Envoy\Task  $task
-     * @return void
+     * @param  \Closure|null  $callback
+     * @return int
      */
     public function run(Task $task, Closure $callback = null)
     {

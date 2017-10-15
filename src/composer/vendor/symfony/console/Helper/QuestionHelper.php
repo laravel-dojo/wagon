@@ -14,6 +14,7 @@ namespace Symfony\Component\Console\Helper;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\StreamableInputInterface;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
@@ -38,7 +39,7 @@ class QuestionHelper extends Helper
      * @param OutputInterface $output   An OutputInterface instance
      * @param Question        $question The question to ask
      *
-     * @return string The user answer
+     * @return mixed The user answer
      *
      * @throws RuntimeException If there is no data to read in the input stream
      */
@@ -50,6 +51,10 @@ class QuestionHelper extends Helper
 
         if (!$input->isInteractive()) {
             return $question->getDefault();
+        }
+
+        if ($input instanceof StreamableInputInterface && $stream = $input->getStream()) {
+            $this->inputStream = $stream;
         }
 
         if (!$question->getValidator()) {
@@ -68,12 +73,17 @@ class QuestionHelper extends Helper
      *
      * This is mainly useful for testing purpose.
      *
+     * @deprecated since version 3.2, to be removed in 4.0. Use
+     *             StreamableInputInterface::setStream() instead.
+     *
      * @param resource $stream The input stream
      *
      * @throws InvalidArgumentException In case the stream is not a resource
      */
     public function setInputStream($stream)
     {
+        @trigger_error(sprintf('The %s() method is deprecated since version 3.2 and will be removed in 4.0. Use %s::setStream() instead.', __METHOD__, StreamableInputInterface::class), E_USER_DEPRECATED);
+
         if (!is_resource($stream)) {
             throw new InvalidArgumentException('Input stream must be a valid resource.');
         }
@@ -84,10 +94,17 @@ class QuestionHelper extends Helper
     /**
      * Returns the helper's input stream.
      *
+     * @deprecated since version 3.2, to be removed in 4.0. Use
+     *             StreamableInputInterface::getStream() instead.
+     *
      * @return resource
      */
     public function getInputStream()
     {
+        if (0 === func_num_args() || func_get_arg(0)) {
+            @trigger_error(sprintf('The %s() method is deprecated since version 3.2 and will be removed in 4.0. Use %s::getStream() instead.', __METHOD__, StreamableInputInterface::class), E_USER_DEPRECATED);
+        }
+
         return $this->inputStream;
     }
 
@@ -100,6 +117,14 @@ class QuestionHelper extends Helper
     }
 
     /**
+     * Prevents usage of stty.
+     */
+    public static function disableStty()
+    {
+        self::$stty = false;
+    }
+
+    /**
      * Asks the question to the user.
      *
      * @param OutputInterface $output
@@ -107,8 +132,7 @@ class QuestionHelper extends Helper
      *
      * @return bool|mixed|null|string
      *
-     * @throws \Exception
-     * @throws \RuntimeException
+     * @throws RuntimeException In case the fallback is deactivated and the response cannot be hidden
      */
     private function doAsk(OutputInterface $output, Question $question)
     {
@@ -122,7 +146,7 @@ class QuestionHelper extends Helper
             if ($question->isHidden()) {
                 try {
                     $ret = trim($this->getHiddenResponse($output, $inputStream));
-                } catch (\RuntimeException $e) {
+                } catch (RuntimeException $e) {
                     if (!$question->isHiddenFallback()) {
                         throw $e;
                     }
@@ -132,7 +156,7 @@ class QuestionHelper extends Helper
             if (false === $ret) {
                 $ret = fgets($inputStream, 4096);
                 if (false === $ret) {
-                    throw new \RuntimeException('Aborted');
+                    throw new RuntimeException('Aborted');
                 }
                 $ret = trim($ret);
             }
@@ -198,6 +222,7 @@ class QuestionHelper extends Helper
      *
      * @param OutputInterface $output
      * @param Question        $question
+     * @param resource        $inputStream
      *
      * @return string
      */
@@ -231,7 +256,7 @@ class QuestionHelper extends Helper
                     $output->write("\033[1D");
                 }
 
-                if ($i === 0) {
+                if (0 === $i) {
                     $ofs = -1;
                     $matches = $autocomplete;
                     $numMatches = count($matches);
@@ -314,7 +339,8 @@ class QuestionHelper extends Helper
     /**
      * Gets a hidden response from user.
      *
-     * @param OutputInterface $output An Output instance
+     * @param OutputInterface $output      An Output instance
+     * @param resource        $inputStream The handler resource
      *
      * @return string The answer
      *
@@ -360,7 +386,7 @@ class QuestionHelper extends Helper
         }
 
         if (false !== $shell = $this->getShell()) {
-            $readCmd = $shell === 'csh' ? 'set mypassword = $<' : 'read -r mypassword';
+            $readCmd = 'csh' === $shell ? 'set mypassword = $<' : 'read -r mypassword';
             $command = sprintf("/usr/bin/env %s -c 'stty -echo; %s; stty echo; echo \$mypassword'", $shell, $readCmd);
             $value = rtrim(shell_exec($command));
             $output->writeln('');
@@ -378,7 +404,7 @@ class QuestionHelper extends Helper
      * @param OutputInterface $output      An Output instance
      * @param Question        $question    A Question instance
      *
-     * @return string The validated response
+     * @return mixed The validated response
      *
      * @throws \Exception In case the max number of attempts has been reached and no valid response has been given
      */
@@ -393,6 +419,8 @@ class QuestionHelper extends Helper
 
             try {
                 return call_user_func($question->getValidator(), $interviewer());
+            } catch (RuntimeException $e) {
+                throw $e;
             } catch (\Exception $error) {
             }
         }
@@ -440,6 +468,6 @@ class QuestionHelper extends Helper
 
         exec('stty 2>&1', $output, $exitcode);
 
-        return self::$stty = $exitcode === 0;
+        return self::$stty = 0 === $exitcode;
     }
 }

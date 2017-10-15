@@ -4,15 +4,14 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInitdce41511ac57df27d14851a6b3dfd33e
+class ComposerStaticInit73d18ad94d9971fdaec758989753d71b
 {
     public static $files = array (
         '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
-        '5255c38a0faeba867671b61dfda6d864' => __DIR__ . '/..' . '/paragonie/random_compat/lib/random.php',
-        'a0edc8309cc5e1d60e3047b5df6b7052' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/functions_include.php',
         'c964ee0ededf28c96ebd9db5099ef910' => __DIR__ . '/..' . '/guzzlehttp/promises/src/functions_include.php',
-        '72579e7bd17821bb1321b87411366eae' => __DIR__ . '/..' . '/illuminate/support/helpers.php',
+        'a0edc8309cc5e1d60e3047b5df6b7052' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/functions_include.php',
         '37a3dc5111fe8f707ab4c132ef1dbc62' => __DIR__ . '/..' . '/guzzlehttp/guzzle/src/functions_include.php',
+        '72579e7bd17821bb1321b87411366eae' => __DIR__ . '/..' . '/illuminate/support/helpers.php',
         '667aeda72477189d0494fecd327c3641' => __DIR__ . '/..' . '/symfony/var-dumper/Resources/functions/dump.php',
         'e7223560d890eab89cda23685e711e2c' => __DIR__ . '/..' . '/psy/psysh/src/Psy/functions.php',
     );
@@ -26,13 +25,19 @@ class ComposerStaticInitdce41511ac57df27d14851a6b3dfd33e
         array (
             'Symfony\\Polyfill\\Mbstring\\' => 26,
             'Symfony\\Component\\VarDumper\\' => 28,
+            'Symfony\\Component\\Translation\\' => 30,
             'Symfony\\Component\\Process\\' => 26,
+            'Symfony\\Component\\Filesystem\\' => 29,
+            'Symfony\\Component\\Debug\\' => 24,
             'Symfony\\Component\\Console\\' => 26,
         ),
         'P' => 
         array (
             'Psy\\' => 4,
+            'Psr\\SimpleCache\\' => 16,
+            'Psr\\Log\\' => 8,
             'Psr\\Http\\Message\\' => 17,
+            'Psr\\Container\\' => 14,
             'PhpParser\\' => 10,
         ),
         'L' => 
@@ -50,6 +55,14 @@ class ComposerStaticInitdce41511ac57df27d14851a6b3dfd33e
             'GuzzleHttp\\Promise\\' => 19,
             'GuzzleHttp\\' => 11,
         ),
+        'D' => 
+        array (
+            'Doctrine\\Common\\Inflector\\' => 26,
+        ),
+        'C' => 
+        array (
+            'Carbon\\' => 7,
+        ),
     );
 
     public static $prefixDirsPsr4 = array (
@@ -65,9 +78,21 @@ class ComposerStaticInitdce41511ac57df27d14851a6b3dfd33e
         array (
             0 => __DIR__ . '/..' . '/symfony/var-dumper',
         ),
+        'Symfony\\Component\\Translation\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/translation',
+        ),
         'Symfony\\Component\\Process\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/process',
+        ),
+        'Symfony\\Component\\Filesystem\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/filesystem',
+        ),
+        'Symfony\\Component\\Debug\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/debug',
         ),
         'Symfony\\Component\\Console\\' => 
         array (
@@ -77,9 +102,21 @@ class ComposerStaticInitdce41511ac57df27d14851a6b3dfd33e
         array (
             0 => __DIR__ . '/..' . '/psy/psysh/src/Psy',
         ),
+        'Psr\\SimpleCache\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/psr/simple-cache/src',
+        ),
+        'Psr\\Log\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/psr/log/Psr/Log',
+        ),
         'Psr\\Http\\Message\\' => 
         array (
             0 => __DIR__ . '/..' . '/psr/http-message/src',
+        ),
+        'Psr\\Container\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/psr/container/src',
         ),
         'PhpParser\\' => 
         array (
@@ -109,6 +146,14 @@ class ComposerStaticInitdce41511ac57df27d14851a6b3dfd33e
         array (
             0 => __DIR__ . '/..' . '/guzzlehttp/guzzle/src',
         ),
+        'Doctrine\\Common\\Inflector\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/doctrine/inflector/lib/Doctrine/Common/Inflector',
+        ),
+        'Carbon\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/nesbot/carbon/src/Carbon',
+        ),
     );
 
     public static $prefixesPsr0 = array (
@@ -128,13 +173,6 @@ class ComposerStaticInitdce41511ac57df27d14851a6b3dfd33e
             'Httpful' => 
             array (
                 0 => __DIR__ . '/..' . '/nategood/httpful/src',
-            ),
-        ),
-        'D' => 
-        array (
-            'Doctrine\\Common\\Inflector\\' => 
-            array (
-                0 => __DIR__ . '/..' . '/doctrine/inflector/lib',
             ),
         ),
     );
@@ -160,10 +198,10 @@ class ComposerStaticInitdce41511ac57df27d14851a6b3dfd33e
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInitdce41511ac57df27d14851a6b3dfd33e::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInitdce41511ac57df27d14851a6b3dfd33e::$prefixDirsPsr4;
-            $loader->prefixesPsr0 = ComposerStaticInitdce41511ac57df27d14851a6b3dfd33e::$prefixesPsr0;
-            $loader->classMap = ComposerStaticInitdce41511ac57df27d14851a6b3dfd33e::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit73d18ad94d9971fdaec758989753d71b::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit73d18ad94d9971fdaec758989753d71b::$prefixDirsPsr4;
+            $loader->prefixesPsr0 = ComposerStaticInit73d18ad94d9971fdaec758989753d71b::$prefixesPsr0;
+            $loader->classMap = ComposerStaticInit73d18ad94d9971fdaec758989753d71b::$classMap;
 
         }, null, ClassLoader::class);
     }

@@ -124,6 +124,12 @@ function resolveMacros($code) {
                 return '$this->startAttributeStack[#1] + $this->endAttributes';
             }
 
+            if ('stackAttributes' == $name) {
+                assertArgs(1, $args, $name);
+                return '$this->startAttributeStack[' . $args[0] . ']'
+                     . ' + $this->endAttributeStack[' . $args[0] . ']';
+            }
+
             if ('init' == $name) {
                 return '$$ = array(' . implode(', ', $args) . ')';
             }
@@ -193,6 +199,15 @@ function resolveMacros($code) {
                      . '? Scalar\String_::KIND_HEREDOC : Scalar\String_::KIND_NOWDOC; '
                      . 'preg_match(\'/\A[bB]?<<<[ \t]*[\\\'"]?([a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)[\\\'"]?(?:\r\n|\n|\r)\z/\', ' . $args[1] . ', $matches); '
                      . $args[0] . '[\'docLabel\'] = $matches[1];';
+            }
+
+            if ('prependLeadingComments' == $name) {
+                assertArgs(1, $args, $name);
+
+                return '$attrs = $this->startAttributeStack[#1]; $stmts = ' . $args[0] . '; '
+                . 'if (!empty($attrs[\'comments\']) && isset($stmts[0])) {'
+                . '$stmts[0]->setAttribute(\'comments\', '
+                . 'array_merge($attrs[\'comments\'], $stmts[0]->getAttribute(\'comments\', []))); }';
             }
 
             return $matches[0];

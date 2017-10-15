@@ -21,6 +21,7 @@ class RunCommand extends \Symfony\Component\Console\Command\Command
      * @var array
      */
     protected $ignoreOptions = [
+        '--continue',
         '--pretend',
         '--help',
         '--quiet',
@@ -43,13 +44,15 @@ class RunCommand extends \Symfony\Component\Console\Command\Command
         $this->setName('run')
                 ->setDescription('Run an Envoy task.')
                 ->addArgument('task', InputArgument::REQUIRED)
-                ->addOption('pretend', null, InputOption::VALUE_NONE, 'Dump Bash script for inspection.');
+                ->addOption('continue', null, InputOption::VALUE_NONE, 'Continue running even if a task fails')
+                ->addOption('pretend', null, InputOption::VALUE_NONE, 'Dump Bash script for inspection')
+                ->addOption('path', null, InputOption::VALUE_REQUIRED, 'The path to the Envoy.blade.php file');
     }
 
     /**
      * Execute the command.
      *
-     * @return void
+     * @return int
      */
     protected function fire()
     {
@@ -63,6 +66,16 @@ class RunCommand extends \Symfony\Component\Console\Command\Command
             if (0 !== $thisCode) {
                 $exitCode = $thisCode;
             }
+
+            if ($thisCode > 0 && ! $this->input->getOption('continue')) {
+                $this->output->writeln('[<fg=red>✗</>] <fg=red>This task did not complete successfully on one of your servers.</>');
+
+                break;
+            }
+        }
+
+        foreach ($container->getFinishedCallbacks() as $callback) {
+            call_user_func($callback);
         }
 
         return $exitCode;
@@ -90,7 +103,7 @@ class RunCommand extends \Symfony\Component\Console\Command\Command
      *
      * @param  \Laravel\Envoy\TaskContainer  $container
      * @param  string  $task
-     * @return void
+     * @return null|int|void
      */
     protected function runTask($container, $task)
     {
@@ -166,13 +179,13 @@ class RunCommand extends \Symfony\Component\Console\Command\Command
 
         foreach ($lines as $line) {
             if (strlen(trim($line)) === 0) {
-                return;
+                continue;
             }
 
             if ($type == Process::OUT) {
                 $this->output->write('<comment>['.$host.']</comment>: '.trim($line).PHP_EOL);
             } else {
-                $this->output->write('<comment>['.$host.']</comment>: <error>'.trim($line).'</error>'.PHP_EOL);
+                $this->output->write('<comment>['.$host.']</comment>: <fg=red>'.trim($line).'</>'.PHP_EOL);
             }
         }
     }
@@ -184,7 +197,9 @@ class RunCommand extends \Symfony\Component\Console\Command\Command
      */
     protected function loadTaskContainer()
     {
-        if (! file_exists($envoyFile = getcwd().'/Envoy.blade.php')) {
+        $path = $this->input->getOption('path');
+
+        if (! file_exists($envoyFile = $path) && ! file_exists($envoyFile = getcwd().'/Envoy.blade.php')) {
             echo "Envoy.blade.php not found.\n";
 
             exit(1);

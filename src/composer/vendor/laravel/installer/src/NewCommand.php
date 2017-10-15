@@ -6,11 +6,13 @@ use ZipArchive;
 use RuntimeException;
 use GuzzleHttp\Client;
 use Symfony\Component\Process\Process;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 
 class NewCommand extends Command
 {
@@ -25,14 +27,15 @@ class NewCommand extends Command
             ->setName('new')
             ->setDescription('Create a new Laravel application.')
             ->addArgument('name', InputArgument::OPTIONAL)
-            ->addOption('dev', null, InputOption::VALUE_NONE, 'Installs the latest "development" release');
+            ->addOption('dev', null, InputOption::VALUE_NONE, 'Installs the latest "development" release')
+            ->addOption('force', null, InputOption::VALUE_NONE, 'Forces install even if the directory already exists');
     }
 
     /**
      * Execute the command.
      *
-     * @param  InputInterface  $input
-     * @param  OutputInterface  $output
+     * @param  \Symfony\Component\Console\Input\InputInterface  $input
+     * @param  \Symfony\Component\Console\Output\OutputInterface  $output
      * @return void
      */
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -41,10 +44,11 @@ class NewCommand extends Command
             throw new RuntimeException('The Zip PHP extension is not installed. Please install it and try again.');
         }
 
-        $this->verifyApplicationDoesntExist(
-            $directory = ($input->getArgument('name')) ? getcwd().'/'.$input->getArgument('name') : getcwd(),
-            $output
-        );
+        $directory = ($input->getArgument('name')) ? getcwd().'/'.$input->getArgument('name') : getcwd();
+
+        if (! $input->getOption('force')) {
+            $this->verifyApplicationDoesntExist($directory);
+        }
 
         $output->writeln('<info>Crafting application...</info>');
 
@@ -52,6 +56,7 @@ class NewCommand extends Command
 
         $this->download($zipFile = $this->makeFilename(), $version)
              ->extract($zipFile, $directory)
+             ->prepareWritableDirectories($directory, $output)
              ->cleanUp($zipFile);
 
         $composer = $this->findComposer();
@@ -59,9 +64,21 @@ class NewCommand extends Command
         $commands = [
             $composer.' install --no-scripts',
             $composer.' run-script post-root-package-install',
-            $composer.' run-script post-install-cmd',
             $composer.' run-script post-create-project-cmd',
+            $composer.' run-script post-autoload-dump',
         ];
+
+        if ($input->getOption('dev')) {
+            unset($commands[2]);
+
+            $commands[] = $composer.' run-script post-autoload-dump';
+        }
+
+        if ($input->getOption('no-ansi')) {
+            $commands = array_map(function ($value) {
+                return $value.' --no-ansi';
+            }, $commands);
+        }
 
         $process = new Process(implode(' && ', $commands), $directory, null, null, null);
 
@@ -82,7 +99,7 @@ class NewCommand extends Command
      * @param  string  $directory
      * @return void
      */
-    protected function verifyApplicationDoesntExist($directory, OutputInterface $output)
+    protected function verifyApplicationDoesntExist($directory)
     {
         if ((is_dir($directory) || is_file($directory)) && $directory != getcwd()) {
             throw new RuntimeException('Application already exists!');
@@ -109,11 +126,11 @@ class NewCommand extends Command
     protected function download($zipFile, $version = 'master')
     {
         switch ($version) {
-            case 'master':
-                $filename = 'latest.zip';
-                break;
             case 'develop':
                 $filename = 'latest-develop.zip';
+                break;
+            case 'master':
+                $filename = 'latest.zip';
                 break;
         }
 
@@ -125,7 +142,7 @@ class NewCommand extends Command
     }
 
     /**
-     * Extract the zip file into the given directory.
+     * Extract the Zip file into the given directory.
      *
      * @param  string  $zipFile
      * @param  string  $directory
@@ -160,12 +177,33 @@ class NewCommand extends Command
     }
 
     /**
+     * Make sure the storage and bootstrap cache directories are writable.
+     *
+     * @param  string  $appDirectory
+     * @param  \Symfony\Component\Console\Output\OutputInterface  $output
+     * @return $this
+     */
+    protected function prepareWritableDirectories($appDirectory, OutputInterface $output)
+    {
+        $filesystem = new Filesystem;
+
+        try {
+            $filesystem->chmod($appDirectory.DIRECTORY_SEPARATOR."bootstrap/cache", 0755, 0000, true);
+            $filesystem->chmod($appDirectory.DIRECTORY_SEPARATOR."storage", 0755, 0000, true);
+        } catch (IOExceptionInterface $e) {
+            $output->writeln('<comment>You should verify that the "storage" and "bootstrap/cache" directories are writable.</comment>');
+        }
+
+        return $this;
+    }
+
+    /**
      * Get the version that should be downloaded.
      *
      * @param  \Symfony\Component\Console\Input\InputInterface  $input
      * @return string
      */
-    protected function getVersion($input)
+    protected function getVersion(InputInterface $input)
     {
         if ($input->getOption('dev')) {
             return 'develop';

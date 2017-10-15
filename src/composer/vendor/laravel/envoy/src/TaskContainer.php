@@ -3,6 +3,8 @@
 namespace Laravel\Envoy;
 
 use Closure;
+use Illuminate\Support\Arr;
+use InvalidArgumentException;
 
 class TaskContainer
 {
@@ -12,6 +14,13 @@ class TaskContainer
      * @var array
      */
     protected $servers = [];
+
+    /**
+     * All of the shared data.
+     *
+     * @var array
+     */
+    protected $sharedData = [];
 
     /**
      * All of the registered macros.
@@ -40,6 +49,13 @@ class TaskContainer
      * @var array
      */
     protected $after = [];
+
+    /**
+     * All of the "finished" callbacks.
+     *
+     * @var array
+     */
+    protected $finished = [];
 
     /**
      * All of the options for each task.
@@ -74,8 +90,8 @@ class TaskContainer
      *
      * No data is needed.
      *
-     * @param  string  $__path
-     * @param  \Laravel\Envoy\Compiler  $__compiler
+     * @param  string  $path
+     * @param  \Laravel\Envoy\Compiler  $compiler
      * @return void
      */
     public function loadServers($path, Compiler $compiler)
@@ -94,10 +110,12 @@ class TaskContainer
      */
     public function load($__path, Compiler $__compiler, array $__data = [], $__serversOnly = false)
     {
+        $__dir = realpath(dirname($__path));
+
         // First we will compiled the "Blade" Envoy file into plain PHP that we'll include
         // into the current scope so it can register tasks in this task container that
         // is also in the current scope. We will extract this other data into scope.
-        $this->writeCompiledEnvoyFile(
+        $__envoyPath = $this->writeCompiledEnvoyFile(
             $__compiler, $__path, $__serversOnly
         );
 
@@ -108,9 +126,9 @@ class TaskContainer
         // Here we will include the compiled Envoy file so it can register tasks into this
         // container instance. Then we will delete the PHP version of the file because
         // it is no longer needed once we have used it to register in the container.
-        include getcwd().'/Envoy.php';
+        include $__envoyPath;
 
-        @unlink(getcwd().'/Envoy.php');
+        @unlink($__envoyPath);
 
         $this->replaceSubTasks();
 
@@ -122,14 +140,17 @@ class TaskContainer
      *
      * @param  \Laravel\Envoy\Compiler  $compiler
      * @param  string  $path
-     * @return void
+     * @param  bool  $serversOnly
+     * @return string
      */
     protected function writeCompiledEnvoyFile($compiler, $path, $serversOnly)
     {
         file_put_contents(
-            getcwd().'/Envoy.php',
+            $envoyPath = getcwd().'/Envoy'.md5_file($path).'.php',
             $compiler->compile(file_get_contents($path), $serversOnly)
         );
+
+        return $envoyPath;
     }
 
     /**
@@ -163,6 +184,7 @@ class TaskContainer
      * Get the IP address for a server.
      *
      * @param  string  $server
+     * @throws \Exception
      * @return string|null
      */
     public function getServer($server)
@@ -192,6 +214,60 @@ class TaskContainer
     public function getFirstServer()
     {
         return head($this->servers);
+    }
+
+    /**
+     * Import the given file into the container.
+     *
+     * @param  string  $file
+     * @param  array  $data
+     * @return void
+     */
+    public function import($file, array $data = [])
+    {
+        $data = Arr::except($data, [
+            '__path', '__dir', '__compiler', '__data', '__serversOnly',
+            '__envoyPath', '__container', 'this',
+        ]);
+
+        if (($path = $this->resolveImportPath($file)) === false) {
+            throw new InvalidArgumentException("Unable to locate file: [{$file}].");
+        }
+
+        $this->load($path, new Compiler, $data);
+    }
+
+    /**
+     * Resolve the import path for the given file.
+     *
+     * @param  string  $file
+     * @return string|bool
+     */
+    protected function resolveImportPath($file)
+    {
+        if (($path = realpath($file)) !== false) {
+            return $path;
+        } elseif (($path = realpath($file.'.blade.php')) !== false) {
+            return $path;
+        } elseif (($path = realpath(getcwd().'/vendor/'.$file.'/Envoy.blade.php')) !== false) {
+            return $path;
+        } elseif (($path = realpath(__DIR__.'/'.$file.'.blade.php')) !== false) {
+            return $path;
+        }
+
+        return false;
+    }
+
+    /**
+     * Share the given piece of data across all tasks.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return void
+     */
+    public function share($key, $value)
+    {
+        $this->sharedData[$key] = $value;
     }
 
     /**
@@ -241,7 +317,8 @@ class TaskContainer
      *
      * @param  string  $task
      * @param  array  $macroOptions
-     * @return string
+     * @throws \Exception
+     * @return \Laravel\Envoy\Task
      */
     public function getTask($task, array $macroOptions = [])
     {
@@ -346,7 +423,15 @@ class TaskContainer
      */
     public function endTask()
     {
-        $this->tasks[array_pop($this->taskStack)] = trim(ob_get_clean());
+        $name = array_pop($this->taskStack);
+
+        $contents = trim(ob_get_clean());
+
+        if (isset($this->tasks[$name])) {
+            $this->tasks[$name] = str_replace('@parent', $this->tasks[$name], $contents);
+        } else {
+            $this->tasks[$name] = $contents;
+        }
     }
 
     /**
@@ -368,6 +453,27 @@ class TaskContainer
     public function getAfterCallbacks()
     {
         return $this->after;
+    }
+
+    /**
+     * Register an finished-task callback.
+     *
+     * @param  \Closure  $callback
+     * @return void
+     */
+    public function finished(Closure $callback)
+    {
+        $this->finished[] = $callback;
+    }
+
+    /**
+     * Get all of the finished-task callbacks.
+     *
+     * @return array
+     */
+    public function getFinishedCallbacks()
+    {
+        return $this->finished;
     }
 
     /**

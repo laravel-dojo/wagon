@@ -19,6 +19,8 @@ class Compiler
      * @var array
      */
     protected $compilers = [
+        'Imports',
+        'Sets',
         'Comments',
         'Echos',
         'Openings',
@@ -36,6 +38,8 @@ class Compiler
         'TaskStop',
         'After',
         'AfterStop',
+        'Finished',
+        'FinishedStop',
         'Error',
         'ErrorStop',
         'Hipchat',
@@ -53,18 +57,44 @@ class Compiler
      * Compile the given Envoy template contents.
      *
      * @param  string  $value
-     * @param  bool  $silent
+     * @param  bool  $serversOnly
      * @return string
      */
     public function compile($value, $serversOnly = false)
     {
         $compilers = $serversOnly ? $this->serverCompilers : $this->compilers;
 
+        $value = $this->initializeVariables($value);
+
         foreach ($compilers as $compiler) {
             $value = $this->{"compile{$compiler}"}($value);
         }
 
         return $value;
+    }
+
+    /**
+     * Compile Envoy sets into valid PHP.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    protected function compileSets($value)
+    {
+        return preg_replace('/\\@set\(\'(.*?)\'\,\s*(.*)\)/', '<?php $$1 = $2; ?>', $value);
+    }
+
+    /**
+     * Compile Envoy imports into valid PHP.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    protected function compileImports($value)
+    {
+        $pattern = $this->createOpenMatcher('import');
+
+        return preg_replace($pattern, '$1<?php $__container->import$2, get_defined_vars()); ?>', $value);
     }
 
     /**
@@ -250,6 +280,10 @@ class Compiler
     {
         $pattern = $this->createMatcher('macro');
 
+        $value = preg_replace($pattern, '$1<?php $__container->startMacro$2; ?>', $value);
+
+        $pattern = $this->createMatcher('story');
+
         return preg_replace($pattern, '$1<?php $__container->startMacro$2; ?>', $value);
     }
 
@@ -262,6 +296,10 @@ class Compiler
     protected function compileMacroStop($value)
     {
         $pattern = $this->createPlainMatcher('endmacro');
+
+        $value = preg_replace($pattern, '$1<?php $__container->endMacro(); ?>$2', $value);
+
+        $pattern = $this->createPlainMatcher('endstory');
 
         return preg_replace($pattern, '$1<?php $__container->endMacro(); ?>$2', $value);
     }
@@ -317,6 +355,30 @@ class Compiler
     }
 
     /**
+     * Compile Envoy finished statements into valid PHP.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    protected function compileFinished($value)
+    {
+        $pattern = $this->createPlainMatcher('finished');
+
+        return preg_replace($pattern, '$1<?php $_vars = get_defined_vars(); $__container->finished(function() use ($_vars) { extract($_vars); $2', $value);
+    }
+
+    /**
+     * Compile Envoy finished stop statements into valid PHP.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    protected function compileFinishedStop($value)
+    {
+        return preg_replace($this->createPlainMatcher('endfinished'), '$1}); ?>$2', $value);
+    }
+
+    /**
      * Compile Envoy error statements into valid PHP.
      *
      * @param  string  $value
@@ -350,7 +412,7 @@ class Compiler
     {
         $pattern = $this->createMatcher('hipchat');
 
-        return preg_replace($pattern, '$1 Laravel\Envoy\Hipchat::make$2->task($task)->send();', $value);
+        return preg_replace($pattern, '$1 if (! isset($task)) $task = null; Laravel\Envoy\Hipchat::make$2->task($task)->send();', $value);
     }
 
     /**
@@ -363,7 +425,24 @@ class Compiler
     {
         $pattern = $this->createMatcher('slack');
 
-        return preg_replace($pattern, '$1 Laravel\Envoy\Slack::make$2->task($task)->send();', $value);
+        return preg_replace($pattern, '$1 if (! isset($task)) $task = null; Laravel\Envoy\Slack::make$2->task($task)->send();', $value);
+    }
+
+    /**
+     * Initialize the variables included in the Envoy template.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    private function initializeVariables($value)
+    {
+        preg_match_all('/\$([a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)/', $value, $matches);
+
+        foreach (array_unique($matches[0]) as $variable) {
+            $value = "<?php $variable = isset($variable) ? $variable : null; ?>\n".$value;
+        }
+
+        return $value;
     }
 
     /**

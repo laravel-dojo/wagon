@@ -14,6 +14,8 @@ class Hipchat
     public $message;
     public $color;
 
+    protected $task;
+
     /**
      * Create a new Hipchat instance.
      *
@@ -51,28 +53,32 @@ class Hipchat
     /**
      * Send the HipChat message.
      *
-     * @return void
+     * @return mixed
      */
     public function send()
     {
-        $message = $this->message ?: ucwords($this->getSystemUser()).' ran the ['.$this->task.'] task.';
+        $message = $this->message ?: ($this->task ? ucwords($this->getSystemUser()).' ran the ['.$this->task.'] task.' : ucwords($this->getSystemUser()).' ran a task.');
 
         $format = $message != strip_tags($message) ? 'html' : 'text';
 
+        $query = ['auth_token' => $this->token];
+
         $payload = [
-            'auth_token' => $this->token, 'room_id' => $this->room,
             'from' => $this->from, 'message' => $message,
-            'message_format' => $format, 'notify' => 1, 'color' => $this->color,
+            'message_format' => $format, 'notify' => true, 'color' => $this->color,
         ];
 
-        Request::get('https://api.hipchat.com/v1/rooms/message?'.http_build_query($payload))->send();
+        return Request::post('https://api.hipchat.com/v2/room/'.$this->room.'/notification?'.http_build_query($query))
+            ->sendsJson()
+            ->body(json_encode($payload))
+            ->send();
     }
 
     /**
      * Set the task for the message.
      *
      * @param  string  $task
-     * @return void
+     * @return $this
      */
     public function task($task)
     {
