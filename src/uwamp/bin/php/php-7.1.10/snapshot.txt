@@ -1,0 +1,86 @@
+This snapshot was automatically generated on
+Tue, 26 Sep 2017 20:30:55 +0000
+
+Version: 7.1.10
+Branch: HEAD
+Build: C:\php-snap-build\php71\vc14\x86\obj\Release_TS
+
+Built-in Extensions
+===========================
+Core
+bcmath
+calendar
+ctype
+date
+filter
+hash
+iconv
+json
+mcrypt
+SPL
+pcre
+readline
+Reflection
+session
+standard
+mysqlnd
+tokenizer
+zip
+zlib
+libxml
+dom
+PDO
+Phar
+SimpleXML
+xml
+wddx
+xmlreader
+xmlwriter
+
+
+Dependency information:
+Module: php_curl.dll
+===========================
+	libeay32.dll
+	libssh2.dll
+	nghttp2.dll
+	ssleay32.dll
+
+Module: php_enchant.dll
+===========================
+	libenchant.dll
+
+Module: php_ftp.dll
+===========================
+	ssleay32.dll
+	libeay32.dll
+
+Module: php_intl.dll
+===========================
+	icuuc57.dll
+	icuin57.dll
+	icuio57.dll
+
+Module: php_ldap.dll
+===========================
+	libsasl.dll
+	ssleay32.dll
+	libeay32.dll
+
+Module: php_openssl.dll
+===========================
+	ssleay32.dll
+	libeay32.dll
+
+Module: php_pgsql.dll
+===========================
+	libpq.dll
+
+Module: php_snmp.dll
+===========================
+	libeay32.dll
+
+Module: php_pdo_pgsql.dll
+===========================
+	libpq.dll
+
