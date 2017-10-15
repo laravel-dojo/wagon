@@ -13,44 +13,113 @@ local parser = clink.arg.new_parser
  -- @return {string} Path to .git directory or nil if such dir not found
 local function get_git_dir(start_dir)
 
-    -- Checks if provided directory contains git directory
+    ---
+     -- Checks if provided directory contains git directory
+     -- @param {String} dir Directory where `.git` might be found
+     -- @returns {String|Boolean} Returns concatenated parameter and
+     --   .git directory path if it was found, false otherwise
     local function has_git_dir(dir)
-        return #clink.find_dirs(dir..'/.git') > 0
+        return #clink.find_dirs(dir..'/.git') > 0 and dir..'/.git'
+    end
+
+    ---
+     --  Checks if provided directory contains .git file that contains
+     --   relative path to submodule.
+     -- @param {String} dir Directory where `.git` might be found
+     -- @returns {String|Boolean} Returns concatenated parameter and
+     --   resolved submodule directory path if it was found, false otherwise
+    local function has_git_file(dir)
+        local gitfile = io.open(dir..'/.git')
+        if not gitfile then return false end
+
+        local git_dir = gitfile:read():match('gitdir: (.*)')
+        gitfile:close()
+
+        return git_dir and dir..'/'..git_dir
     end
 
     -- Set default path to current directory
     if not start_dir or start_dir == '.' then start_dir = clink.get_cwd() end
 
-    -- If we're already have .git directory here, then return current path
-    if has_git_dir(start_dir) then return start_dir..'/.git' end
+    -- Calculate parent path now otherwise we won't be
+    -- able to do that inside of logical operator
+    local parent_path = path.pathname(start_dir)
 
-    -- Otherwise go up one level and make a recursive call
-    local parent_path =  path.pathname(start_dir)
-    if parent_path ~= start_dir then return get_git_dir(parent_path) end
+    return has_git_dir(start_dir)
+        or has_git_file(start_dir)
+        -- Otherwise go up one level and make a recursive call
+        or (parent_path ~= start_dir and get_git_dir(parent_path) or nil)
 end
 
--- end preamble
+---
+ -- Lists remote branches based on packed-refs file from git directory
+ -- @param string [git_dir]  Directory where to search file for
+ -- @return table  List of remote branches
+local function list_packed_refs(git_dir)
+    local result = w()
+    local git_dir = git_dir or get_git_dir()
+    if not git_dir then return result end
+
+    local packed_refs_file = io.open(git_dir..'/packed-refs')
+    if packed_refs_file == nil then return {} end
+
+    for line in packed_refs_file:lines() do
+        -- SHA is 40 char length + 1 char for space
+        if #line > 41 then
+            local match = line:sub(41):match('refs/remotes/(.*)')
+            if match then table.insert(result, match) end
+        end
+    end
+
+    packed_refs_file:close()
+    return result
+end
+
+local function list_remote_branches(git_dir)
+    local git_dir = git_dir or get_git_dir()
+    if not git_dir then return w() end
+
+    return w(path.list_files(git_dir..'/refs/remotes', '/*',
+        --[[recursive=]]true, --[[reverse_separator=]]true))
+    :concat(list_packed_refs(git_dir))
+    :sort():dedupe()
+end
+
+---
+ -- Lists local branches for git repo in git_dir directory.
+ --
+ -- @param string [git_dir]  Git directory, where to search for remote branches
+ -- @return table  List of branches.
+local function list_local_branches(git_dir)
+    local git_dir = git_dir or get_git_dir()
+    if not git_dir then return w() end
+
+    local result = w(path.list_files(git_dir..'/refs/heads', '/*',
+        --[[recursive=]]true, --[[reverse_separator=]]true))
+
+    return result
+end
 
 local branches = function (token)
     local git_dir = get_git_dir()
-    if not git_dir then return {} end
+    if not git_dir then return w() end
 
-    return w(path.list_files(git_dir..'/refs/heads', '/*',
-        --[[recursive=]]true, --[[reverse_separator=]]true))
+    return list_local_branches(git_dir)
     :filter(function(path)
         return clink.is_match(token, path)
     end)
 end
 
 local function alias(token)
-    local res = {}
+    local res = w()
 
     -- Try to resolve .git directory location
     local git_dir = get_git_dir()
 
     if git_dir == nil then return res end
 
-    f = assert (io.popen ("git config --get-regexp alias"))
+    f = io.popen("git config --get-regexp alias 2>nul")
+    if f == nil then return {} end
 
     for line in f:lines() do
         local s, e = line:find(" ", 1, true)
@@ -67,14 +136,14 @@ local function alias(token)
 end
 
 local function remotes(token)
+    local remotes = w()
     local git_dir = get_git_dir()
-    if not git_dir then return {} end
+    if not git_dir then return remotes end
 
     local git_config = io.open(git_dir..'/config')
     -- if there is no gitconfig file (WAT?!), return empty list
-    if git_config == nil then return {} end
+    if git_config == nil then return remotes end
 
-    local remotes = w()
     for line in git_config:lines() do
         local remote = line:match('%[remote "(.*)"%]')
         if (remote) then
@@ -89,21 +158,41 @@ end
 local function local_or_remote_branches(token)
     -- Try to resolve .git directory location
     local git_dir = get_git_dir()
-    if not git_dir then return {} end
+    if not git_dir then return w() end
 
-    return w(path.list_files(git_dir..'/refs/remotes', '/*',
-        --[[recursive=]]true, --[[reverse_separator=]]true))
-    :concat(branches(token))
+    return list_local_branches(git_dir)
+    :concat(list_remote_branches(git_dir))
     :filter(function(path)
         return clink.is_match(token, path)
     end)
 end
 
 local function checkout_spec_generator(token)
-    local branches = local_or_remote_branches(token)
     local files = matchers.files(token)
+        :filter(function(file)
+            return path.is_real_dir(file)
+        end)
 
-    if #branches == 0 then return files end
+    local git_dir = get_git_dir()
+
+    local local_branches = branches(token)
+    local remote_branches = list_remote_branches(git_dir)
+        :filter(function(path)
+            return clink.is_match(token, path)
+        end)
+
+    local predicted_branches = list_remote_branches(git_dir)
+        :map(function (remote_branch)
+            return remote_branch:match('.-/(.+)')
+        end)
+        :filter(function(branch)
+            return branch
+                and clink.is_match(token, branch)
+                -- Filter out those predictions which are already exists as local branches
+                and not local_branches:contains(branch)
+        end)
+
+    if (#local_branches + #remote_branches + #predicted_branches) == 0 then return files end
 
     -- if there is any refspec that matches token then:
     --   * disable readline's filename completion, otherwise we'll get a list of these specs
@@ -115,15 +204,20 @@ local function checkout_spec_generator(token)
         return files:map(function(file)
             return clink.is_dir(file) and file..'\\' or file
         end)
-        :concat(branches)
+        :concat(local_branches)
+        :concat(predicted_branches:map(function(branch) return '*'..branch end))
+        :concat(remote_branches)
     end
 
-    return files:concat(branches)
+    return files
+        :concat(local_branches)
+        :concat(predicted_branches)
+        :concat(remote_branches)
 end
 
 local function push_branch_spec(token)
     local git_dir = get_git_dir()
-    if not git_dir then return {} end
+    if not git_dir then return w() end
 
     local plus_prefix = token:sub(0, 1) == '+'
     -- cut out leading '+' symbol as it is a part of branch spec
@@ -175,11 +269,11 @@ end
 local stashes = function(token)
 
     local git_dir = get_git_dir()
-    if not git_dir then return {} end
+    if not git_dir then return w() end
 
     local stash_file = io.open(git_dir..'/logs/refs/stash')
     -- if there is no stash file, return empty list
-    if stash_file == nil then return {} end
+    if stash_file == nil then return w() end
 
     local stashes = {}
     -- make a dictionary of stash time and stash comment to
@@ -227,6 +321,7 @@ local git_options = {
     "core.pager",
     "core.excludesfile",
     "core.autocrlf"..parser({"true", "false", "input"}),
+    "core.trustctime"..parser({"true", "false"}),
     "core.whitespace"..parser({
         "cr-at-eol",
         "-cr-at-eol",
@@ -242,7 +337,7 @@ local git_options = {
     "color.diff"..color_opts, "color.interactive"..color_opts, "color.status"..color_opts,
     "help.autocorrect",
     "merge.tool", "mergetool.*.cmd", "mergetool.trustExitCode"..parser({"true", "false"}), "diff.external",
-    "user.signingkey",
+    "user.name", "user.email", "user.signingkey",
 }
 
 local config_parser = parser(
@@ -291,7 +386,7 @@ local merge_strategies = parser({
 local git_parser = parser(
     {
         {alias},
-        "add" .. parser({files},
+        "add" .. parser({matchers.files},
             "-n", "--dry-run",
             "-v", "--verbose",
             "-f", "--force",
@@ -310,7 +405,7 @@ local git_parser = parser(
             ),
         "add--interactive",
         "am",
-        "annotate" .. parser({files},
+        "annotate" .. parser({matchers.files},
             "-b",
             "--root",
             "--show-stats",
@@ -373,9 +468,9 @@ local git_parser = parser(
             "--contains" ,
             "--abbrev",
             "-a", "--all",
-            "-d" .. parser({branches}),
-            "--delete" .. parser({branches}),
-            "-D" .. parser({branches}),
+            "-d" .. parser({branches}):loop(1),
+            "--delete" .. parser({branches}):loop(1),
+            "-D" .. parser({branches}):loop(1),
             "-m", "--move",
             "-M",
             "--list",
@@ -411,7 +506,24 @@ local git_parser = parser(
         ),
         "checkout-index",
         "cherry",
-        "cherry-pick",
+        "cherry-pick"..parser(
+            "-e", "--edit",
+            "-m", "--mainline ",
+            "-n", "--no-commit",
+            "-r",
+            "-x",
+            "--ff",
+             "-s", "-S", "--gpg-sign",
+            "--allow-empty",
+            "--allow-empty-message",
+            "--keep-redundant-commits",
+            "--strategy"..parser({merge_strategies}),
+            "-X"..parser({merge_recursive_options}),
+            "--strategy-option"..parser({merge_recursive_options}),
+            "--continue",
+            "--quit",
+            "--abort"
+        ),
         "citool",
         "clean",
         "clone",
@@ -467,11 +579,18 @@ local git_parser = parser(
         "diff-files",
         "diff-index",
         "diff-tree",
-        "difftool",
+        "difftool"..parser(
+            "-d", "--dir-diff",
+            "-y", "--no-prompt", "--prompt",
+            "-t", "--tool=" -- TODO: complete tool (take from config)
+        ),
         "difftool--helper",
         "fast-export",
         "fast-import",
-        "fetch" .. parser({remotes}),
+        "fetch" .. parser({remotes},
+            "--prune",
+            "--tags"
+        ),
         "fetch-pack",
         "filter-branch",
         "fmt-merge-msg",
@@ -510,9 +629,9 @@ local git_parser = parser(
             "--stat", "-n", "--no-stat",
             "--squash", "--no-squash",
             "-s" .. merge_strategies,
-            -- "--strategy=" .. merge_strategies,
+            "--strategy" .. merge_strategies,
             "-X" .. merge_recursive_options,
-            -- "--strategy-option=" .. merge_recursive_options,
+            "--strategy-option" .. merge_recursive_options,
             "--verify-signatures", "--no-verify-signatures",
             "-q", "--quiet", "-v", "--verbose",
             "--progress", "--no-progress",
@@ -559,8 +678,10 @@ local git_parser = parser(
             "--log", "--no-log",
             "--stat", "-n", "--no-stat",
             "--squash", "--no-squash",
-            "-s", "--strategy=",
-            "-X", "--strategy-option",
+            "-s"..merge_strategies,
+            "--strategy"..merge_strategies,
+            "-X"..merge_recursive_options,
+            "--strategy-option"..merge_recursive_options,
             "--verify-signatures", "--no-verify-signatures",
             "--summary", "--no-summary",
             "-r", "--rebase", "--no-rebase",
@@ -610,9 +731,9 @@ local git_parser = parser(
             "--edit-todo",
             "-m", "--merge",
             "-s" .. merge_strategies,
-            -- "--strategy=<strategy>",
+            "--strategy"..merge_strategies,
             "-X" .. merge_recursive_options,
-            -- "--strategy-option=<strategy-option>",
+            "--strategy-option"..merge_recursive_options,
             "-S", "--gpg-sign",
             "-q", "--quiet",
             "-v", "--verbose",
@@ -655,7 +776,7 @@ local git_parser = parser(
             ),
             "show"..parser("-n", {remotes}),
             "prune"..parser("-n", "--dry-run", {remotes}),
-            "update"..parser("-p", "--prune")
+            "update"..parser({remotes}, "-p", "--prune")
             }, "-v", "--verbose"),
         "remote-ext",
         "remote-fd",
@@ -670,8 +791,8 @@ local git_parser = parser(
         "repo-config",
         "request-pull",
         "rerere",
-        "reset"..parser(
-        -- TODO: Add commit/tree/branch completions
+        -- TODO: Add commit completions
+        "reset"..parser({local_or_remote_branches},
             "-q",
             "-p", "--patch",
             "--soft", "--mixed", "--hard",
@@ -710,38 +831,47 @@ local git_parser = parser(
             }),
         "status",
         "stripspace",
-        "submodule",
+        "submodule"..parser({
+            "add",
+            "init",
+            "deinit",
+            "foreach",
+            "status"..parser("--cached", "--recursive"),
+            "summary",
+            "sync",
+            "update"
+        }, '--quiet'),
         "subtree",
         "svn"..parser({
-		    "init"..parser("-T", "--trunk", "-t", "--tags", "-b", "--branches", "-s", "--stdlayout",
-				"--no-metadata", "--use-svm-props", "--use-svnsync-props", "--rewrite-root",
-				"--rewrite-uuid", "--username", "--prefix"..parser({"origin"}), "--ignore-paths",
-				"--include-paths", "--no-minimize-url"),
-				"fetch"..parser({remotes}, "--localtime", "--parent", "--ignore-paths", "--include-paths",
-				"--log-window-size"),
-				"clone"..parser("-T", "--trunk", "-t", "--tags", "-b", "--branches", "-s", "--stdlayout",
-				"--no-metadata", "--use-svm-props", "--use-svnsync-props", "--rewrite-root",
-				"--rewrite-uuid", "--username", "--prefix"..parser({"origin"}), "--ignore-paths",
-				"--include-paths", "--no-minimize-url", "--preserve-empty-dirs",
-				"--placeholder-filename"),
-				"rebase"..parser({local_or_remote_branches}, {branches}),
-			"dcommit"..parser("--no-rebase", "--commit-url", "--mergeinfo", "--interactive"),
-			"branch"..parser("-m","--message","-t", "--tags", "-d", "--destination", "--username", "--commit-url", "--parents"),
-			"log"..parser("-r", "--revision", "-v", "--verbose", "--limit", "--incremental", "--show-commit", "--oneline"),
-			"find-rev"..parser("--before", "--after"),
-			"reset"..parser("-r", "--revision", "-p", "--parent"),
-			"tag",
-			"blame",
-			"set-tree",
-			"create-ignore",
-			"show-ignore",
-			"mkdirs",
-			"commit-diff",
-			"info",
-			"proplist",
-			"propget",
-			"show-externals",
-			"gc"
+            "init"..parser("-T", "--trunk", "-t", "--tags", "-b", "--branches", "-s", "--stdlayout",
+                "--no-metadata", "--use-svm-props", "--use-svnsync-props", "--rewrite-root",
+                "--rewrite-uuid", "--username", "--prefix"..parser({"origin"}), "--ignore-paths",
+                "--include-paths", "--no-minimize-url"),
+                "fetch"..parser({remotes}, "--localtime", "--parent", "--ignore-paths", "--include-paths",
+                "--log-window-size"),
+                "clone"..parser("-T", "--trunk", "-t", "--tags", "-b", "--branches", "-s", "--stdlayout",
+                "--no-metadata", "--use-svm-props", "--use-svnsync-props", "--rewrite-root",
+                "--rewrite-uuid", "--username", "--prefix"..parser({"origin"}), "--ignore-paths",
+                "--include-paths", "--no-minimize-url", "--preserve-empty-dirs",
+                "--placeholder-filename"),
+                "rebase"..parser({local_or_remote_branches}, {branches}),
+            "dcommit"..parser("--no-rebase", "--commit-url", "--mergeinfo", "--interactive"),
+            "branch"..parser("-m","--message","-t", "--tags", "-d", "--destination", "--username", "--commit-url", "--parents"),
+            "log"..parser("-r", "--revision", "-v", "--verbose", "--limit", "--incremental", "--show-commit", "--oneline"),
+            "find-rev"..parser("--before", "--after"),
+            "reset"..parser("-r", "--revision", "-p", "--parent"),
+            "tag",
+            "blame",
+            "set-tree",
+            "create-ignore",
+            "show-ignore",
+            "mkdirs",
+            "commit-diff",
+            "info",
+            "proplist",
+            "propget",
+            "show-externals",
+            "gc"
         }),
         "symbolic-ref",
         "tag",

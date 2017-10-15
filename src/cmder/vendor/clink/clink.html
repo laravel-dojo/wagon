@@ -20,6 +20,11 @@ h4 { font-size: 1.14em; }
 h5 { font-size: 1.07em; }
 h6 { font-size: 1.00em; }
 
+.section {
+    margin-top: 2em;
+    margin-bottom: 4em;
+}
+
 #header {
     float: right;
     text-align: right;
@@ -71,6 +76,11 @@ h6 { font-size: 1.00em; }
 }
 
 #content #api h5 {
+    border-top: gray dashed 1px;
+    padding-top: 0.3em;
+    margin-bottom: 0em;
+    font-size: 1.0em;
+    color: darkgreen;
     font-family: courier, monospace;
 }
 </style>
@@ -93,6 +103,7 @@ h6 { font-size: 1.00em; }
             var div = document.createElement("div");
             div.innerHTML = marked(md.innerHTML);
             div.id = md.getAttribute("_id");
+            div.className = md.getAttribute("_class");
             content.appendChild(div);
         }
 
@@ -125,7 +136,7 @@ h6 { font-size: 1.00em; }
 <!-- ----------------------------------------------------- -->
 <body onload="go();">
     <div id="header">
-        <div id="title">Clink v0.4.5</div>
+        <div id="title">Clink v0.4.8</div>
         <div id="url">
             <a href="http://github.com/mridgers/clink">
                 http://github.com/mridgers/clink
@@ -137,7 +148,7 @@ h6 { font-size: 1.00em; }
     </div>
     <div id="toc"></div>
     <div id="content"></div>
-    <md _id="documentation" style="display: none;">
+    <md _class="section" _id="documentation" style="display: none;">
 ### What is Clink?
 
 Clink combines the native Windows shell cmd.exe with the powerful command line editing features of the GNU Readline library, which provides rich completion, history, and line-editing capabilities. Readline is best known for its use in the famous Unix shell Bash, the standard shell for Mac OS X and many Linux distributions.
@@ -181,22 +192,7 @@ When running Clink via the methods above, Clink checks the parent process is sup
 
 The easiest way to configure Clink is to use Clink's **set** command line option.  This can list, query, and set Clink's settings. Run **clink set --help** from a Clink-installed cmd.exe process to learn more both about how to use it and to get descriptions for Clink's various options.
 
-Configuring Clink by and large involves configuring Readline by creating a **clink_inputrc** file. There is excellent documentation for all the options available to configure Readline in Readline's [manual](http://tinyurl.com/oum26rp).
-
-Where Clink looks for **clink_inputrc** (as well as .lua scripts and the settings file) depends on which distribution of Clink was used. If you installed Clink using the .exe installer then Clink uses the current user's non-roaming application data directory. This user directory is usually found in one of the following locations;
-
-- c:\Documents and Settings\\&lt;username&gt;\Local Settings\Application Data *(XP)*
-- c:\Users\\&lt;username&gt;\AppData\Local *(Vista onwards)*
-
-The .zip distribution of Clink creates and uses a directory called **profile** which is located in the same directory where Clink's core files are found.
-
-All of the above locations can be overriden using the **--profile &lt;path&gt;** command line option which is specified when injecting Clink into cmd.exe using **clink inject**.
-
-#### Settings
-
-It is also possible to configure settings specific to Clink. These are stored in a file called **settings** which is found in one of the locations mentioned in the previous section. The settings file gets created the first time Clink is run.
-
-Settings loaded from the file can be overriden by setting environment variables matching the setting name and prefixed with "clink.". For example, the command **set clink.prompt_colour=10** will turn the prompt green regardless of what is in the settings file. Overrides are not saved to disk.
+Settings that are loaded when Clink starts can be overridden by setting environment variables matching the setting name and prefixed with "clink.". For example, the command **set clink.prompt_colour=10** will turn the prompt green regardless of what is in the settings file. Overrides are not saved to disk.
 
 The following table describes the available settings;
 
@@ -216,6 +212,27 @@ Name                         | Description
 **space_prefix_match_files** | If the line begins with whitespace then Clink bypasses executable matching and will match all files and directories instead.
 **terminate_autoanswer**     | Automatically answers cmd.exe's **Terminate batch job (Y/N)?** prompts. 0 = disabled, 1 = answer Y, 2 = answer N.
 **use_altgr_substitute**     | Windows provides Ctrl-Alt as a substitute for AltGr, historically to support keyboards with no AltGr key. This may collide with some of Readline's bindings.
+
+#### File Locations
+
+Settings and history are persisted to disk from session to session. The location of these files depends on which distribution of Clink was used. If you installed Clink using the .exe installer then Clink uses the current user's non-roaming application data directory. This user directory is usually found in one of the following locations;
+
+- c:\Documents and Settings\\&lt;username&gt;\Local Settings\Application Data *(XP)*
+- c:\Users\\&lt;username&gt;\AppData\Local *(Vista onwards)*
+
+The .zip distribution of Clink creates and uses a directory called **profile** which is located in the same directory where Clink's core files are found.
+
+All of the above locations can be overridden using the **--profile &lt;path&gt;** command line option which is specified when injecting Clink into cmd.exe using **clink inject**.
+
+### Configuring Readline
+
+Readline itself can also be configured to add custom keybindings and macros by creating a Readline init file. There is excellent documentation for all the options available to configure Readline in Readline's [manual](http://tinyurl.com/oum26rp).
+
+Clink will search in the directory as specified by the HOME environment variable for one or all of the following files; `clink_inputrc`, `_inputrc`, and `.inputrc`. If HOME is unset then Clink will use either of the standard Windows environment variables `%homedrive%\%homepath%` or `%userprofile%`.
+
+Other software that also uses Readline will also look for the `.inputrc` file (and possibly the `_inputrc` file too). To set macros and keybindings intended only for Clink one can use the Readline init file conditional construct like this; `$if cmd.exe [...] $endif`.
+
+Editing the `clink_inputrc_base` is discouraged as this will change from version to version and may not be present in the future.
 
 ### Extending Clink
 
@@ -271,7 +288,7 @@ clink.register_match_generator(env_vars_match_generator, 10)
 
 #### Argument Completion
 
-Clink provides a framework for writing complex argument match generators in Lua.  It works by creating a parser object that describes a command's arguments and flags and then registering the parser with Clink. When Clink detects the command is being entered on the current command line being editied, it uses the parser to generate matches.
+Clink provides a framework for writing complex argument match generators in Lua.  It works by creating a parser object that describes a command's arguments and flags and then registering the parser with Clink. When Clink detects the command is being entered on the current command line being edited, it uses the parser to generate matches.
 
 Here is an example of a simple parser for the command **foobar**;
 
@@ -322,7 +339,7 @@ c_parser:set_arguments(
 )
 ```
 
-With syntax from preceeded section this converts into:
+With syntax from preceding section this converts into:
 
 ```
 parser = clink.arg.new_parser
@@ -444,7 +461,7 @@ Clink has basic support for Powershell. In order to show completion correctly Cl
 <!-- vim: wrap nolist ft=markdown
 -->
     </md>
-    <md _id="api" style="display: none;">
+    <md _class="section" _id="api" style="display: none;">
 ### The Clink Lua API
 
 #### Matches
@@ -676,16 +693,49 @@ The current cursor position within the line buffer.
 <!-- vim: wrap nolist ft=markdown
 -->
     </md>
-    <md _id="changelog" style="display: none;">
+    <md _class="section" _id="changes" style="display: none;">
 
-### Changelog
+### Changes
+
+##### v0.4.8
+
+- Environment variable 'clink_profile' overrides Clink's profile path (#390).
+- Load a clink_inputrc file from Clink's profile directory (fixes #406).
+- Bug fixes;
+    - Redraw issues when prompts end in OSC ANSI codes (#387, #384).
+    - Fixed 'clink autorun --help' crash.
+
+##### v0.4.7
+
+- Bug fixes;
+    - Sometimes autorun tries to run clink.exe (#374).
+    - Autorun would cause cmd.exe to return an error if it wasn't interactive (#373).
+
+##### v0.4.6
+
+- HOME is only set if it is currently unset.
+- Readline can be initialised with .inputrc and _inputrc files too (#258).
+- Bug fixes;
+    - Executable completion;
+        - Paths from PATH were checked twice.
+        - Incorrect results were returned for words ending in '.' or '-'.
+        - Directories . and .. were incorrectly displayed.
+    - Fixed a crash if .bat script's stdout is redirected (#366).
+    - Occasional crash when injecting Clink (#351).
+    - Display errors;
+        - When editing near the window's right-hand edge (#347).
+        - Double display of multi-line prompts when resizing the terminal (#352).
+        - Very rare wrap artefacts when making the terminal window larger.
+    - Doskey emulation (#344).
+    - Improved 'clink autorun' help (#348).
+    - Fixed launching Clink when clink.bat is renamed (#357).
 
 ##### v0.4.5
 
-- Improved "clink autorun". It now defaults to the Current User registry hive.
-- "clink set" gives more details for enumeration-type settings.
+- Improved 'clink autorun'. It now defaults to the Current User registry hive.
+- 'clink set' gives more details for enumeration-type settings.
 - Tab completion for p4vc.
-- New settings "history_expand_mode" to control history expansion in quotes (#317).
+- New settings 'history_expand_mode' to control history expansion in quotes (#317).
 - Bug fixes;
     - Use full width of the terminal (#337).
     - Fixed MinGW compile error (#335).
@@ -717,7 +767,7 @@ The current cursor position within the line buffer.
 
 ##### v0.4.3
 
-- Localised Y/N when auto-answering "terminate?" prompt.
+- Localised Y/N when auto-answering 'terminate?' prompt.
 - $* would early out if there was no arguments.
 - Disable ANSI code support if third party provides it.
 - Installer can now set %CLINK_DIR% to install location.
@@ -737,7 +787,7 @@ The current cursor position within the line buffer.
 ##### v0.4.2
 
 - Prompt colouring no longer requires third party ANSI code utility.
-- Override settings with environment variables prefixed with "clink."
+- Override settings with environment variables prefixed with 'clink'.
 - Ctrl-PgUp goes up a directory.
 - Updated Go completions (by matrixik).
 - Arguments to clink.arg.new_parser() now initialise parser's flags/args (from vladimir-kotikov).
@@ -796,7 +846,7 @@ The current cursor position within the line buffer.
 
 - Automatic answering of cmd.exe's 'Terminate batch script?' prompt.
 - Coloured prompts (requires ANSICON or ConEmu).
-- Added Shift-Up keyboard shortcut to automatically execute "cd .."
+- Added Shift-Up keyboard shortcut to automatically execute 'cd ..'
 - Mapped Ctrl-Z to undo, Microsoft style.
 - Improved integration of Readline;
     - New input handling code (Ctrl-Alt combos now work).

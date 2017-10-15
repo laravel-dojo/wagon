@@ -1,6 +1,6 @@
  gdi+
 
- Timestamp is 5782e7b3 (Mon Jul 11 03:26:27 2016)
+ Timestamp is 5847d8b1 (Wed Dec  7 12:38:57 2016)
 
  Preferred load address is 0000000180000000
 
@@ -121,11 +121,11 @@
  0001:0000211c       WaitForSingleObject        000000018000311c f   kernel32:KERNEL32.dll
  0001:00002122       FreeLibrary                0000000180003122 f   kernel32:KERNEL32.dll
  0001:00002128       GetProcAddress             0000000180003128 f   kernel32:KERNEL32.dll
- 0001:0000212e       LoadLibraryW               000000018000312e f   kernel32:KERNEL32.dll
- 0001:00002134       lstrcpynW                  0000000180003134 f   kernel32:KERNEL32.dll
- 0001:0000213a       lstrcpyW                   000000018000313a f   kernel32:KERNEL32.dll
- 0001:00002140       lstrcatW                   0000000180003140 f   kernel32:KERNEL32.dll
- 0001:00002146       lstrlenW                   0000000180003146 f   kernel32:KERNEL32.dll
+ 0001:0000212e       lstrcpynW                  000000018000312e f   kernel32:KERNEL32.dll
+ 0001:00002134       lstrcpyW                   0000000180003134 f   kernel32:KERNEL32.dll
+ 0001:0000213a       lstrcatW                   000000018000313a f   kernel32:KERNEL32.dll
+ 0001:00002140       lstrlenW                   0000000180003140 f   kernel32:KERNEL32.dll
+ 0001:00002146       LoadLibraryW               0000000180003146 f   kernel32:KERNEL32.dll
  0001:0000214c       HeapCreate                 000000018000314c f   kernel32:KERNEL32.dll
  0001:00002152       HeapDestroy                0000000180003152 f   kernel32:KERNEL32.dll
  0001:00002158       HeapReAlloc                0000000180003158 f   kernel32:KERNEL32.dll
@@ -170,10 +170,10 @@
  0004:00000050       __imp_WaitForSingleObject  000000018000e050     kernel32:KERNEL32.dll
  0004:00000058       __imp_FreeLibrary          000000018000e058     kernel32:KERNEL32.dll
  0004:00000060       __imp_GetProcAddress       000000018000e060     kernel32:KERNEL32.dll
- 0004:00000068       __imp_LoadLibraryW         000000018000e068     kernel32:KERNEL32.dll
- 0004:00000070       __imp_lstrcpynW            000000018000e070     kernel32:KERNEL32.dll
- 0004:00000078       __imp_lstrcpyW             000000018000e078     kernel32:KERNEL32.dll
- 0004:00000080       __imp_lstrcatW             000000018000e080     kernel32:KERNEL32.dll
+ 0004:00000068       __imp_lstrcpynW            000000018000e068     kernel32:KERNEL32.dll
+ 0004:00000070       __imp_lstrcpyW             000000018000e070     kernel32:KERNEL32.dll
+ 0004:00000078       __imp_lstrcatW             000000018000e078     kernel32:KERNEL32.dll
+ 0004:00000080       __imp_lstrlenW             000000018000e080     kernel32:KERNEL32.dll
  0004:00000088       __imp_GetLastError         000000018000e088     kernel32:KERNEL32.dll
  0004:00000090       __imp_HeapCreate           000000018000e090     kernel32:KERNEL32.dll
  0004:00000098       __imp_HeapDestroy          000000018000e098     kernel32:KERNEL32.dll
@@ -190,7 +190,7 @@
  0004:000000f0       __imp_WriteFile            000000018000e0f0     kernel32:KERNEL32.dll
  0004:000000f8       __imp_GetTempFileNameW     000000018000e0f8     kernel32:KERNEL32.dll
  0004:00000100       __imp_DeleteFileW          000000018000e100     kernel32:KERNEL32.dll
- 0004:00000108       __imp_lstrlenW             000000018000e108     kernel32:KERNEL32.dll
+ 0004:00000108       __imp_LoadLibraryW         000000018000e108     kernel32:KERNEL32.dll
  0004:00000110       __imp_CreateFileW          000000018000e110     kernel32:KERNEL32.dll
  0004:00000118       \177KERNEL32_NULL_THUNK_DATA 000000018000e118     kernel32:KERNEL32.dll
  0004:00000120       __imp_wsprintfA            000000018000e120     user32:USER32.dll

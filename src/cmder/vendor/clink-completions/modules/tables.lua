@@ -43,9 +43,30 @@ exports.wrap = function (tbl)
     mt.__index.keys = function (tbl)
         local res = {}
         for k,_ in pairs(tbl) do
-            table.insert(k)
+            table.insert(res, k)
         end
         return exports.wrap(res)
+    end
+    mt.__index.sort = function (tbl)
+        table.sort(tbl)
+        return tbl
+    end
+    mt.__index.dedupe = function (tbl)
+        local res, hash = {}, {}
+        for _,v in ipairs(tbl) do
+            if not hash[v] then
+                hash[v] = true
+                table.insert(res, v)
+            end
+        end
+        return exports.wrap(res)
+    end
+    mt.__index.contains = function (tbl, value)
+        local res, hash = {}, {}
+        for _,v in ipairs(tbl) do
+            if v == value then return true, _ end
+        end
+        return false
     end
 
     return setmetatable(tbl, mt)

@@ -1,54 +1,85 @@
 -- preamble: common routines
 
+local JSON = require("JSON")
+function JSON:assert () end -- silence JSON parsing errors
+
+local color = require('color')
+local w = require('tables').wrap
 local matchers = require('matchers')
 
 function trim(s)
   return s:match "^%s*(.-)%s*$"
 end
 
-function get_npm_cache_location()
-    local proc = io.popen("npm config get cache 2>nul")
+---
+ -- Queries config options value using 'npm config' call
+ -- @param  {string}  config_entry  Config option name
+ -- @return {string}  Config value for specific option or
+ --   empty string in case of any error
+---
+local function get_npm_config_value (config_entry)
+    assert(config_entry and type(config_entry) == "string" and #config_entry > 0,
+        "get_npm_config_value: config_entry param should be non-empty string")
+
+    local proc = io.popen("npm config get "..config_entry.." 2>nul")
     if not proc then return "" end
 
-    return proc:read() or ""
+    local value = proc:read()
+    proc:close()
+
+    return value or nil
 end
 
 local modules = matchers.create_dirs_matcher('node_modules/*')
-local cached_modules = matchers.create_dirs_matcher(get_npm_cache_location()..'/*')
 
--- Reads package.json in current directory and extracts all "script" commands defined 
+local cache_location = nil
+local cached_modules_matcher = nil
+local function cached_modules(token)
+    -- If we already have matcher then just return it
+    if cached_modules_matcher then return cached_modules_matcher(token) end
+
+    -- otherwise try to get cache location and return empty table if failed
+    cache_location = cache_location or get_npm_config_value("cache")
+    if not cache_location then return {} end
+
+    -- Create a new matcher, save it in module's variable for further usage and return it
+    cached_modules_matcher = matchers.create_dirs_matcher(cache_location..'/*')
+    return cached_modules_matcher(token)
+end
+
+local globals_location = nil
+local global_modules_matcher = nil
+local function global_modules(token)
+    -- If we already have matcher then just return it
+    if global_modules_matcher then return global_modules_matcher(token) end
+
+    -- If token starts with . or .. or has path delimiter then return empty
+    -- result and do not create a matcher so only fs paths will be completed
+    if (token:match('^%.(%.)?') or token:match('[%\\%/]+')) then return {} end
+
+    -- otherwise try to get cache location and return empty table if failed
+    globals_location = globals_location or get_npm_config_value("prefix")
+    if not globals_location then return {} end
+
+    -- Create a new matcher, save it in module's variable for further usage and return it
+    global_modules_matcher = matchers.create_dirs_matcher(globals_location..'/node_modules/*')
+    return global_modules_matcher(token)
+end
+
+-- Reads package.json in current directory and extracts all "script" commands defined
 local function scripts(token)
-
-    local matches = {}
 
     -- Read package.json first
     local package_json = io.open('package.json')
     -- If there is no such file, then close handle and return
-    if package_json == nil then
-        package_json:close()
-        return matches
-    end
-    
+    if package_json == nil then return matches end
+
     -- Read the whole file contents
     local package_contents = package_json:read("*a")
     package_json:close()
 
-    -- First, gind all "scripts" elements in package file
-    -- This is necessary since package.json can contain multiple sections
-    -- And we'll need to merge them first
-    local scripts_sections = {}
-    for section in package_contents:gmatch('"scripts"%s*:%s*{(.-)}') do
-        table.insert(scripts_sections, trim(section))
-    end
-
-    -- Then merge "scripts" sections found and try to find
-    -- <script_name>: <script_command> pairs
-    local scripts = table.concat(scripts_sections, ",\n")
-    for script_name in scripts:gmatch('"(.-)"%s*:%s*(".-")') do
-        table.insert(matches, script_name)
-    end
-
-    return matches
+    local scripts = JSON:decode(package_contents).scripts
+    return w(scripts):keys()
 end
 
 local parser = clink.arg.new_parser
@@ -108,13 +139,19 @@ local npm_parser = parser({
     "install" .. install_parser,
     "issues",
     "la",
-    "link",
+    "link"..parser({matchers.files, global_modules}),
     "list",
     "ll",
-    "ln",
+    "ln"..parser({matchers.files, global_modules}),
     "login",
     "ls",
-    "outdated",
+    "outdated"..parser(
+        "--json",
+        "--long",
+        "--parseable",
+        "--global",
+        "--depth"
+    ),
     "owner",
     "pack",
     "prefix",
@@ -156,7 +193,30 @@ local npm_parser = parser({
     "view",
     "whoami"
     },
-    "-h"
+    "-h", "--version"
 )
 
 clink.arg.register_parser("npm", npm_parser)
+
+function npm_prompt_filter()
+    local package_file = io.open('package.json')
+    if not package_file then return false end
+
+    local package_data = package_file:read('*a')
+    package_file:close()
+
+    local package = JSON:decode(package_data)
+    -- Bail out if package.json is malformed
+    if not package then return false end
+    -- Don't print package info when the package is private or both version and name are missing
+    if package.private or (not package.name and not package.version) then return false end
+
+    local package_name = package.name or "<no name>"
+    local package_version = package.version and "@"..package.version or ""
+    local package_string = color.color_text("("..package_name..package_version..")", color.YELLOW)
+    clink.prompt.value = clink.prompt.value:gsub('{git}', '{git} '..package_string)
+
+    return false
+end
+
+clink.prompt.register_filter(npm_prompt_filter, 40)

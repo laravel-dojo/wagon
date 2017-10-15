@@ -20,6 +20,115 @@ https://conemu.github.io/en/Whats_New.html
 -------------------------------------------
 
 
+2016.12.6
+* gh-970: Pasting windows path in cygwin produces truncated result (77eb4e6 regression).
+* Allow to pass empty string via -cur_console:m:"" (set no mount prefix for Unix path conversion).
+* gh-552: Templates %m...m, %M...M - show mark ‘...’ for active (m) and inactive (M) tab.
+  So, if you want to see ‘• ’ mark on the active tab (to emboss active tab)
+  just change your console tab template to smth like: ‘%m• m<%c> %s’.
+  https://conemu.github.io/en/SettingsTabBar.html#id2106
+* Don't show Assertions in ‘Stable’ releases.
+
+
+2016.12.3
+* StatusBar. new column ‘Cell Info’ shows information about cell under cursor: UCS & ConAttr.
+  CellInfo is turned on by default in ‘-basic’ mode to simplify bugreporting.
+* gh-809: Support mount root for unix-path conversion.
+  ConEmu tries to choose mount root automatically, if user have not defined
+  it explicitly with ‘-cur_console:m:/mnt’ switch.
+  For example, to use ‘/cygdrive’ just run your console with switch:
+  ‘-cur_console:m:/cygdrive’.
+* In some cases ConEmu window was closed unexpectedly during initialization.
+  That happend if delay between consoles initialization was greater
+  than first console run duration. So, ConEmu was closed before second
+  console process was created.
+* gh-943: Rename option to ‘Change mouse cursor if busy’.
+* Add switch `ConEmuC -IsRedirect` to determine if CONOUT is redirected.
+* Force enable mouse events processing in KeyEvents.
+* gh-964: Let default {Far} task load plugins from FARPROFILE.
+* gh-927: Appropriate behavior while posting chars with AltGr pressed.
+  Example: `print("*")` when Lithuanian keyboard layout is selected.
+* Support clickable links like 'example-protocol://someurl'.
+  Origin: http://superuser.com/q/1152465/139371
+
+
+2016.10.22
+* gh-910: Fix regression: slower startup.
+* File `wsl-con.cmd` was created by msi in wrong folder.
+* Far Macro. Some improvements in ConEmu.CtrlNumber.lua
+* Console test (ConEmuC -checkunicode) improved.
+* gh-919: Fix misprint.
+* Some internal changes in hooking: support KernelBase for installing injects.
+
+
+2016.10.9a
+* gh-896: Fix regression: cygwin/msys process creation was broken.
+
+
+2016.10.9
+* GuiMacro: Allow {Task} arguments in `Shell` function.
+* Reuse previous palette on Unfasten/Re-Attach.
+* gh-888: Allow to use ConEmu as default console in third-party applications.
+* DefTerm. Reinit some functions in SetAllHook
+* gh-830: Fix: Significant dwm.exe CPU time when renamed ConEmu tab is active.
+* gh-886: Settings / Integration: When ‘Shift’ is pressed during ‘Register’ button click,
+  ConEmu's ‘Here’ and ‘Inside’ items are registered as ‘extended’ menu items,
+  and they are shown by Explorer only when ‘Shift’ is pressed.
+* Show process startup time in SysInfo and LogFiles.
+* Far macro emulating `Ctrl+Number` on `LCtrl+Shift+Number` keypress.
+
+
+2016.10.2
+* gh-879: Fix doubled CJK glyphs on Windows 10 build 14931.
+  Windows 10 (since 14931) has changed behavior for double-cell glyphs. Now they are
+  doubled (COMMON_LVB_LEADING_BYTE/COMMON_LVB_TRAILING_BYTE) even for UTF-8 codepage.
+* gh-871: Selection was not working in Alternative mode.
+* Turn on certain StatusBar columns on `-basic` switch.
+* Switch `/OMITHOOKSWARN` was passed improperly to server when `/log` was defined.
+* Sample file demonstrates ability to use 256 colors in Windows Subsystem for Linux
+  started in ConEmu tab.
+
+
+2016.9.14
+* gh-863: Unchecking option ‘Kill ssh-agent with ConEmu’ had no effect.
+* Suggest `%UserProfile%\ConEmu\Logs` as default location for ANSI logs.
+
+
+2016.9.13
+* Add option to kill `ssh-agent.exe` processes started from ConEmu's consoles
+  on ConEmu termination. Read more at: https://conemu.github.io/en/SshAgent.html
+* Installer was signed without timestamp.
+
+
+2016.9.4
+* GuiMacro: Detach(1) didn't disable confirmation.
+* gh-841: Support COMMON_LVB_REVERSE_VIDEO console attribute.
+* gitextensions/gitextensions#3263: Inside mode: Don't run console ‘As Admin’ if Shift is pressed.
+
+  Remove ambiguous option to run started elevated console (Run As Admin).
+  If ConEmu was started by some shortcut with `Shift` key,
+  user faced the unexpected UAC confirmation.
+
+  If user want to run elevated console, they may use special Task
+  with `-cur_console:a` switch. Example: {cmd (Admin)}.
+
+  If developer want to run ConEmu console in elevated mode,
+  they may add `-cur_console:a` switch *after* `-run` switch.
+  Example: `ConEmu.exe -run cmd.exe -cur_console:a /k <some command>`.
+
+
+2016.8.28
+* gi-821: Fixed crash on startup if Explorer is not started.
+* Support sha256 checksum in chocolatey package.
+* gh-832: Fix crash on erasing ‘Settings->Keys & Macro->Mark/Copy->Exceptions’.
+* gh-766: Prefer 'TEMP' env.var over GetTempPath function.
+* GuiMacro: Let Detach(1) do the work without confirmation.
+
+
+2016.7.24
+* gh-780: Fix crash on drawing certain text data.
+
+
 2016.7.10
 * gh-766: ConEmuSetup improvements and error handling.
   * Don't show MessageBox in auto mode (chocolatey, autoupdate);

@@ -1,6 +1,4 @@
-::
 :: Copyright (c) 2012 Martin Ridgers
-::
 ::
 :: Permission is hereby granted, free of charge, to any person obtaining a copy
 :: of this software and associated documentation files (the "Software"), to deal
@@ -19,12 +17,10 @@
 :: LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 :: OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 :: SOFTWARE.
-::
 
 @echo off
 
 :: Mimic cmd.exe's behaviour when starting from the start menu.
-::
 if /i "%1"=="startmenu" (
     cd /d "%userprofile%"
     shift /1
@@ -38,21 +34,19 @@ if /i "%1"=="--profile" (
 )
 
 :: If the .bat is run without any arguments, then start a cmd.exe instance.
-::
 if "%1"=="" (
     call :launch
     goto :end
 )
 
 :: Pass through to appropriate loader.
-::
-if /i "%PROCESSOR_ARCHITECTURE%"=="x86" (
-    call :loader_x86 %*
-) else if /i "%PROCESSOR_ARCHITECTURE%"=="amd64" (
-    if defined PROCESSOR_ARCHITEW6432 (
-        call :loader_x86 %*
+if /i "%processor_architecture%"=="x86" (
+        "%~dp0\clink_x86.exe" %*
+) else if /i "%processor_architecture%"=="amd64" (
+    if defined processor_architew6432 (
+        "%~dp0\clink_x86.exe" %*
     ) else (
-        call :loader_x64 %*
+        "%~dp0\clink_x64.exe" %*
     )
 )
 
@@ -60,19 +54,7 @@ if /i "%PROCESSOR_ARCHITECTURE%"=="x86" (
 set clink_profile_arg=
 goto :eof
 
-:: Helper functions to avoid cmd.exe's issues with brackets.
-:loader_x86
-if exist "%~dpn0_x86.exe" (
-    "%~dpn0_x86.exe" %*
-)
-exit /b 0
-
-:loader_x64
-if exist "%~dpn0_x64.exe" (
-    "%~dpn0_x64.exe" %*
-)
-exit /b 0
-
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 :launch
-start "" cmd.exe /s /k ""%~dpnx0" inject %clink_profile_arg% && title Clink"
+start "Clink" cmd.exe /s /k ""%~dpnx0" inject %clink_profile_arg%"
 exit /b 0
