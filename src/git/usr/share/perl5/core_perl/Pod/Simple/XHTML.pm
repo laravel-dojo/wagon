@@ -38,14 +38,14 @@ you can prevent high-bit characters from being encoded as HTML entities and
 declare the output character set as UTF-8 before parsing, like so:
 
   $psx->html_charset('UTF-8');
-  $psx->html_encode_chars('&<>">');
+  $psx->html_encode_chars(q{&<>'"});
 
 =cut
 
 package Pod::Simple::XHTML;
 use strict;
 use vars qw( $VERSION @ISA $HAS_HTML_ENTITIES );
-$VERSION = '3.29';
+$VERSION = '3.32';
 use Pod::Simple::Methody ();
 @ISA = ('Pod::Simple::Methody');
 
@@ -202,7 +202,7 @@ are output as C<< <dt> >> elements. Disabled by default.
 
 =head2 backlink
 
-Whether to turn every =head1 directive into a link pointing to the top 
+Whether to turn every =head1 directive into a link pointing to the top
 of the page (specifically, the opening body tag).
 
 =cut
@@ -489,7 +489,7 @@ sub end_item_number { $_[0]{'scratch'} .= '</p>'; $_[0]->emit }
 
 sub end_item_text   {
     # idify and anchor =item content if wanted
-    my $dt_id = $_[0]{'anchor_items'} 
+    my $dt_id = $_[0]{'anchor_items'}
                  ? ' id="'. $_[0]->idify($_[0]{'scratch'}) .'"'
                  : '';
 
@@ -832,8 +832,8 @@ pod-people@perl.org mail list. Send an empty email to
 pod-people-subscribe@perl.org to subscribe.
 
 This module is managed in an open GitHub repository,
-L<https://github.com/theory/pod-simple/>. Feel free to fork and contribute, or
-to clone L<git://github.com/theory/pod-simple.git> and send patches!
+L<https://github.com/perl-pod/pod-simple/>. Feel free to fork and contribute, or
+to clone L<git://github.com/perl-pod/pod-simple.git> and send patches!
 
 Patches against Pod::Simple are welcome. Please send bug reports to
 <bug-pod-simple@rt.cpan.org>.

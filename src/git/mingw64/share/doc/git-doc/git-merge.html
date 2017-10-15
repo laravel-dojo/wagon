@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 1.5.4">
+<meta name="generator" content="Asciidoctor 1.5.5">
 <title>git-merge(1)</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
@@ -17,7 +17,6 @@ audio:not([controls]){display:none;height:0}
 [hidden],template{display:none}
 script{display:none!important}
 html{font-family:sans-serif;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%}
-body{margin:0}
 a{background:transparent}
 a:focus{outline:thin dotted}
 a:active,a:hover{outline:0}
@@ -52,7 +51,7 @@ textarea{overflow:auto;vertical-align:top}
 table{border-collapse:collapse;border-spacing:0}
 *,*:before,*:after{-moz-box-sizing:border-box;-webkit-box-sizing:border-box;box-sizing:border-box}
 html,body{font-size:100%}
-body{background:#fff;color:rgba(0,0,0,.8);padding:0;margin:0;font-family:"Noto Serif","DejaVu Serif",serif;font-weight:400;font-style:normal;line-height:1;position:relative;cursor:auto}
+body{background:#fff;color:rgba(0,0,0,.8);padding:0;margin:0;font-family:"Noto Serif","DejaVu Serif",serif;font-weight:400;font-style:normal;line-height:1;position:relative;cursor:auto;tab-size:4;-moz-osx-font-smoothing:grayscale;-webkit-font-smoothing:antialiased}
 a:hover{cursor:pointer}
 img,object,embed{max-width:100%;height:auto}
 object,embed{height:100%}
@@ -64,7 +63,6 @@ img{-ms-interpolation-mode:bicubic}
 .text-center{text-align:center!important}
 .text-justify{text-align:justify!important}
 .hide{display:none}
-body{-webkit-font-smoothing:antialiased}
 img,object,svg{display:inline-block;vertical-align:middle}
 textarea{height:auto;min-height:50px}
 select{width:100%}
@@ -119,13 +117,16 @@ table thead tr th,table thead tr td,table tfoot tr th,table tfoot tr td{padding:
 table tr th,table tr td{padding:.5625em .625em;font-size:inherit;color:rgba(0,0,0,.8)}
 table tr.even,table tr.alt,table tr:nth-of-type(even){background:#f8f8f7}
 table thead tr th,table tfoot tr th,table tbody tr td,table tr td,table tfoot tr td{display:table-cell;line-height:1.6}
-body{tab-size:4}
 h1,h2,h3,#toctitle,.sidebarblock>.content>.title,h4,h5,h6{line-height:1.2;word-spacing:-.05em}
 h1 strong,h2 strong,h3 strong,#toctitle strong,.sidebarblock>.content>.title strong,h4 strong,h5 strong,h6 strong{font-weight:400}
 .clearfix:before,.clearfix:after,.float-group:before,.float-group:after{content:" ";display:table}
 .clearfix:after,.float-group:after{clear:both}
-*:not(pre)>code{font-size:.9375em;font-style:normal!important;letter-spacing:0;padding:.1em .5ex;word-spacing:-.15em;background-color:#f7f7f8;-webkit-border-radius:4px;border-radius:4px;line-height:1.45;text-rendering:optimizeSpeed}
+*:not(pre)>code{font-size:.9375em;font-style:normal!important;letter-spacing:0;padding:.1em .5ex;word-spacing:-.15em;background-color:#f7f7f8;-webkit-border-radius:4px;border-radius:4px;line-height:1.45;text-rendering:optimizeSpeed;word-wrap:break-word}
+*:not(pre)>code.nobreak{word-wrap:normal}
+*:not(pre)>code.nowrap{white-space:nowrap}
 pre,pre>code{line-height:1.45;color:rgba(0,0,0,.9);font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;font-weight:400;text-rendering:optimizeSpeed}
+em em{font-style:normal}
+strong strong{font-weight:400}
 .keyseq{color:rgba(51,51,51,.8)}
 kbd{font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;display:inline-block;color:rgba(0,0,0,.8);font-size:.65em;line-height:1.45;background-color:#f7f7f7;border:1px solid #ccc;-webkit-border-radius:3px;border-radius:3px;-webkit-box-shadow:0 1px 0 rgba(0,0,0,.2),0 0 0 .1em white inset;box-shadow:0 1px 0 rgba(0,0,0,.2),0 0 0 .1em #fff inset;margin:0 .15em;padding:.2em .5em;vertical-align:middle;position:relative;top:-.1em;white-space:nowrap}
 .keyseq kbd:first-child{margin-left:0}
@@ -434,8 +435,8 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 	[-s &lt;strategy&gt;] [-X &lt;strategy-option&gt;] [-S[&lt;keyid&gt;]]
 	[--[no-]allow-unrelated-histories]
 	[--[no-]rerere-autoupdate] [-m &lt;msg&gt;] [&lt;commit&gt;&#8230;&#8203;]
-<em>git merge</em> &lt;msg&gt; HEAD &lt;commit&gt;&#8230;&#8203;
-<em>git merge</em> --abort</pre>
+<em>git merge</em> --abort
+<em>git merge</em> --continue</pre>
 </div>
 </div>
 </div>
@@ -475,12 +476,7 @@ a log message from the user describing the changes.</p>
 </div>
 </div>
 <div class="paragraph">
-<p>The second syntax (&lt;msg&gt; <code>HEAD</code> &lt;commit&gt;&#8230;&#8203;) is supported for
-historical reasons.  Do not use it from the command line or in
-new scripts.  It is the same as <code>git merge -m &lt;msg&gt; &lt;commit&gt;...</code>.</p>
-</div>
-<div class="paragraph">
-<p>The third syntax ("<code>git merge --abort</code>") can only be run after the
+<p>The second syntax ("<code>git merge --abort</code>") can only be run after the
 merge has resulted in conflicts. <em>git merge --abort</em> will abort the
 merge process and try to reconstruct the pre-merge state. However,
 if there were uncommitted changes when the merge started (and
@@ -492,6 +488,10 @@ reconstruct the original (pre-merge) changes. Therefore:</p>
 <p><strong>Warning</strong>: Running <em>git merge</em> with non-trivial uncommitted changes is
 discouraged: while possible, it may leave you in a state that is hard to
 back out of in the case of a conflict.</p>
+</div>
+<div class="paragraph">
+<p>The fourth syntax ("<code>git merge --continue</code>") can only be run after the
+merge has resulted in conflicts.</p>
 </div>
 </div>
 </div>
@@ -683,6 +683,12 @@ commit or stash your changes before running <em>git merge</em>.</p>
 <p><em>git merge --abort</em> is equivalent to <em>git reset --merge</em> when
 <code>MERGE_HEAD</code> is present.</p>
 </div>
+</dd>
+<dt class="hdlist1">--continue</dt>
+<dd>
+<p>After a <em>git merge</em> stops due to conflicts you can conclude the
+merge by running <em>git merge --continue</em> (see "HOW TO RESOLVE
+CONFLICTS" section below).</p>
 </dd>
 <dt class="hdlist1">&lt;commit&gt;&#8230;&#8203;</dt>
 <dd>
@@ -915,7 +921,10 @@ can be used for this.</p>
 <li>
 <p>Resolve the conflicts.  Git will mark the conflicts in
 the working tree.  Edit the files into shape and
-<em>git add</em> them to the index.  Use <em>git commit</em> to seal the deal.</p>
+<em>git add</em> them to the index.  Use <em>git commit</em> or
+<em>git merge --continue</em> to seal the deal. The latter command
+checks whether there is a (interrupted) merge in progress
+before calling <em>git commit</em>.</p>
 </li>
 </ul>
 </div>
@@ -1325,7 +1334,7 @@ strategy.  Level 0 outputs nothing except a final error
 message if conflicts were detected. Level 1 outputs only
 conflicts, 2 outputs conflicts and file changes.  Level 5 and
 above outputs debugging information.  The default is level 2.
-Can be overridden by the <em>GIT_MERGE_VERBOSITY</em> environment variable.</p>
+Can be overridden by the <code>GIT_MERGE_VERBOSITY</code> environment variable.</p>
 </dd>
 <dt class="hdlist1">merge.&lt;driver&gt;.name</dt>
 <dd>
@@ -1377,7 +1386,7 @@ values containing whitespace characters are currently not supported.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-06-14 11:04:07 W. Europe Daylight Time
+Last updated 2017-10-12 21:18:05 Coordinated Universal Time
 </div>
 </div>
 </body>

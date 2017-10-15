@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 1.5.4">
+<meta name="generator" content="Asciidoctor 1.5.5">
 <title>git-filter-branch(1)</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
@@ -17,7 +17,6 @@ audio:not([controls]){display:none;height:0}
 [hidden],template{display:none}
 script{display:none!important}
 html{font-family:sans-serif;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%}
-body{margin:0}
 a{background:transparent}
 a:focus{outline:thin dotted}
 a:active,a:hover{outline:0}
@@ -52,7 +51,7 @@ textarea{overflow:auto;vertical-align:top}
 table{border-collapse:collapse;border-spacing:0}
 *,*:before,*:after{-moz-box-sizing:border-box;-webkit-box-sizing:border-box;box-sizing:border-box}
 html,body{font-size:100%}
-body{background:#fff;color:rgba(0,0,0,.8);padding:0;margin:0;font-family:"Noto Serif","DejaVu Serif",serif;font-weight:400;font-style:normal;line-height:1;position:relative;cursor:auto}
+body{background:#fff;color:rgba(0,0,0,.8);padding:0;margin:0;font-family:"Noto Serif","DejaVu Serif",serif;font-weight:400;font-style:normal;line-height:1;position:relative;cursor:auto;tab-size:4;-moz-osx-font-smoothing:grayscale;-webkit-font-smoothing:antialiased}
 a:hover{cursor:pointer}
 img,object,embed{max-width:100%;height:auto}
 object,embed{height:100%}
@@ -64,7 +63,6 @@ img{-ms-interpolation-mode:bicubic}
 .text-center{text-align:center!important}
 .text-justify{text-align:justify!important}
 .hide{display:none}
-body{-webkit-font-smoothing:antialiased}
 img,object,svg{display:inline-block;vertical-align:middle}
 textarea{height:auto;min-height:50px}
 select{width:100%}
@@ -119,13 +117,16 @@ table thead tr th,table thead tr td,table tfoot tr th,table tfoot tr td{padding:
 table tr th,table tr td{padding:.5625em .625em;font-size:inherit;color:rgba(0,0,0,.8)}
 table tr.even,table tr.alt,table tr:nth-of-type(even){background:#f8f8f7}
 table thead tr th,table tfoot tr th,table tbody tr td,table tr td,table tfoot tr td{display:table-cell;line-height:1.6}
-body{tab-size:4}
 h1,h2,h3,#toctitle,.sidebarblock>.content>.title,h4,h5,h6{line-height:1.2;word-spacing:-.05em}
 h1 strong,h2 strong,h3 strong,#toctitle strong,.sidebarblock>.content>.title strong,h4 strong,h5 strong,h6 strong{font-weight:400}
 .clearfix:before,.clearfix:after,.float-group:before,.float-group:after{content:" ";display:table}
 .clearfix:after,.float-group:after{clear:both}
-*:not(pre)>code{font-size:.9375em;font-style:normal!important;letter-spacing:0;padding:.1em .5ex;word-spacing:-.15em;background-color:#f7f7f8;-webkit-border-radius:4px;border-radius:4px;line-height:1.45;text-rendering:optimizeSpeed}
+*:not(pre)>code{font-size:.9375em;font-style:normal!important;letter-spacing:0;padding:.1em .5ex;word-spacing:-.15em;background-color:#f7f7f8;-webkit-border-radius:4px;border-radius:4px;line-height:1.45;text-rendering:optimizeSpeed;word-wrap:break-word}
+*:not(pre)>code.nobreak{word-wrap:normal}
+*:not(pre)>code.nowrap{white-space:nowrap}
 pre,pre>code{line-height:1.45;color:rgba(0,0,0,.9);font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;font-weight:400;text-rendering:optimizeSpeed}
+em em{font-style:normal}
+strong strong{font-weight:400}
 .keyseq{color:rgba(51,51,51,.8)}
 kbd{font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;display:inline-block;color:rgba(0,0,0,.8);font-size:.65em;line-height:1.45;background-color:#f7f7f7;border:1px solid #ccc;-webkit-border-radius:3px;border-radius:3px;-webkit-box-shadow:0 1px 0 rgba(0,0,0,.2),0 0 0 .1em white inset;box-shadow:0 1px 0 rgba(0,0,0,.2),0 0 0 .1em #fff inset;margin:0 .15em;padding:.2em .5em;vertical-align:middle;position:relative;top:-.1em;white-space:nowrap}
 .keyseq kbd:first-child{margin-left:0}
@@ -430,11 +431,11 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <h2 id="_synopsis">SYNOPSIS</h2>
 <div class="sectionbody">
 <div class="verseblock">
-<pre class="content"><em>git filter-branch</em> [--env-filter &lt;command&gt;] [--tree-filter &lt;command&gt;]
-	[--index-filter &lt;command&gt;] [--parent-filter &lt;command&gt;]
-	[--msg-filter &lt;command&gt;] [--commit-filter &lt;command&gt;]
-	[--tag-name-filter &lt;command&gt;] [--subdirectory-filter &lt;directory&gt;]
-	[--prune-empty]
+<pre class="content"><em>git filter-branch</em> [--setup &lt;command&gt;] [--env-filter &lt;command&gt;]
+	[--tree-filter &lt;command&gt;] [--index-filter &lt;command&gt;]
+	[--parent-filter &lt;command&gt;] [--msg-filter &lt;command&gt;]
+	[--commit-filter &lt;command&gt;] [--tag-name-filter &lt;command&gt;]
+	[--subdirectory-filter &lt;directory&gt;] [--prune-empty]
 	[--original &lt;namespace&gt;] [-d &lt;directory&gt;] [-f | --force]
 	[--] [&lt;rev-list options&gt;&#8230;&#8203;]</pre>
 </div>
@@ -483,7 +484,7 @@ if different from the rewritten ones, will be stored in the namespace
 <div class="paragraph">
 <p>Note that since this operation is very I/O expensive, it might
 be a good idea to redirect the temporary directory off-disk with the
-<em>-d</em> option, e.g. on tmpfs.  Reportedly the speedup is very noticeable.</p>
+<code>-d</code> option, e.g. on tmpfs.  Reportedly the speedup is very noticeable.</p>
 </div>
 <div class="sect2">
 <h3 id="_filters">Filters</h3>
@@ -491,7 +492,7 @@ be a good idea to redirect the temporary directory off-disk with the
 <p>The filters are applied in the order as listed below.  The &lt;command&gt;
 argument is always evaluated in the shell context using the <em>eval</em> command
 (with the notable exception of the commit filter, for technical reasons).
-Prior to that, the $GIT_COMMIT environment variable will be set to contain
+Prior to that, the <code>$GIT_COMMIT</code> environment variable will be set to contain
 the id of the commit being rewritten.  Also, GIT_AUTHOR_NAME,
 GIT_AUTHOR_EMAIL, GIT_AUTHOR_DATE, GIT_COMMITTER_NAME, GIT_COMMITTER_EMAIL,
 and GIT_COMMITTER_DATE are taken from the current commit and exported to
@@ -518,13 +519,20 @@ multiple commits.</p>
 <div class="sectionbody">
 <div class="dlist">
 <dl>
+<dt class="hdlist1">--setup &lt;command&gt;</dt>
+<dd>
+<p>This is not a real filter executed for each commit but a one
+time setup just before the loop. Therefore no commit-specific
+variables are defined yet.  Functions or variables defined here
+can be used or modified in the following filter steps except
+the commit filter, for technical reasons.</p>
+</dd>
 <dt class="hdlist1">--env-filter &lt;command&gt;</dt>
 <dd>
 <p>This filter may be used if you only need to modify the environment
 in which the commit will be performed.  Specifically, you might
 want to rewrite the author/committer name/email/time environment
-variables (see <a href="git-commit-tree.html">git-commit-tree</a>(1) for details).  Do not forget
-to re-export the variables.</p>
+variables (see <a href="git-commit-tree.html">git-commit-tree</a>(1) for details).</p>
 </dd>
 <dt class="hdlist1">--tree-filter &lt;command&gt;</dt>
 <dd>
@@ -617,14 +625,12 @@ project root. Implies <a href="#Remap_to_ancestor">Remap to ancestor</a>.</p>
 </dd>
 <dt class="hdlist1">--prune-empty</dt>
 <dd>
-<p>Some kind of filters will generate empty commits, that left the tree
-untouched.  This switch allow git-filter-branch to ignore such
-commits.  Though, this switch only applies for commits that have one
-and only one parent, it will hence keep merges points. Also, this
-option is not compatible with the use of <em>--commit-filter</em>. Though you
-just need to use the function <em>git_commit_non_empty_tree "$@"</em> instead
-of the <code>git commit-tree "$@"</code> idiom in your commit filter to make that
-happen.</p>
+<p>Some filters will generate empty commits that leave the tree untouched.
+This option instructs git-filter-branch to remove such commits if they
+have exactly one or zero non-pruned parents; merge commits will
+therefore remain intact.  This option cannot be used together with
+<code>--commit-filter</code>, though the same effect can be achieved by using the
+provided <code>git_commit_non_empty_tree</code> function in a commit filter.</p>
 </dd>
 <dt class="hdlist1">--original &lt;namespace&gt;</dt>
 <dd>
@@ -651,7 +657,7 @@ directory or when there are already refs starting with
 <dd>
 <p>Arguments for <em>git rev-list</em>.  All positive refs included by
 these options are rewritten.  You may also specify options
-such as <em>--all</em>, but you must use <em>--</em> to separate them from
+such as <code>--all</code>, but you must use <code>--</code> to separate them from
 the <em>git filter-branch</em> options. Implies <a href="#Remap_to_ancestor">Remap to ancestor</a>.</p>
 </dd>
 </dl>
@@ -825,12 +831,10 @@ before publishing the project, like this:</p>
 	if test "$GIT_AUTHOR_EMAIL" = "root@localhost"
 	then
 		GIT_AUTHOR_EMAIL=john@example.com
-		export GIT_AUTHOR_EMAIL
 	fi
 	if test "$GIT_COMMITTER_EMAIL" = "root@localhost"
 	then
 		GIT_COMMITTER_EMAIL=john@example.com
-		export GIT_COMMITTER_EMAIL
 	fi
 ' -- --all</pre>
 </div>
@@ -996,7 +1000,7 @@ to the tasks of removing unwanted data- e.g:
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-06-14 11:04:07 W. Europe Daylight Time
+Last updated 2017-10-12 21:18:05 Coordinated Universal Time
 </div>
 </div>
 </body>

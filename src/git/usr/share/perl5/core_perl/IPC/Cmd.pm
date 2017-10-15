@@ -18,7 +18,7 @@ BEGIN {
                         $HAVE_MONOTONIC
                     ];
 
-    $VERSION        = '0.92';
+    $VERSION        = '0.92_01';
     $VERBOSE        = 0;
     $DEBUG          = 0;
     $WARN           = 1;
@@ -142,6 +142,8 @@ sub can_use_ipc_run     {
     return if IS_WIN98;
 
     ### if we don't have ipc::run, we obviously can't use it.
+    local @INC = @INC;
+    pop @INC if $INC[-1] eq '.';
     return unless can_load(
                         modules => { 'IPC::Run' => '0.55' },
                         verbose => ($WARN && $verbose),
@@ -169,6 +171,8 @@ sub can_use_ipc_open3   {
 
     ### IPC::Open3 works on every non-VMS platform, but it can't
     ### capture buffers on win32 :(
+    local @INC = @INC;
+    pop @INC if $INC[-1] eq '.';
     return unless can_load(
         modules => { map {$_ => '0.0'} qw|IPC::Open3 IO::Select Symbol| },
         verbose => ($WARN && $verbose),
@@ -476,7 +480,7 @@ sub kill_gently {
   while ($do_wait) {
     $previous_monotonic_value = $now;
     $now = get_monotonic_time();
-    
+
     adjust_monotonic_start_time([\$wait_start_time], $now, $previous_monotonic_value);
 
     if ($now > $wait_start_time + $opts->{'wait_time'}) {
@@ -491,7 +495,7 @@ sub kill_gently {
         $do_wait = 0;
         next;
     }
-    
+
     Time::HiRes::usleep(250000); # quarter of a second
   }
 
@@ -1052,7 +1056,7 @@ sub run_forked {
               $opts->{'stderr_handler'}->($data);
             }
           }
- 
+
           # process may finish (waitpid returns -1) before
           # we've read all of its output because of buffering;
           # so try to read all the way it is possible to read

@@ -8,7 +8,7 @@ Pod::Functions - Group Perl's functions a la perlfunc.pod
 =head1 SYNOPSIS
 
     use Pod::Functions;
-    
+
     my @misc_ops = @{ $Kinds{ 'Misc' } };
     my $misc_dsc = $Type_Description{ 'Misc' };
 
@@ -16,7 +16,7 @@ or
 
     perl /path/to/lib/Pod/Functions.pm
 
-This will print a grouped list of Perl's functions, like the 
+This will print a grouped list of Perl's functions, like the
 L<perlfunc/"Perl Functions by Category"> section.
 
 =head1 DESCRIPTION
@@ -37,12 +37,12 @@ The category can be a comma separated list.
 
 =item %Flavor
 
-In this hash each key represents a function and the value is a short 
+In this hash each key represents a function and the value is a short
 description of that function.
 
 =item %Type_Description
 
-In this hash each key represents a category of functions and the value is 
+In this hash each key represents a category of functions and the value is
 a short description of that category.
 
 =item @Type_Order
@@ -54,7 +54,7 @@ L<perlfunc/"Perl Functions by Category"> section.
 
 =cut
 
-our $VERSION = '1.09';
+our $VERSION = '1.10';
 
 require Exporter;
 
@@ -104,20 +104,20 @@ while (<DATA>) {
 close DATA;
 
 my( $typedesc, $list );
-unless (caller) { 
+unless (caller) {
     foreach my $type ( @Type_Order ) {
 	$list = join(", ", sort @{$Kinds{$type}});
 	$typedesc = $Type_Description{$type} . ":";
 	write;
-    } 
+    }
 }
 
-format = 
+format =
 
 ^<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-    $typedesc 
+    $typedesc
 ~~ ^<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-    $typedesc 
+    $typedesc
  ~~  ^<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	$list
 .
@@ -207,7 +207,7 @@ glob	File	expand filenames using wildcards
 gmtime	Time	convert UNIX time into record or string using Greenwich time
 goto	Flow	create spaghetti code
 grep	LIST	locate elements in a list test true against a given criterion
-hex	Math	String	convert a string to a hexadecimal number
+hex	Math	String	convert a hexadecimal string to a number
 import	Modules	Namespace	patch a module's namespace into your own
 index	String	find a substring within a string
 int	Math	get the integer portion of a number
@@ -280,7 +280,7 @@ say	I/O	output a list to a filehandle, appending a newline
 scalar	Misc	force a scalar context
 seek	I/O	reposition file pointer for random-access I/O
 seekdir	I/O	reposition directory pointer
-select	I/O	reset default output or do I/O multiplexing
+select	File	I/O	reset default output or do I/O multiplexing
 semctl	SysV	SysV semaphore control operations
 semget	SysV	get set of SysV semaphores
 semop	SysV	SysV semaphore operations

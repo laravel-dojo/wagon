@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 1.5.4">
+<meta name="generator" content="Asciidoctor 1.5.5">
 <title>git-format-patch(1)</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
@@ -17,7 +17,6 @@ audio:not([controls]){display:none;height:0}
 [hidden],template{display:none}
 script{display:none!important}
 html{font-family:sans-serif;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%}
-body{margin:0}
 a{background:transparent}
 a:focus{outline:thin dotted}
 a:active,a:hover{outline:0}
@@ -52,7 +51,7 @@ textarea{overflow:auto;vertical-align:top}
 table{border-collapse:collapse;border-spacing:0}
 *,*:before,*:after{-moz-box-sizing:border-box;-webkit-box-sizing:border-box;box-sizing:border-box}
 html,body{font-size:100%}
-body{background:#fff;color:rgba(0,0,0,.8);padding:0;margin:0;font-family:"Noto Serif","DejaVu Serif",serif;font-weight:400;font-style:normal;line-height:1;position:relative;cursor:auto}
+body{background:#fff;color:rgba(0,0,0,.8);padding:0;margin:0;font-family:"Noto Serif","DejaVu Serif",serif;font-weight:400;font-style:normal;line-height:1;position:relative;cursor:auto;tab-size:4;-moz-osx-font-smoothing:grayscale;-webkit-font-smoothing:antialiased}
 a:hover{cursor:pointer}
 img,object,embed{max-width:100%;height:auto}
 object,embed{height:100%}
@@ -64,7 +63,6 @@ img{-ms-interpolation-mode:bicubic}
 .text-center{text-align:center!important}
 .text-justify{text-align:justify!important}
 .hide{display:none}
-body{-webkit-font-smoothing:antialiased}
 img,object,svg{display:inline-block;vertical-align:middle}
 textarea{height:auto;min-height:50px}
 select{width:100%}
@@ -119,13 +117,16 @@ table thead tr th,table thead tr td,table tfoot tr th,table tfoot tr td{padding:
 table tr th,table tr td{padding:.5625em .625em;font-size:inherit;color:rgba(0,0,0,.8)}
 table tr.even,table tr.alt,table tr:nth-of-type(even){background:#f8f8f7}
 table thead tr th,table tfoot tr th,table tbody tr td,table tr td,table tfoot tr td{display:table-cell;line-height:1.6}
-body{tab-size:4}
 h1,h2,h3,#toctitle,.sidebarblock>.content>.title,h4,h5,h6{line-height:1.2;word-spacing:-.05em}
 h1 strong,h2 strong,h3 strong,#toctitle strong,.sidebarblock>.content>.title strong,h4 strong,h5 strong,h6 strong{font-weight:400}
 .clearfix:before,.clearfix:after,.float-group:before,.float-group:after{content:" ";display:table}
 .clearfix:after,.float-group:after{clear:both}
-*:not(pre)>code{font-size:.9375em;font-style:normal!important;letter-spacing:0;padding:.1em .5ex;word-spacing:-.15em;background-color:#f7f7f8;-webkit-border-radius:4px;border-radius:4px;line-height:1.45;text-rendering:optimizeSpeed}
+*:not(pre)>code{font-size:.9375em;font-style:normal!important;letter-spacing:0;padding:.1em .5ex;word-spacing:-.15em;background-color:#f7f7f8;-webkit-border-radius:4px;border-radius:4px;line-height:1.45;text-rendering:optimizeSpeed;word-wrap:break-word}
+*:not(pre)>code.nobreak{word-wrap:normal}
+*:not(pre)>code.nowrap{white-space:nowrap}
 pre,pre>code{line-height:1.45;color:rgba(0,0,0,.9);font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;font-weight:400;text-rendering:optimizeSpeed}
+em em{font-style:normal}
+strong strong{font-weight:400}
 .keyseq{color:rgba(51,51,51,.8)}
 kbd{font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;display:inline-block;color:rgba(0,0,0,.8);font-size:.65em;line-height:1.45;background-color:#f7f7f7;border:1px solid #ccc;-webkit-border-radius:3px;border-radius:3px;-webkit-box-shadow:0 1px 0 rgba(0,0,0,.2),0 0 0 .1em white inset;box-shadow:0 1px 0 rgba(0,0,0,.2),0 0 0 .1em #fff inset;margin:0 .15em;padding:.2em .5em;vertical-align:middle;position:relative;top:-.1em;white-space:nowrap}
 .keyseq kbd:first-child{margin-left:0}
@@ -440,7 +441,8 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 		   [--start-number &lt;n&gt;] [--numbered-files]
 		   [--in-reply-to=Message-Id] [--suffix=.&lt;sfx&gt;]
 		   [--ignore-if-in-upstream]
-		   [--subject-prefix=Subject-Prefix] [(--reroll-count|-v) &lt;n&gt;]
+		   [--rfc] [--subject-prefix=Subject-Prefix]
+		   [(--reroll-count|-v) &lt;n&gt;]
 		   [--to=&lt;email&gt;] [--cc=&lt;email&gt;]
 		   [--[no-]cover-letter] [--quiet] [--notes[=&lt;ref&gt;]]
 		   [&lt;common diff options&gt;]
@@ -492,7 +494,7 @@ output, unless the <code>--stdout</code> option is specified.</p>
 <div class="paragraph">
 <p>If <code>-o</code> is specified, output files are created in &lt;dir&gt;.  Otherwise
 they are created in the current working directory. The default path
-can be set with the <em>format.outputDirectory</em> configuration option.
+can be set with the <code>format.outputDirectory</code> configuration option.
 The <code>-o</code> option takes precedence over <code>format.outputDirectory</code>.
 To store patches in the current working directory even when
 <code>format.outputDirectory</code> points elsewhere, use <code>-o .</code>.</p>
@@ -531,13 +533,12 @@ reference.</p>
 <p>Generate diffs with &lt;n&gt; lines of context instead of
 the usual three.</p>
 </dd>
-<dt class="hdlist1">--compaction-heuristic</dt>
-<dt class="hdlist1">--no-compaction-heuristic</dt>
+<dt class="hdlist1">--indent-heuristic</dt>
+<dt class="hdlist1">--no-indent-heuristic</dt>
 <dd>
-<p>These are to help debugging and tuning an experimental
-heuristic (which is off by default) that shifts the hunk
-boundary in an attempt to make the resulting patch easier
-to read.</p>
+<p>These are to help debugging and tuning experimental heuristics
+(which are off by default) that shift diff hunk boundaries to
+make patches easier to read.</p>
 </dd>
 <dt class="hdlist1">--minimal</dt>
 <dd>
@@ -775,7 +776,7 @@ projects, so use it with caution.  Giving more than one
 the diff between the preimage and <code>/dev/null</code>. The resulting patch
 is not meant to be applied with <code>patch</code> or <code>git apply</code>; this is
 solely for people who want to just concentrate on reviewing the
-text after the change. In addition, the output obviously lack
+text after the change. In addition, the output obviously lacks
 enough information to apply such a patch in reverse, even manually,
 hence the name of the option.</p>
 <div class="paragraph">
@@ -793,11 +794,53 @@ number.</p>
 </dd>
 <dt class="hdlist1">-O&lt;orderfile&gt;</dt>
 <dd>
-<p>Output the patch in the order specified in the
-&lt;orderfile&gt;, which has one shell glob pattern per line.
+<p>Control the order in which files appear in the output.
 This overrides the <code>diff.orderFile</code> configuration variable
 (see <a href="git-config.html">git-config</a>(1)).  To cancel <code>diff.orderFile</code>,
 use <code>-O/dev/null</code>.</p>
+<div class="paragraph">
+<p>The output order is determined by the order of glob patterns in
+&lt;orderfile&gt;.
+All files with pathnames that match the first pattern are output
+first, all files with pathnames that match the second pattern (but not
+the first) are output next, and so on.
+All files with pathnames that do not match any pattern are output
+last, as if there was an implicit match-all pattern at the end of the
+file.
+If multiple pathnames have the same rank (they match the same pattern
+but no earlier patterns), their output order relative to each other is
+the normal order.</p>
+</div>
+<div class="paragraph">
+<p>&lt;orderfile&gt; is parsed as follows:</p>
+</div>
+<div class="openblock">
+<div class="content">
+<div class="ulist">
+<ul>
+<li>
+<p>Blank lines are ignored, so they can be used as separators for
+readability.</p>
+</li>
+<li>
+<p>Lines starting with a hash ("<code>#</code>") are ignored, so they can be used
+for comments.  Add a backslash ("<code>\</code>") to the beginning of the
+pattern if it starts with a hash.</p>
+</li>
+<li>
+<p>Each other line contains a single pattern.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Patterns have the same syntax and semantics as patterns used for
+fnmantch(3) without the FNM_PATHNAME flag, except a pathname also
+matches a pattern if removing any number of the final pathname
+components matches the pattern.  For example, the pattern "<code>foo*bar</code>"
+matches "<code>fooasdfbar</code>" and "<code>foo/bar/baz/asdf</code>" but not "<code>foobarx</code>".</p>
+</div>
 </dd>
 <dt class="hdlist1">-a</dt>
 <dt class="hdlist1">--text</dt>
@@ -829,7 +872,9 @@ line has none.</p>
 <dt class="hdlist1">--inter-hunk-context=&lt;lines&gt;</dt>
 <dd>
 <p>Show the context between diff hunks, up to the specified number
-of lines, thereby fusing hunks that are close to each other.</p>
+of lines, thereby fusing hunks that are close to each other.
+Defaults to <code>diff.interHunkContext</code> or 0 if the config option
+is unset.</p>
 </dd>
 <dt class="hdlist1">-W</dt>
 <dt class="hdlist1">--function-context</dt>
@@ -883,6 +928,19 @@ the behavior until 1.7.0). Using "all" hides all changes to submodules.</p>
 <dt class="hdlist1">--no-prefix</dt>
 <dd>
 <p>Do not show any source or destination prefix.</p>
+</dd>
+<dt class="hdlist1">--line-prefix=&lt;prefix&gt;</dt>
+<dd>
+<p>Prepend an additional prefix to every line of output.</p>
+</dd>
+<dt class="hdlist1">--ita-invisible-in-index</dt>
+<dd>
+<p>By default entries added by "git add -N" appear as an existing
+empty file in "git diff" and a new file in "git diff --cached".
+This option makes the entry appear as a new file in "git diff"
+and non-existent in "git diff --cached". This option could be
+reverted with <code>--ita-visible-in-index</code>. Both options are
+experimental and could be removed in future.</p>
 </dd>
 </dl>
 </div>
@@ -971,9 +1029,9 @@ series, where the head is chosen from the cover letter, the
 threading makes every mail a reply to the previous one.</p>
 </div>
 <div class="paragraph">
-<p>The default is <code>--no-thread</code>, unless the <em>format.thread</em> configuration
+<p>The default is <code>--no-thread</code>, unless the <code>format.thread</code> configuration
 is set.  If <code>--thread</code> is specified without a style, it defaults to the
-style specified by <em>format.thread</em> if any, or else <code>shallow</code>.</p>
+style specified by <code>format.thread</code> if any, or else <code>shallow</code>.</p>
 </div>
 <div class="paragraph">
 <p>Beware that the default for <em>git send-email</em> is to thread emails
@@ -1001,6 +1059,12 @@ ignored.</p>
 line, instead use <em>[&lt;Subject-Prefix&gt;]</em>. This
 allows for useful naming of a patch series, and can be
 combined with the <code>--numbered</code> option.</p>
+</dd>
+<dt class="hdlist1">--rfc</dt>
+<dd>
+<p>Alias for <code>--subject-prefix="RFC PATCH"</code>. RFC means "Request For
+Comments"; use this when sending an experimental patch for
+discussion rather than application.</p>
 </dd>
 <dt class="hdlist1">-v &lt;n&gt;</dt>
 <dt class="hdlist1">--reroll-count=&lt;n&gt;</dt>
@@ -1072,7 +1136,7 @@ of the patch series (but see the discussion of the <code>notes.rewrite</code>
 configuration options in <a href="git-notes.html">git-notes</a>(1) to use this workflow).</p>
 </div>
 </dd>
-<dt class="hdlist1">--[no]-signature=&lt;signature&gt;</dt>
+<dt class="hdlist1">--[no-]signature=&lt;signature&gt;</dt>
 <dd>
 <p>Add a signature to each message produced. Per RFC 3676 the signature
 is separated from the body by a line with '-- ' on it. If the
@@ -1496,7 +1560,7 @@ series A, B, C, the history would be like:</p>
 </div>
 <div class="paragraph">
 <p>With <code>git format-patch --base=P -3 C</code> (or variants thereof, e.g. with
-<code>--cover-letter</code> of using <code>Z..C</code> instead of <code>-3 C</code> to specify the
+<code>--cover-letter</code> or using <code>Z..C</code> instead of <code>-3 C</code> to specify the
 range), the base tree information block is shown at the end of the
 first message the command outputs (either the first patch, or the
 cover letter), like this:</p>
@@ -1615,7 +1679,7 @@ as e-mailable patches:</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-06-14 11:04:07 W. Europe Daylight Time
+Last updated 2017-10-12 21:18:05 Coordinated Universal Time
 </div>
 </div>
 </body>

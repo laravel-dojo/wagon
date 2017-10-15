@@ -4,8 +4,8 @@ use strict;
 use vars qw(@ISA $VERSION);
 require File::Spec::Unix;
 
-$VERSION = '3.56';
-$VERSION =~ tr/_//;
+$VERSION = '3.63_01';
+$VERSION =~ tr/_//d;
 
 @ISA = qw(File::Spec::Unix);
 
@@ -688,7 +688,7 @@ sub abs2rel {
     # Now, remove all leading components that are the same
     my @pathchunks = $self->splitdir( $path_dirs );
     my @basechunks = $self->splitdir( $base_dirs );
-	
+
     while ( @pathchunks &&
 	    @basechunks &&
 	    lc( $pathchunks[0] ) eq lc( $basechunks[0] ) ) {

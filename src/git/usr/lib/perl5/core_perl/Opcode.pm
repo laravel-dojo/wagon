@@ -6,7 +6,7 @@ use strict;
 
 our($VERSION, @ISA, @EXPORT_OK);
 
-$VERSION = "1.32";
+$VERSION = "1.34";
 
 use Carp;
 use Exporter ();
@@ -312,7 +312,7 @@ invert_opset function.
     av2arylen
 
     rv2hv helem hslice kvhslice each values keys exists delete
-    aeach akeys avalues reach rvalues rkeys multideref
+    aeach akeys avalues multideref
 
     preinc i_preinc predec i_predec postinc i_postinc
     postdec i_postdec int hex oct abs pow multiply i_multiply
@@ -552,7 +552,7 @@ SystemV Interprocess Communications:
 This tag holds opcodes related to loading modules and getting information
 about calling environment and args.
 
-    require dofile 
+    require dofile
     caller runcv
 
 =item :still_to_be_decided

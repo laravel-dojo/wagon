@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 1.5.4">
+<meta name="generator" content="Asciidoctor 1.5.5">
 <title>git-ls-files(1)</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
@@ -17,7 +17,6 @@ audio:not([controls]){display:none;height:0}
 [hidden],template{display:none}
 script{display:none!important}
 html{font-family:sans-serif;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%}
-body{margin:0}
 a{background:transparent}
 a:focus{outline:thin dotted}
 a:active,a:hover{outline:0}
@@ -52,7 +51,7 @@ textarea{overflow:auto;vertical-align:top}
 table{border-collapse:collapse;border-spacing:0}
 *,*:before,*:after{-moz-box-sizing:border-box;-webkit-box-sizing:border-box;box-sizing:border-box}
 html,body{font-size:100%}
-body{background:#fff;color:rgba(0,0,0,.8);padding:0;margin:0;font-family:"Noto Serif","DejaVu Serif",serif;font-weight:400;font-style:normal;line-height:1;position:relative;cursor:auto}
+body{background:#fff;color:rgba(0,0,0,.8);padding:0;margin:0;font-family:"Noto Serif","DejaVu Serif",serif;font-weight:400;font-style:normal;line-height:1;position:relative;cursor:auto;tab-size:4;-moz-osx-font-smoothing:grayscale;-webkit-font-smoothing:antialiased}
 a:hover{cursor:pointer}
 img,object,embed{max-width:100%;height:auto}
 object,embed{height:100%}
@@ -64,7 +63,6 @@ img{-ms-interpolation-mode:bicubic}
 .text-center{text-align:center!important}
 .text-justify{text-align:justify!important}
 .hide{display:none}
-body{-webkit-font-smoothing:antialiased}
 img,object,svg{display:inline-block;vertical-align:middle}
 textarea{height:auto;min-height:50px}
 select{width:100%}
@@ -119,13 +117,16 @@ table thead tr th,table thead tr td,table tfoot tr th,table tfoot tr td{padding:
 table tr th,table tr td{padding:.5625em .625em;font-size:inherit;color:rgba(0,0,0,.8)}
 table tr.even,table tr.alt,table tr:nth-of-type(even){background:#f8f8f7}
 table thead tr th,table tfoot tr th,table tbody tr td,table tr td,table tfoot tr td{display:table-cell;line-height:1.6}
-body{tab-size:4}
 h1,h2,h3,#toctitle,.sidebarblock>.content>.title,h4,h5,h6{line-height:1.2;word-spacing:-.05em}
 h1 strong,h2 strong,h3 strong,#toctitle strong,.sidebarblock>.content>.title strong,h4 strong,h5 strong,h6 strong{font-weight:400}
 .clearfix:before,.clearfix:after,.float-group:before,.float-group:after{content:" ";display:table}
 .clearfix:after,.float-group:after{clear:both}
-*:not(pre)>code{font-size:.9375em;font-style:normal!important;letter-spacing:0;padding:.1em .5ex;word-spacing:-.15em;background-color:#f7f7f8;-webkit-border-radius:4px;border-radius:4px;line-height:1.45;text-rendering:optimizeSpeed}
+*:not(pre)>code{font-size:.9375em;font-style:normal!important;letter-spacing:0;padding:.1em .5ex;word-spacing:-.15em;background-color:#f7f7f8;-webkit-border-radius:4px;border-radius:4px;line-height:1.45;text-rendering:optimizeSpeed;word-wrap:break-word}
+*:not(pre)>code.nobreak{word-wrap:normal}
+*:not(pre)>code.nowrap{white-space:nowrap}
 pre,pre>code{line-height:1.45;color:rgba(0,0,0,.9);font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;font-weight:400;text-rendering:optimizeSpeed}
+em em{font-style:normal}
+strong strong{font-weight:400}
 .keyseq{color:rgba(51,51,51,.8)}
 kbd{font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;display:inline-block;color:rgba(0,0,0,.8);font-size:.65em;line-height:1.45;background-color:#f7f7f7;border:1px solid #ccc;-webkit-border-radius:3px;border-radius:3px;-webkit-box-shadow:0 1px 0 rgba(0,0,0,.2),0 0 0 .1em white inset;box-shadow:0 1px 0 rgba(0,0,0,.2),0 0 0 .1em #fff inset;margin:0 .15em;padding:.2em .5em;vertical-align:middle;position:relative;top:-.1em;white-space:nowrap}
 .keyseq kbd:first-child{margin-left:0}
@@ -439,7 +440,8 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 		[--exclude-per-directory=&lt;file&gt;]
 		[--exclude-standard]
 		[--error-unmatch] [--with-tree=&lt;tree-ish&gt;]
-		[--full-name] [--abbrev] [--] [&lt;file&gt;&#8230;&#8203;]</pre>
+		[--full-name] [--recurse-submodules]
+		[--abbrev] [--] [&lt;file&gt;&#8230;&#8203;]</pre>
 </div>
 </div>
 </div>
@@ -493,7 +495,7 @@ pattern.</p>
 <dt class="hdlist1">-s</dt>
 <dt class="hdlist1">--stage</dt>
 <dd>
-<p>Show staged contents' object name, mode bits and stage number in the output.</p>
+<p>Show staged contents' mode bits, object name and stage number in the output.</p>
 </dd>
 <dt class="hdlist1">--directory</dt>
 <dd>
@@ -518,7 +520,8 @@ succeed.</p>
 </dd>
 <dt class="hdlist1">-z</dt>
 <dd>
-<p>\0 line termination on output.</p>
+<p>\0 line termination on output and do not quote filenames.
+See OUTPUT below for more information.</p>
 </dd>
 <dt class="hdlist1">-x &lt;pattern&gt;</dt>
 <dt class="hdlist1">--exclude=&lt;pattern&gt;</dt>
@@ -609,6 +612,11 @@ outputs paths relative to the current directory.  This
 option forces paths to be output relative to the project
 top directory.</p>
 </dd>
+<dt class="hdlist1">--recurse-submodules</dt>
+<dd>
+<p>Recursively calls ls-files on each submodule in the repository.
+Currently there is only support for the --cached mode.</p>
+</dd>
 <dt class="hdlist1">--abbrev[=&lt;n&gt;]</dt>
 <dd>
 <p>Instead of showing the full 40-byte hexadecimal object
@@ -635,8 +643,7 @@ not accessible in the working tree.</p>
 <div class="paragraph">
 <p>&lt;eolattr&gt; is the attribute that is used when checking out or committing,
 it is either "", "-text", "text", "text=auto", "text eol=lf", "text eol=crlf".
-Note: Currently Git does not support "text=auto eol=lf" or "text=auto eol=crlf",
-that may change in the future.</p>
+Since Git 2.10 "text=auto eol=lf" and "text=auto eol=crlf" are supported.</p>
 </div>
 <div class="paragraph">
 <p>Both the &lt;eolinfo&gt; in the index ("i/&lt;eolinfo&gt;")
@@ -661,7 +668,7 @@ specified criteria are shown.</p>
 <h2 id="_output">Output</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p><em>git ls-files</em> just outputs the filenames unless <em>--stage</em> is specified in
+<p><em>git ls-files</em> just outputs the filenames unless <code>--stage</code> is specified in
 which case it outputs:</p>
 </div>
 <div class="literalblock">
@@ -685,9 +692,10 @@ the user (or the porcelain) to see what should eventually be recorded at the
 path. (see <a href="git-read-tree.html">git-read-tree</a>(1) for more information on state)</p>
 </div>
 <div class="paragraph">
-<p>When <code>-z</code> option is not used, TAB, LF, and backslash characters
-in pathnames are represented as <code>\t</code>, <code>\n</code>, and <code>\\</code>,
-respectively.</p>
+<p>Without the <code>-z</code> option, pathnames with "unusual" characters are
+quoted as explained for the configuration variable <code>core.quotePath</code>
+(see <a href="git-config.html">git-config</a>(1)).  Using <code>-z</code> the filename is output
+verbatim and the line is terminated by a NUL byte.</p>
 </div>
 </div>
 </div>
@@ -752,7 +760,7 @@ pattern file appears in.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-06-14 11:04:07 W. Europe Daylight Time
+Last updated 2017-10-12 21:18:05 Coordinated Universal Time
 </div>
 </div>
 </body>

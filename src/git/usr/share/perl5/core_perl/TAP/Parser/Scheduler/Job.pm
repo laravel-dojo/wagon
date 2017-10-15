@@ -10,11 +10,11 @@ TAP::Parser::Scheduler::Job - A single testing job.
 
 =head1 VERSION
 
-Version 3.35
+Version 3.36
 
 =cut
 
-our $VERSION = '3.35';
+our $VERSION = '3.36_01';
 
 =head1 SYNOPSIS
 
@@ -69,7 +69,7 @@ sub on_finish {
    $self->finish;
 
 Called when a job is complete to unlock it. If a callback has been registered
-with C<on_finish>, it calls it. Otherwise, it does nothing. 
+with C<on_finish>, it calls it. Otherwise, it does nothing.
 
 =cut
 

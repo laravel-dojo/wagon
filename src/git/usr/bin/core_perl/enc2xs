@@ -7,13 +7,14 @@ BEGIN {
     # with $ENV{PERL_CORE} set
     # In case we need it in future...
     require Config; import Config;
+    pop @INC if $INC[-1] eq '.';
 }
 use strict;
 use warnings;
 use Getopt::Std;
 use Config;
 my @orig_ARGV = @ARGV;
-our $VERSION  = do { my @r = (q$Revision: 2.17 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r };
+our $VERSION  = do { my @r = (q$Revision: 2.18 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r };
 
 # These may get re-ordered.
 # RAW is a do_now as inserted by &enter
@@ -149,6 +150,52 @@ sub verbosef {
     printf STDERR @_ if $opt{v};
 }
 
+
+# ($cpp, $static, $sized) = compiler_info($declaration)
+#
+# return some information about the compiler and compile options we're using:
+#
+#   $declaration - true if we're doing a declaration rather than a definition.
+#
+#   $cpp    - we're using C++
+#   $static - ok to declare the arrays as static
+#   $sized  - the array declarations should be sized
+
+sub compiler_info {
+    my ($declaration) = @_;
+
+    my $ccflags = $Config{ccflags};
+    if (defined $Config{ccwarnflags}) {
+        $ccflags .= " " . $Config{ccwarnflags};
+    }
+    my $compat   = $ccflags =~ /\Q-Wc++-compat/;
+    my $pedantic = $ccflags =~ /-pedantic/;
+
+    my $cpp      = ($Config{d_cplusplus} || '') eq 'define';
+
+    # The encpage_t tables contain recursive and mutually recursive
+    # references. To allow them to compile under C++ and some restrictive
+    # cc options, it may be necessary to make the tables non-static/const
+    # (thus moving them from the text to the data segment) and/or not
+    # include the size in the declaration.
+
+    my $static = !(
+                        $cpp
+                     || ($compat && $pedantic)
+                     || ($^O eq 'MacOS' && $declaration)
+                  );
+
+    # -Wc++-compat on its own warns if the array declaration is sized.
+    # The easiest way to avoid this warning is simply not to include
+    # the size in the declaration.
+    # With -pedantic as well, the issue doesn't arise because $static
+    # above becomes false.
+    my $sized  = $declaration && !($compat && !$pedantic);
+
+    return ($cpp, $static, $sized);
+}
+
+
 # This really should go first, else the die here causes empty (non-erroneous)
 # output files to be written.
 my @encfiles;
@@ -282,7 +329,7 @@ if ($doC)
 
     # push(@{$encoding{$name}},outstring(\*C,$e2u->{Cname}.'_def',$erep));
    }
-  my $cpp = ($Config{d_cplusplus} || '') eq 'define';
+  my ($cpp) = compiler_info(0);
   my $ext  = $cpp ? 'extern "C"' : "extern";
   my $exta = $cpp ? 'extern "C"' : "static";
   my $extb = $cpp ? 'extern "C"' : "";
@@ -291,7 +338,7 @@ if ($doC)
     # my ($e2u,$u2e,$rep,$min_el,$max_el,$rsym) = @{$encoding{$enc}};
     my ($e2u,$u2e,$rep,$min_el,$max_el) = @{$encoding{$enc}};
     #my @info = ($e2u->{Cname},$u2e->{Cname},$rsym,length($rep),$min_el,$max_el);
-    my $replen = 0; 
+    my $replen = 0;
     $replen++ while($rep =~ /\G\\x[0-9A-Fa-f]/g);
     my $sym = "${enc}_encoding";
     $sym =~ s/\W+/_/g;
@@ -422,7 +469,7 @@ sub compile_ucm
    #$attr{'subchar'} =~ /^\s*/cg;
    #push(@byte,$1) while $attr{'subchar'} =~ /\G\\x([0-9a-f]+)/icg;
    #$erep = join('',map(chr(hex($_)),@byte));
-   $erep = $attr{'subchar'}; 
+   $erep = $attr{'subchar'};
    $erep =~ s/^\s+//; $erep =~ s/\s+$//;
   }
  print "Reading $name ($cs)\n";
@@ -525,7 +572,7 @@ sub compile_enc
      die "$.:${line}Line should be exactly 65 characters long including
      newline (".length($line).")" unless length ($line) == 65;
      # Split line into groups of 4 hex digits, convert groups to ints
-     # This takes 65.35		
+     # This takes 65.35
      # map {hex $_} $line =~ /(....)/g
      # This takes 63.75 (2.5% less time)
      # unpack "n*", pack "H*", $line
@@ -710,15 +757,10 @@ sub addstrings
   }
  if ($a->{'Forward'})
   {
-   my $cpp = ($Config{d_cplusplus} || '') eq 'define';
-   my $var = $^O eq 'MacOS' || $cpp ? 'extern' : 'static';
-   my $const = $cpp ? '' : 'const';
-   my $ccflags = $Config{ccflags};
-   if (defined $Config{ccwarnflags}) {
-       $ccflags .= " " . $Config{ccwarnflags};
-   }
-   my $count = $ccflags =~ /-Wc\+\+-compat/ ? '' : scalar(@{$a->{'Entries'}});
-   print $fh "$var $const encpage_t $name\[$count];\n";
+   my ($cpp, $static, $sized) = compiler_info(1);
+   my $var   = $static ? 'static const' : 'extern';
+   my $count = $sized ? scalar(@{$a->{'Entries'}}) : '';
+   print $fh "$var encpage_t $name\[$count];\n";
   }
  $a->{'DoneStrings'} = 1;
  foreach my $b (@{$a->{'Entries'}})
@@ -781,7 +823,7 @@ sub outbigstring
   }
 
   $strings = length $string_acc;
-  my $cpp = ($Config{d_cplusplus} || '') eq 'define';
+  my ($cpp) = compiler_info(0);
   my $var = $cpp ? '' : 'static';
   my $definition = "\n$var const U8 $name\[$strings] = { " .
     join(',',unpack "C*",$string_acc);
@@ -808,10 +850,9 @@ sub outtable
    my ($s,$e,$out,$t,$end,$l) = @$b;
    outtable($fh,$t,$bigname) unless $t->{'Done'};
   }
- my $cpp = ($Config{d_cplusplus} || '') eq 'define';
- my $var = $cpp ? '' : 'static';
- my $const = $cpp ? '' : 'const';
- print $fh "\n$var $const encpage_t $name\[",
+ my ($cpp, $static) = compiler_info(0);
+ my $var = $static ? 'static const ' : '';
+ print $fh "\n${var}encpage_t $name\[",
    scalar(@{$a->{'Entries'}}), "] = {\n";
  foreach my $b (@{$a->{'Entries'}})
   {
@@ -938,7 +979,7 @@ use vars qw(
     $_Enc2xs
     $_Version
     $_Inc
-    $_E2X 
+    $_E2X
     $_Name
     $_TableFiles
     $_Now
@@ -1065,13 +1106,13 @@ sub _print_expand{
     open my $in, $src or die "$src : $!";
     if ((my $d = dirname($dst)) ne '.'){
     -d $d or mkdir $d, 0755 or die  "mkdir $d : $!";
-    }	   
+    }
     open my $out, ">$dst" or die "$!";
     my $asis = 0;
-    while (<$in>){ 
+    while (<$in>){
     if (/^#### END_OF_HEADER/){
         $asis = 1; next;
-    }	  
+    }
     s/(\$_[A-Z][A-Za-z0-9]+)_/$1/gee unless $asis;
     print $out $_;
     }
@@ -1276,7 +1317,7 @@ values is as follows:
 
 =over 4
 
-=item |0 
+=item |0
 
 Round trip safe.  A character decoded to Unicode encodes back to the
 same byte sequence.  Most characters have this flag.
@@ -1286,11 +1327,11 @@ same byte sequence.  Most characters have this flag.
 Fallback for unicode -> encoding.  When seen, enc2xs adds this
 character for the encode map only.
 
-=item |2 
+=item |2
 
 Skip sub-char mapping should there be no code point.
 
-=item |3 
+=item |3
 
 Fallback for encoding -> unicode.  When seen, enc2xs adds this
 character for the decode map only.
@@ -1325,15 +1366,15 @@ how to make sure:
 
 =over 4
 
-=item * 
+=item *
 
 Sort your map in Unicode order.
 
 =item *
 
 When you have a duplicate entry, mark either one with '|1' or '|3'.
-  
-=item * 
+
+=item *
 
 And make sure the '|1' or '|3' entry FOLLOWS the '|0' entry.
 
@@ -1351,7 +1392,7 @@ this;
   --------------------------------------
   \xF9\xF9 => U2550    U2550 => \xF9\xF9
   \xA2\xA4 => U2550
- 
+
 So it is round-trip safe for \xF9\xF9.  But if the line above is upside
 down, here is what happens.
 
@@ -1373,7 +1414,7 @@ Encode/bin directory.
 
 =item *
 
-ICU Home Page 
+ICU Home Page
 L<http://www.icu-project.org/>
 
 =item *

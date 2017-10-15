@@ -2,21 +2,21 @@ require 5;
 package Pod::Simple::Debug;
 use strict;
 use vars qw($VERSION );
-$VERSION = '3.29';
+$VERSION = '3.32';
 
 sub import {
   my($value,$variable);
-  
+
   if(@_ == 2) {
     $value = $_[1];
   } elsif(@_ == 3) {
     ($variable, $value) = @_[1,2];
-    
+
     ($variable, $value) = ($value, $variable)
        if     defined $value    and ref($value)    eq 'SCALAR'
       and not(defined $variable and ref($variable) eq 'SCALAR')
     ; # tolerate getting it backwards
-    
+
     unless( defined $variable and ref($variable) eq 'SCALAR') {
       require Carp;
       Carp::croak("Usage:\n use Pod::Simple::Debug (NUMVAL)\nor"
@@ -33,7 +33,7 @@ sub import {
     Carp::croak("It's too late to call Pod::Simple::Debug -- "
               . "Pod::Simple has already loaded\nAborting");
   }
-  
+
   $value = 0 unless defined $value;
 
   unless($value =~ m/^-?\d+$/) {
@@ -47,12 +47,12 @@ sub import {
     # make a not-really-constant
     *Pod::Simple::DEBUG = sub () { $$variable } ;
     $$variable = $value;
-    print "# Starting Pod::Simple::DEBUG = non-constant $variable with val $value\n";
+    print STDERR "# Starting Pod::Simple::DEBUG = non-constant $variable with val $value\n";
   } else {
     *Pod::Simple::DEBUG = eval " sub () { $value } ";
-    print "# Starting Pod::Simple::DEBUG = $value\n";
+    print STDERR "# Starting Pod::Simple::DEBUG = $value\n";
   }
-  
+
   require Pod::Simple;
   return;
 }
@@ -140,8 +140,8 @@ pod-people@perl.org mail list. Send an empty email to
 pod-people-subscribe@perl.org to subscribe.
 
 This module is managed in an open GitHub repository,
-L<https://github.com/theory/pod-simple/>. Feel free to fork and contribute, or
-to clone L<git://github.com/theory/pod-simple.git> and send patches!
+L<https://github.com/perl-pod/pod-simple/>. Feel free to fork and contribute, or
+to clone L<git://github.com/perl-pod/pod-simple.git> and send patches!
 
 Patches against Pod::Simple are welcome. Please send bug reports to
 <bug-pod-simple@rt.cpan.org>.

@@ -1,6 +1,6 @@
 package English;
 
-our $VERSION = '1.09';
+our $VERSION = '1.10';
 
 require Exporter;
 @ISA = qw(Exporter);
@@ -22,12 +22,12 @@ English - use nice English (or awk) names for ugly punctuation variables
 
 This module provides aliases for the built-in variables whose
 names no one seems to like to read.  Variables with side-effects
-which get triggered just by accessing them (like $0) will still 
+which get triggered just by accessing them (like $0) will still
 be affected.
 
 For those variables that have an B<awk> version, both long
-and short English alternatives are provided.  For example, 
-the C<$/> variable can be referred to either $RS or 
+and short English alternatives are provided.  For example,
+the C<$/> variable can be referred to either $RS or
 $INPUT_RECORD_SEPARATOR if you are using the English module.
 
 See L<perlvar> for a complete list of these.
@@ -182,7 +182,7 @@ sub import {
 
 	*FORMAT_PAGE_NUMBER			= *%	;
 	*FORMAT_LINES_PER_PAGE			= *=	;
-	*FORMAT_LINES_LEFT			= *-	;
+	*FORMAT_LINES_LEFT			= *-{SCALAR}	;
 	*FORMAT_NAME				= *~	;
 	*FORMAT_TOP_NAME			= *^	;
 	*FORMAT_LINE_BREAK_CHARACTERS		= *:	;

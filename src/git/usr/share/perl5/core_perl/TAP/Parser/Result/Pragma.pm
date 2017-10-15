@@ -11,11 +11,11 @@ TAP::Parser::Result::Pragma - TAP pragma token.
 
 =head1 VERSION
 
-Version 3.35
+Version 3.36
 
 =cut
 
-our $VERSION = '3.35';
+our $VERSION = '3.36_01';
 
 =head1 DESCRIPTION
 
@@ -46,7 +46,7 @@ They keep me awake at night.
 
 =head2 Instance Methods
 
-=head3 C<pragmas> 
+=head3 C<pragmas>
 
 if ( $result->is_pragma ) {
     @pragmas = $result->pragmas;

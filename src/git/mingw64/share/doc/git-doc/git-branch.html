@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 1.5.4">
+<meta name="generator" content="Asciidoctor 1.5.5">
 <title>git-branch(1)</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
@@ -17,7 +17,6 @@ audio:not([controls]){display:none;height:0}
 [hidden],template{display:none}
 script{display:none!important}
 html{font-family:sans-serif;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%}
-body{margin:0}
 a{background:transparent}
 a:focus{outline:thin dotted}
 a:active,a:hover{outline:0}
@@ -52,7 +51,7 @@ textarea{overflow:auto;vertical-align:top}
 table{border-collapse:collapse;border-spacing:0}
 *,*:before,*:after{-moz-box-sizing:border-box;-webkit-box-sizing:border-box;box-sizing:border-box}
 html,body{font-size:100%}
-body{background:#fff;color:rgba(0,0,0,.8);padding:0;margin:0;font-family:"Noto Serif","DejaVu Serif",serif;font-weight:400;font-style:normal;line-height:1;position:relative;cursor:auto}
+body{background:#fff;color:rgba(0,0,0,.8);padding:0;margin:0;font-family:"Noto Serif","DejaVu Serif",serif;font-weight:400;font-style:normal;line-height:1;position:relative;cursor:auto;tab-size:4;-moz-osx-font-smoothing:grayscale;-webkit-font-smoothing:antialiased}
 a:hover{cursor:pointer}
 img,object,embed{max-width:100%;height:auto}
 object,embed{height:100%}
@@ -64,7 +63,6 @@ img{-ms-interpolation-mode:bicubic}
 .text-center{text-align:center!important}
 .text-justify{text-align:justify!important}
 .hide{display:none}
-body{-webkit-font-smoothing:antialiased}
 img,object,svg{display:inline-block;vertical-align:middle}
 textarea{height:auto;min-height:50px}
 select{width:100%}
@@ -119,13 +117,16 @@ table thead tr th,table thead tr td,table tfoot tr th,table tfoot tr td{padding:
 table tr th,table tr td{padding:.5625em .625em;font-size:inherit;color:rgba(0,0,0,.8)}
 table tr.even,table tr.alt,table tr:nth-of-type(even){background:#f8f8f7}
 table thead tr th,table tfoot tr th,table tbody tr td,table tr td,table tfoot tr td{display:table-cell;line-height:1.6}
-body{tab-size:4}
 h1,h2,h3,#toctitle,.sidebarblock>.content>.title,h4,h5,h6{line-height:1.2;word-spacing:-.05em}
 h1 strong,h2 strong,h3 strong,#toctitle strong,.sidebarblock>.content>.title strong,h4 strong,h5 strong,h6 strong{font-weight:400}
 .clearfix:before,.clearfix:after,.float-group:before,.float-group:after{content:" ";display:table}
 .clearfix:after,.float-group:after{clear:both}
-*:not(pre)>code{font-size:.9375em;font-style:normal!important;letter-spacing:0;padding:.1em .5ex;word-spacing:-.15em;background-color:#f7f7f8;-webkit-border-radius:4px;border-radius:4px;line-height:1.45;text-rendering:optimizeSpeed}
+*:not(pre)>code{font-size:.9375em;font-style:normal!important;letter-spacing:0;padding:.1em .5ex;word-spacing:-.15em;background-color:#f7f7f8;-webkit-border-radius:4px;border-radius:4px;line-height:1.45;text-rendering:optimizeSpeed;word-wrap:break-word}
+*:not(pre)>code.nobreak{word-wrap:normal}
+*:not(pre)>code.nowrap{white-space:nowrap}
 pre,pre>code{line-height:1.45;color:rgba(0,0,0,.9);font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;font-weight:400;text-rendering:optimizeSpeed}
+em em{font-style:normal}
+strong strong{font-weight:400}
 .keyseq{color:rgba(51,51,51,.8)}
 kbd{font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;display:inline-block;color:rgba(0,0,0,.8);font-size:.65em;line-height:1.45;background-color:#f7f7f7;border:1px solid #ccc;-webkit-border-radius:3px;border-radius:3px;-webkit-box-shadow:0 1px 0 rgba(0,0,0,.2),0 0 0 .1em white inset;box-shadow:0 1px 0 rgba(0,0,0,.2),0 0 0 .1em #fff inset;margin:0 .15em;padding:.2em .5em;vertical-align:middle;position:relative;top:-.1em;white-space:nowrap}
 .keyseq kbd:first-child{margin-left:0}
@@ -432,9 +433,10 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="verseblock">
 <pre class="content"><em>git branch</em> [--color[=&lt;when&gt;] | --no-color] [-r | -a]
 	[--list] [-v [--abbrev=&lt;length&gt; | --no-abbrev]]
-	[--column[=&lt;options&gt;] | --no-column]
-	[(--merged | --no-merged | --contains) [&lt;commit&gt;]] [--sort=&lt;key&gt;]
-	[--points-at &lt;object&gt;] [&lt;pattern&gt;&#8230;&#8203;]
+	[--column[=&lt;options&gt;] | --no-column] [--sort=&lt;key&gt;]
+	[(--merged | --no-merged) [&lt;commit&gt;]]
+	[--contains [&lt;commit]] [--no-contains [&lt;commit&gt;]]
+	[--points-at &lt;object&gt;] [--format=&lt;format&gt;] [&lt;pattern&gt;&#8230;&#8203;]
 <em>git branch</em> [--set-upstream | --track | --no-track] [-l] [-f] &lt;branchname&gt; [&lt;start-point&gt;]
 <em>git branch</em> (--set-upstream-to=&lt;upstream&gt; | -u &lt;upstream&gt;) [&lt;branchname&gt;]
 <em>git branch</em> --unset-upstream [&lt;branchname&gt;]
@@ -461,15 +463,16 @@ as branch creation.</p>
 <div class="paragraph">
 <p>With <code>--contains</code>, shows only the branches that contain the named commit
 (in other words, the branches whose tip commits are descendants of the
-named commit).  With <code>--merged</code>, only branches merged into the named
-commit (i.e. the branches whose tip commits are reachable from the named
-commit) will be listed.  With <code>--no-merged</code> only branches not merged into
-the named commit will be listed.  If the &lt;commit&gt; argument is missing it
-defaults to <em>HEAD</em> (i.e. the tip of the current branch).</p>
+named commit), <code>--no-contains</code> inverts it. With <code>--merged</code>, only branches
+merged into the named commit (i.e. the branches whose tip commits are
+reachable from the named commit) will be listed.  With <code>--no-merged</code> only
+branches not merged into the named commit will be listed.  If the &lt;commit&gt;
+argument is missing it defaults to <code>HEAD</code> (i.e. the tip of the current
+branch).</p>
 </div>
 <div class="paragraph">
 <p>The command&#8217;s second form creates a new branch head named &lt;branchname&gt;
-which points to the current <em>HEAD</em>, or &lt;start-point&gt; if given.</p>
+which points to the current <code>HEAD</code>, or &lt;start-point&gt; if given.</p>
 </div>
 <div class="paragraph">
 <p>Note that this will create the new branch, but it will not switch the
@@ -529,7 +532,10 @@ upstream branch, or in <code>HEAD</code> if no upstream was set with
 all changes made to the branch ref, enabling use of date
 based sha1 expressions such as "&lt;branchname&gt;@{yesterday}".
 Note that in non-bare repositories, reflogs are usually
-enabled by default by the <code>core.logallrefupdates</code> config option.</p>
+enabled by default by the <code>core.logallrefupdates</code> config option.
+The negated form <code>--no-create-reflog</code> only overrides an earlier
+<code>--create-reflog</code>, but currently does not negate the setting of
+<code>core.logallrefupdates</code>.</p>
 </dd>
 <dt class="hdlist1">-f</dt>
 <dt class="hdlist1">--force</dt>
@@ -562,6 +568,11 @@ The value must be always (the default), never, or auto.</p>
 default to color output.
 Same as <code>--color=never</code>.</p>
 </dd>
+<dt class="hdlist1">-i</dt>
+<dt class="hdlist1">--ignore-case</dt>
+<dd>
+<p>Sorting and filtering branches are case insensitive.</p>
+</dd>
 <dt class="hdlist1">--column[=&lt;options&gt;]</dt>
 <dt class="hdlist1">--no-column</dt>
 <dd>
@@ -584,8 +595,14 @@ without options are equivalent to <em>always</em> and <em>never</em> respectivel
 </dd>
 <dt class="hdlist1">--list</dt>
 <dd>
-<p>Activate the list mode. <code>git branch &lt;pattern&gt;</code> would try to create a branch,
-use <code>git branch --list &lt;pattern&gt;</code> to list matching branches.</p>
+<p>List branches.  With optional <code>&lt;pattern&gt;...</code>, e.g. <code>git
+branch --list 'maint-*'</code>, list only the branches that match
+the pattern(s).</p>
+<div class="paragraph">
+<p>This should not be confused with <code>git branch -l &lt;branchname&gt;</code>,
+which creates a branch named <code>&lt;branchname&gt;</code> with a reflog.
+See <code>--create-reflog</code> above for details.</p>
+</div>
 </dd>
 <dt class="hdlist1">-v</dt>
 <dt class="hdlist1">-vv</dt>
@@ -626,7 +643,7 @@ upstream when the new branch is checked out.</p>
 <div class="paragraph">
 <p>This behavior is the default when the start point is a remote-tracking branch.
 Set the branch.autoSetupMerge configuration variable to <code>false</code> if you
-want <code>git checkout</code> and <code>git branch</code> to always behave as if <em>--no-track</em>
+want <code>git checkout</code> and <code>git branch</code> to always behave as if <code>--no-track</code>
 were given. Set it to <code>always</code> if you want this behavior when the
 start-point is either a local or remote-tracking branch.</p>
 </div>
@@ -667,15 +684,22 @@ may be used.</p>
 <p>Only list branches which contain the specified commit (HEAD
 if not specified). Implies <code>--list</code>.</p>
 </dd>
+<dt class="hdlist1">--no-contains [&lt;commit&gt;]</dt>
+<dd>
+<p>Only list branches which don&#8217;t contain the specified commit
+(HEAD if not specified). Implies <code>--list</code>.</p>
+</dd>
 <dt class="hdlist1">--merged [&lt;commit&gt;]</dt>
 <dd>
 <p>Only list branches whose tips are reachable from the
-specified commit (HEAD if not specified). Implies <code>--list</code>.</p>
+specified commit (HEAD if not specified). Implies <code>--list</code>,
+incompatible with <code>--no-merged</code>.</p>
 </dd>
 <dt class="hdlist1">--no-merged [&lt;commit&gt;]</dt>
 <dd>
 <p>Only list branches whose tips are not reachable from the
-specified commit (HEAD if not specified). Implies <code>--list</code>.</p>
+specified commit (HEAD if not specified). Implies <code>--list</code>,
+incompatible with <code>--merged</code>.</p>
 </dd>
 <dt class="hdlist1">&lt;branchname&gt;</dt>
 <dd>
@@ -713,6 +737,12 @@ finally remote-tracking branches.</p>
 <dt class="hdlist1">--points-at &lt;object&gt;</dt>
 <dd>
 <p>Only list branches of the given object.</p>
+</dd>
+<dt class="hdlist1">--format &lt;format&gt;</dt>
+<dd>
+<p>A string that interpolates <code>%(fieldname)</code> from a branch ref being shown
+and the object it points at.  The format is the same as
+that of <a href="git-for-each-ref.html">git-for-each-ref</a>(1).</p>
 </dd>
 </dl>
 </div>
@@ -779,8 +809,8 @@ easier to use the git checkout command with its <code>-b</code> option to create
 a branch and check it out with a single command.</p>
 </div>
 <div class="paragraph">
-<p>The options <code>--contains</code>, <code>--merged</code> and <code>--no-merged</code> serve three related
-but different purposes:</p>
+<p>The options <code>--contains</code>, <code>--no-contains</code>, <code>--merged</code> and <code>--no-merged</code>
+serve four related but different purposes:</p>
 </div>
 <div class="ulist">
 <ul>
@@ -788,6 +818,10 @@ but different purposes:</p>
 <p><code>--contains &lt;commit&gt;</code> is used to find all branches which will need
 special attention if &lt;commit&gt; were to be rebased or amended, since those
 branches contain the specified &lt;commit&gt;.</p>
+</li>
+<li>
+<p><code>--no-contains &lt;commit&gt;</code> is the inverse of that, i.e. branches that don&#8217;t
+contain the specified &lt;commit&gt;.</p>
 </li>
 <li>
 <p><code>--merged</code> is used to find all branches which can be safely deleted,
@@ -824,7 +858,7 @@ a branch?&#8221;</a> in the Git User&#8217;s Manual.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-06-14 11:04:07 W. Europe Daylight Time
+Last updated 2017-10-12 21:18:05 Coordinated Universal Time
 </div>
 </div>
 </body>

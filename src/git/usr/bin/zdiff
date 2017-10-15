@@ -24,7 +24,7 @@ case $1 in
   *)    prog=diff; cmp='${DIFF-diff}';;
 esac
 
-version="z$prog (gzip) 1.7
+version="z$prog (gzip) 1.8
 Copyright (C) 2009, 2011-2016 Free Software Foundation, Inc.
 This is free software.  You may redistribute copies of it under the terms of
 the GNU General Public License <http://www.gnu.org/licenses/gpl.html>.

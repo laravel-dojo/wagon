@@ -12,7 +12,7 @@ use warnings;
 
 # mro.pm versions < 1.00 reserved for MRO::Compat
 #  for partial back-compat to 5.[68].x
-our $VERSION = '1.17';
+our $VERSION = '1.18';
 
 sub import {
     mro::set_mro(scalar(caller), $_[1]) if $_[1];
@@ -276,7 +276,7 @@ The problem exists because the anonymous subroutine being assigned to the
 C<*Foo::foo> glob will show up in the call stack as being called
 C<__ANON__> and not C<foo> as you might expect. Since C<next::method> uses
 C<caller> to find the name of the method it was called in, it will fail in
-this case. 
+this case.
 
 But fear not, there's a simple solution. The module C<Sub::Name> will
 reach into the perl internals and assign a name to an anonymous subroutine

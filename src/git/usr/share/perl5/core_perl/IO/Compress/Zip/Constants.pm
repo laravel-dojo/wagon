@@ -7,7 +7,7 @@ require Exporter;
 
 our ($VERSION, @ISA, @EXPORT, %ZIP_CM_MIN_VERSIONS);
 
-$VERSION = '2.068';
+$VERSION = '2.069_001';
 
 @ISA = qw(Exporter);
 
@@ -18,7 +18,7 @@ $VERSION = '2.068';
     ZIP_CM_BZIP2
     ZIP_CM_LZMA
     ZIP_CM_PPMD
-    
+
     ZIP_LOCAL_HDR_SIG
     ZIP_DATA_HDR_SIG
     ZIP_CENTRAL_HDR_SIG
@@ -40,7 +40,7 @@ $VERSION = '2.068';
     ZIP_EXTRA_ID_INFO_ZIP_UNIX2
     ZIP_EXTRA_ID_INFO_ZIP_UNIXN
     ZIP_EXTRA_ID_INFO_ZIP_Upath
-    ZIP_EXTRA_ID_INFO_ZIP_Ucom        
+    ZIP_EXTRA_ID_INFO_ZIP_Ucom
     ZIP_EXTRA_ID_JAVA_EXE
 
     ZIP_OS_CODE_UNIX
@@ -55,7 +55,7 @@ $VERSION = '2.068';
     ZIP_A_HIDDEN
     ZIP_A_SYSTEM
     ZIP_A_LABEL
-    ZIP_A_DIR 
+    ZIP_A_DIR
     ZIP_A_ARCHIVE
     );
 

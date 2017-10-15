@@ -2,7 +2,7 @@ package Encode::Alias;
 use strict;
 use warnings;
 no warnings 'redefine';
-our $VERSION = do { my @r = ( q$Revision: 2.19 $ =~ /\d+/g ); sprintf "%d." . "%02d" x $#r, @r };
+our $VERSION = do { my @r = ( q$Revision: 2.20 $ =~ /\d+/g ); sprintf "%d." . "%02d" x $#r, @r };
 use constant DEBUG => !!$ENV{PERL_ENCODE_DEBUG};
 
 use Exporter 'import';
@@ -139,7 +139,7 @@ sub init_aliases {
     define_alias( qr/^UCS-?2-?LE$/i => '"UCS-2LE"' );
     define_alias(
         qr/^UCS-?2-?(BE)?$/i    => '"UCS-2BE"',
-        qr/^UCS-?4-?(BE|LE)?$/i => 'uc("UTF-32$1")',
+        qr/^UCS-?4-?(BE|LE|)?$/i => 'uc("UTF-32$1")',
         qr/^iso-10646-1$/i      => '"UCS-2BE"'
     );
     define_alias(
@@ -298,7 +298,7 @@ Encode::Alias - alias definitions to encodings
 =head1 DESCRIPTION
 
 Allows newName to be used as an alias for ENCODING. ENCODING may be
-either the name of an encoding or an encoding object (as described 
+either the name of an encoding or an encoding object (as described
 in L<Encode>).
 
 Currently the first argument to define_alias() can be specified in the
@@ -340,7 +340,7 @@ As of Encode 1.87, the older form
 
   define_alias( sub { return  /^iso8859-(\d+)$/i ? "iso-8859-$1" : undef } );
 
-no longer works. 
+no longer works.
 
 Encode up to 1.86 internally used "local $_" to implement this older
 form.  But consider the code below;

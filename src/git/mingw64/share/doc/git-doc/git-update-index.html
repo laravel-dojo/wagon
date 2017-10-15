@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 1.5.4">
+<meta name="generator" content="Asciidoctor 1.5.5">
 <title>git-update-index(1)</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
@@ -17,7 +17,6 @@ audio:not([controls]){display:none;height:0}
 [hidden],template{display:none}
 script{display:none!important}
 html{font-family:sans-serif;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%}
-body{margin:0}
 a{background:transparent}
 a:focus{outline:thin dotted}
 a:active,a:hover{outline:0}
@@ -52,7 +51,7 @@ textarea{overflow:auto;vertical-align:top}
 table{border-collapse:collapse;border-spacing:0}
 *,*:before,*:after{-moz-box-sizing:border-box;-webkit-box-sizing:border-box;box-sizing:border-box}
 html,body{font-size:100%}
-body{background:#fff;color:rgba(0,0,0,.8);padding:0;margin:0;font-family:"Noto Serif","DejaVu Serif",serif;font-weight:400;font-style:normal;line-height:1;position:relative;cursor:auto}
+body{background:#fff;color:rgba(0,0,0,.8);padding:0;margin:0;font-family:"Noto Serif","DejaVu Serif",serif;font-weight:400;font-style:normal;line-height:1;position:relative;cursor:auto;tab-size:4;-moz-osx-font-smoothing:grayscale;-webkit-font-smoothing:antialiased}
 a:hover{cursor:pointer}
 img,object,embed{max-width:100%;height:auto}
 object,embed{height:100%}
@@ -64,7 +63,6 @@ img{-ms-interpolation-mode:bicubic}
 .text-center{text-align:center!important}
 .text-justify{text-align:justify!important}
 .hide{display:none}
-body{-webkit-font-smoothing:antialiased}
 img,object,svg{display:inline-block;vertical-align:middle}
 textarea{height:auto;min-height:50px}
 select{width:100%}
@@ -119,13 +117,16 @@ table thead tr th,table thead tr td,table tfoot tr th,table tfoot tr td{padding:
 table tr th,table tr td{padding:.5625em .625em;font-size:inherit;color:rgba(0,0,0,.8)}
 table tr.even,table tr.alt,table tr:nth-of-type(even){background:#f8f8f7}
 table thead tr th,table tfoot tr th,table tbody tr td,table tr td,table tfoot tr td{display:table-cell;line-height:1.6}
-body{tab-size:4}
 h1,h2,h3,#toctitle,.sidebarblock>.content>.title,h4,h5,h6{line-height:1.2;word-spacing:-.05em}
 h1 strong,h2 strong,h3 strong,#toctitle strong,.sidebarblock>.content>.title strong,h4 strong,h5 strong,h6 strong{font-weight:400}
 .clearfix:before,.clearfix:after,.float-group:before,.float-group:after{content:" ";display:table}
 .clearfix:after,.float-group:after{clear:both}
-*:not(pre)>code{font-size:.9375em;font-style:normal!important;letter-spacing:0;padding:.1em .5ex;word-spacing:-.15em;background-color:#f7f7f8;-webkit-border-radius:4px;border-radius:4px;line-height:1.45;text-rendering:optimizeSpeed}
+*:not(pre)>code{font-size:.9375em;font-style:normal!important;letter-spacing:0;padding:.1em .5ex;word-spacing:-.15em;background-color:#f7f7f8;-webkit-border-radius:4px;border-radius:4px;line-height:1.45;text-rendering:optimizeSpeed;word-wrap:break-word}
+*:not(pre)>code.nobreak{word-wrap:normal}
+*:not(pre)>code.nowrap{white-space:nowrap}
 pre,pre>code{line-height:1.45;color:rgba(0,0,0,.9);font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;font-weight:400;text-rendering:optimizeSpeed}
+em em{font-style:normal}
+strong strong{font-weight:400}
 .keyseq{color:rgba(51,51,51,.8)}
 kbd{font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;display:inline-block;color:rgba(0,0,0,.8);font-size:.65em;line-height:1.45;background-color:#f7f7f7;border:1px solid #ccc;-webkit-border-radius:3px;border-radius:3px;-webkit-box-shadow:0 1px 0 rgba(0,0,0,.2),0 0 0 .1em white inset;box-shadow:0 1px 0 rgba(0,0,0,.2),0 0 0 .1em #fff inset;margin:0 .15em;padding:.2em .5em;vertical-align:middle;position:relative;top:-.1em;white-space:nowrap}
 .keyseq kbd:first-child{margin-left:0}
@@ -547,7 +548,7 @@ you will need to handle the situation manually.</p>
 </dd>
 <dt class="hdlist1">--really-refresh</dt>
 <dd>
-<p>Like <em>--refresh</em>, but checks stat information unconditionally,
+<p>Like <code>--refresh</code>, but checks stat information unconditionally,
 without regard to the "assume unchanged" setting.</p>
 </dd>
 <dt class="hdlist1">--[no-]skip-worktree</dt>
@@ -620,14 +621,17 @@ separated with NUL character instead of LF.</p>
 <dt class="hdlist1">--split-index</dt>
 <dt class="hdlist1">--no-split-index</dt>
 <dd>
-<p>Enable or disable split index mode. If enabled, the index is
-split into two files, $GIT_DIR/index and $GIT_DIR/sharedindex.&lt;SHA-1&gt;.
-Changes are accumulated in $GIT_DIR/index while the shared
-index file contains all index entries stays unchanged. If
-split-index mode is already enabled and <code>--split-index</code> is
-given again, all changes in $GIT_DIR/index are pushed back to
-the shared index file. This mode is designed for very large
-indexes that take a significant amount of time to read or write.</p>
+<p>Enable or disable split index mode. If split-index mode is
+already enabled and <code>--split-index</code> is given again, all
+changes in $GIT_DIR/index are pushed back to the shared index
+file.</p>
+<div class="paragraph">
+<p>These options take effect whatever the value of the <code>core.splitIndex</code>
+configuration variable (see <a href="git-config.html">git-config</a>(1)). But a warning is
+emitted when the change goes against the configured value, as the
+configured value will take effect next time the index is read and this
+will remove the intended effect of the option.</p>
+</div>
 </dd>
 <dt class="hdlist1">--untracked-cache</dt>
 <dt class="hdlist1">--no-untracked-cache</dt>
@@ -680,7 +684,7 @@ The same applies to directories ending <em>/</em> and paths with <em>//</em></p>
 <h2 id="_using_refresh">Using --refresh</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p><em>--refresh</em> does not calculate a new sha1 file or bring the index
+<p><code>--refresh</code> does not calculate a new sha1 file or bring the index
 up-to-date for mode/content changes. But what it <strong>does</strong> do is to
 "re-match" the stat information of a file with the index, so that you
 can refresh the index for a file that hasn&#8217;t been changed but where
@@ -696,7 +700,7 @@ up the stat index details with the proper files.</p>
 <h2 id="_using_cacheinfo_or_info_only">Using --cacheinfo or --info-only</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p><em>--cacheinfo</em> is used to register a file that is not in the
+<p><code>--cacheinfo</code> is used to register a file that is not in the
 current working directory.  This is useful for minimum-checkout
 merging.</p>
 </div>
@@ -709,13 +713,13 @@ merging.</p>
 </div>
 </div>
 <div class="paragraph">
-<p><em>--info-only</em> is used to register files without placing them in the object
+<p><code>--info-only</code> is used to register files without placing them in the object
 database.  This is useful for status-only repositories.</p>
 </div>
 <div class="paragraph">
-<p>Both <em>--cacheinfo</em> and <em>--info-only</em> behave similarly: the index is updated
-but the object database isn&#8217;t.  <em>--cacheinfo</em> is useful when the object is
-in the database but the file isn&#8217;t available locally.  <em>--info-only</em> is
+<p>Both <code>--cacheinfo</code> and <code>--info-only</code> behave similarly: the index is updated
+but the object database isn&#8217;t.  <code>--cacheinfo</code> is useful when the object is
+in the database but the file isn&#8217;t available locally.  <code>--info-only</code> is
 useful when the file is available, but you do not wish to update the
 object database.</p>
 </div>
@@ -927,6 +931,38 @@ precedence over assume-unchanged bit when both are set.</p>
 </div>
 </div>
 <div class="sect1">
+<h2 id="_split_index">Split index</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This mode is designed for repositories with very large indexes, and
+aims at reducing the time it takes to repeatedly write these indexes.</p>
+</div>
+<div class="paragraph">
+<p>In this mode, the index is split into two files, $GIT_DIR/index and
+$GIT_DIR/sharedindex.&lt;SHA-1&gt;. Changes are accumulated in
+$GIT_DIR/index, the split index, while the shared index file contains
+all index entries and stays unchanged.</p>
+</div>
+<div class="paragraph">
+<p>All changes in the split index are pushed back to the shared index
+file when the number of entries in the split index reaches a level
+specified by the splitIndex.maxPercentChange config variable (see
+<a href="git-config.html">git-config</a>(1)).</p>
+</div>
+<div class="paragraph">
+<p>Each time a new shared index file is created, the old shared index
+files are deleted if their modification time is older than what is
+specified by the splitIndex.sharedIndexExpire config variable (see
+<a href="git-config.html">git-config</a>(1)).</p>
+</div>
+<div class="paragraph">
+<p>To avoid deleting a shared index file that is still used, its
+modification time is updated to the current time everytime a new split
+index based on the shared index file is either created or read from.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
 <h2 id="_untracked_cache">Untracked cache</h2>
 <div class="sectionbody">
 <div class="paragraph">
@@ -1021,7 +1057,7 @@ ctime for marking files processed) (see <a href="git-config.html">git-config</a>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-06-14 11:04:08 W. Europe Daylight Time
+Last updated 2017-10-12 21:18:06 Coordinated Universal Time
 </div>
 </div>
 </body>

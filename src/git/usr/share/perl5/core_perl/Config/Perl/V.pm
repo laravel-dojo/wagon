@@ -8,7 +8,7 @@ use warnings;
 use Config;
 use Exporter;
 use vars qw($VERSION @ISA @EXPORT_OK %EXPORT_TAGS);
-$VERSION     = "0.24";
+$VERSION     = "0.25";
 @ISA         = ("Exporter");
 @EXPORT_OK   = qw( plv2hash summary myconfig signature );
 %EXPORT_TAGS = (
@@ -33,6 +33,7 @@ my %BTD = map { $_ => 0 } qw(
     NO_MATHOMS
     NO_TAINT_SUPPORT
     PERL_BOOL_AS_CHAR
+    PERL_COPY_ON_WRITE
     PERL_DISABLE_PMC
     PERL_DONT_CREATE_GVSV
     PERL_EXTERNAL_GLOB
@@ -66,6 +67,7 @@ my %BTD = map { $_ => 0 } qw(
     USE_HASH_SEED_EXPLICIT
     USE_LOCALE
     USE_LOCALE_CTYPE
+    USE_NO_REGISTRY
     USE_PERL_ATOF
     USE_SITECUSTOMIZE
 
@@ -217,7 +219,7 @@ sub _make_derived
     ($conf->{config}{version_patchlevel_string} ||= join " ",
 	map  { ($_, $conf->{config}{$_} ) }
 	grep {      $conf->{config}{$_}   }
-	qw( api_version subversion perl_patchlevel )) =~ s/\bperl_//; 
+	qw( api_version subversion perl_patchlevel )) =~ s/\bperl_//;
 
     $conf->{config}{perl_patchlevel}  ||= "";	# 0 is not a valid patchlevel
 
@@ -306,7 +308,7 @@ sub summary
 	qw( archname osname osvers revision patchlevel subversion version
 	    cc ccversion gccversion config_args inc_version_list
 	    d_longdbl d_longlong use64bitall use64bitint useithreads
-	    uselongdouble usemultiplicity usemymalloc useperlio useshrplib 
+	    uselongdouble usemultiplicity usemymalloc useperlio useshrplib
 	    doublesize intsize ivsize nvsize longdblsize longlongsize lseeksize
 	    );
     $info{$_}++ for grep { $conf->{build}{options}{$_} } keys %{$conf->{build}{options}};

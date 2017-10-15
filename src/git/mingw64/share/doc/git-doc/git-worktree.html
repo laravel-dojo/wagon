@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 1.5.4">
+<meta name="generator" content="Asciidoctor 1.5.5">
 <title>git-worktree(1)</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
@@ -17,7 +17,6 @@ audio:not([controls]){display:none;height:0}
 [hidden],template{display:none}
 script{display:none!important}
 html{font-family:sans-serif;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%}
-body{margin:0}
 a{background:transparent}
 a:focus{outline:thin dotted}
 a:active,a:hover{outline:0}
@@ -52,7 +51,7 @@ textarea{overflow:auto;vertical-align:top}
 table{border-collapse:collapse;border-spacing:0}
 *,*:before,*:after{-moz-box-sizing:border-box;-webkit-box-sizing:border-box;box-sizing:border-box}
 html,body{font-size:100%}
-body{background:#fff;color:rgba(0,0,0,.8);padding:0;margin:0;font-family:"Noto Serif","DejaVu Serif",serif;font-weight:400;font-style:normal;line-height:1;position:relative;cursor:auto}
+body{background:#fff;color:rgba(0,0,0,.8);padding:0;margin:0;font-family:"Noto Serif","DejaVu Serif",serif;font-weight:400;font-style:normal;line-height:1;position:relative;cursor:auto;tab-size:4;-moz-osx-font-smoothing:grayscale;-webkit-font-smoothing:antialiased}
 a:hover{cursor:pointer}
 img,object,embed{max-width:100%;height:auto}
 object,embed{height:100%}
@@ -64,7 +63,6 @@ img{-ms-interpolation-mode:bicubic}
 .text-center{text-align:center!important}
 .text-justify{text-align:justify!important}
 .hide{display:none}
-body{-webkit-font-smoothing:antialiased}
 img,object,svg{display:inline-block;vertical-align:middle}
 textarea{height:auto;min-height:50px}
 select{width:100%}
@@ -119,13 +117,16 @@ table thead tr th,table thead tr td,table tfoot tr th,table tfoot tr td{padding:
 table tr th,table tr td{padding:.5625em .625em;font-size:inherit;color:rgba(0,0,0,.8)}
 table tr.even,table tr.alt,table tr:nth-of-type(even){background:#f8f8f7}
 table thead tr th,table tfoot tr th,table tbody tr td,table tr td,table tfoot tr td{display:table-cell;line-height:1.6}
-body{tab-size:4}
 h1,h2,h3,#toctitle,.sidebarblock>.content>.title,h4,h5,h6{line-height:1.2;word-spacing:-.05em}
 h1 strong,h2 strong,h3 strong,#toctitle strong,.sidebarblock>.content>.title strong,h4 strong,h5 strong,h6 strong{font-weight:400}
 .clearfix:before,.clearfix:after,.float-group:before,.float-group:after{content:" ";display:table}
 .clearfix:after,.float-group:after{clear:both}
-*:not(pre)>code{font-size:.9375em;font-style:normal!important;letter-spacing:0;padding:.1em .5ex;word-spacing:-.15em;background-color:#f7f7f8;-webkit-border-radius:4px;border-radius:4px;line-height:1.45;text-rendering:optimizeSpeed}
+*:not(pre)>code{font-size:.9375em;font-style:normal!important;letter-spacing:0;padding:.1em .5ex;word-spacing:-.15em;background-color:#f7f7f8;-webkit-border-radius:4px;border-radius:4px;line-height:1.45;text-rendering:optimizeSpeed;word-wrap:break-word}
+*:not(pre)>code.nobreak{word-wrap:normal}
+*:not(pre)>code.nowrap{white-space:nowrap}
 pre,pre>code{line-height:1.45;color:rgba(0,0,0,.9);font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;font-weight:400;text-rendering:optimizeSpeed}
+em em{font-style:normal}
+strong strong{font-weight:400}
 .keyseq{color:rgba(51,51,51,.8)}
 kbd{font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;display:inline-block;color:rgba(0,0,0,.8);font-size:.65em;line-height:1.45;background-color:#f7f7f7;border:1px solid #ccc;-webkit-border-radius:3px;border-radius:3px;-webkit-box-shadow:0 1px 0 rgba(0,0,0,.2),0 0 0 .1em white inset;box-shadow:0 1px 0 rgba(0,0,0,.2),0 0 0 .1em #fff inset;margin:0 .15em;padding:.2em .5em;vertical-align:middle;position:relative;top:-.1em;white-space:nowrap}
 .keyseq kbd:first-child{margin-left:0}
@@ -430,9 +431,11 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <h2 id="_synopsis">SYNOPSIS</h2>
 <div class="sectionbody">
 <div class="verseblock">
-<pre class="content"><em>git worktree add</em> [-f] [--detach] [--checkout] [-b &lt;new-branch&gt;] &lt;path&gt; [&lt;branch&gt;]
+<pre class="content"><em>git worktree add</em> [-f] [--detach] [--checkout] [--lock] [-b &lt;new-branch&gt;] &lt;path&gt; [&lt;branch&gt;]
+<em>git worktree list</em> [--porcelain]
+<em>git worktree lock</em> [--reason &lt;string&gt;] &lt;worktree&gt;
 <em>git worktree prune</em> [-n] [-v] [--expire &lt;expire&gt;]
-<em>git worktree list</em> [--porcelain]</pre>
+<em>git worktree unlock</em> &lt;worktree&gt;</pre>
 </div>
 </div>
 </div>
@@ -466,9 +469,8 @@ section "DETAILS" for more information.</p>
 <div class="paragraph">
 <p>If a linked working tree is stored on a portable device or network share
 which is not always mounted, you can prevent its administrative files from
-being pruned by creating a file named <em>locked</em> alongside the other
-administrative files, optionally containing a plain text reason that
-pruning should be suppressed. See section "DETAILS" for more information.</p>
+being pruned by issuing the <code>git worktree lock</code> command, optionally
+specifying <code>--reason</code> to explain why the working tree is locked.</p>
 </div>
 </div>
 </div>
@@ -481,16 +483,13 @@ pruning should be suppressed. See section "DETAILS" for more information.</p>
 <dd>
 <p>Create <code>&lt;path&gt;</code> and checkout <code>&lt;branch&gt;</code> into it. The new working directory
 is linked to the current repository, sharing everything except working
-directory specific files such as HEAD, index, etc.</p>
+directory specific files such as HEAD, index, etc. <code>-</code> may also be
+specified as <code>&lt;branch&gt;</code>; it is synonymous with <code>@{-1}</code>.</p>
 <div class="paragraph">
-<p>If <code>&lt;branch&gt;</code> is omitted and neither <code>-b</code> nor <code>-B</code> nor <code>--detached</code> used,
+<p>If <code>&lt;branch&gt;</code> is omitted and neither <code>-b</code> nor <code>-B</code> nor <code>--detach</code> used,
 then, as a convenience, a new branch based at HEAD is created automatically,
 as if <code>-b $(basename &lt;path&gt;)</code> was specified.</p>
 </div>
-</dd>
-<dt class="hdlist1">prune</dt>
-<dd>
-<p>Prune working tree information in $GIT_DIR/worktrees.</p>
 </dd>
 <dt class="hdlist1">list</dt>
 <dd>
@@ -498,6 +497,22 @@ as if <code>-b $(basename &lt;path&gt;)</code> was specified.</p>
 each of the linked worktrees.  The output details include if the worktree is
 bare, the revision currently checked out, and the branch currently checked out
 (or <em>detached HEAD</em> if none).</p>
+</dd>
+<dt class="hdlist1">lock</dt>
+<dd>
+<p>If a working tree is on a portable device or network share which
+is not always mounted, lock it to prevent its administrative
+files from being pruned automatically. This also prevents it from
+being moved or deleted. Optionally, specify a reason for the lock
+with <code>--reason</code>.</p>
+</dd>
+<dt class="hdlist1">prune</dt>
+<dd>
+<p>Prune working tree information in $GIT_DIR/worktrees.</p>
+</dd>
+<dt class="hdlist1">unlock</dt>
+<dd>
+<p>Unlock a working tree, allowing it to be pruned, moved or deleted.</p>
 </dd>
 </dl>
 </div>
@@ -537,6 +552,12 @@ be used to suppress checkout in order to make customizations,
 such as configuring sparse-checkout. See "Sparse checkout"
 in <a href="git-read-tree.html">git-read-tree</a>(1).</p>
 </dd>
+<dt class="hdlist1">--lock</dt>
+<dd>
+<p>Keep the working tree locked after creation. This is the
+equivalent of <code>git worktree lock</code> after <code>git worktree add</code>,
+but without race condition.</p>
+</dd>
 <dt class="hdlist1">-n</dt>
 <dt class="hdlist1">--dry-run</dt>
 <dd>
@@ -557,6 +578,21 @@ configuration.  See below for details.</p>
 <dt class="hdlist1">--expire &lt;time&gt;</dt>
 <dd>
 <p>With <code>prune</code>, only expire unused working trees older than &lt;time&gt;.</p>
+</dd>
+<dt class="hdlist1">--reason &lt;string&gt;</dt>
+<dd>
+<p>With <code>lock</code>, an explanation why the working tree is locked.</p>
+</dd>
+<dt class="hdlist1">&lt;worktree&gt;</dt>
+<dd>
+<p>Working trees can be identified by path, either relative or
+absolute.</p>
+<div class="paragraph">
+<p>If the last path components in the working tree&#8217;s path is unique among
+working trees, it can be used to identify worktrees. For example if
+you only have two working trees, at "/abc/def/ghi" and "/abc/def/ggg",
+then "ghi" or "def/ghi" is enough to point to the former working tree.</p>
+</div>
 </dd>
 </dl>
 </div>
@@ -609,7 +645,8 @@ instead.</p>
 <div class="paragraph">
 <p>To prevent a $GIT_DIR/worktrees entry from being pruned (which
 can be useful in some situations, such as when the
-entry&#8217;s working tree is stored on a portable device), add a file named
+entry&#8217;s working tree is stored on a portable device), use the
+<code>git worktree lock</code> command, which adds a file named
 <em>locked</em> to the entry&#8217;s directory. The file contains the reason in
 plain text. For example, if a linked working tree&#8217;s <code>.git</code> file points
 to <code>/path/main/.git/worktrees/test-next</code> then a file named
@@ -708,10 +745,6 @@ warn if the working tree is dirty)</p>
 <li>
 <p><code>mv</code> to move or rename a working tree and update its administrative files</p>
 </li>
-<li>
-<p><code>lock</code> to prevent automatic pruning of administrative files (for instance,
-for a working tree on a portable device)</p>
-</li>
 </ul>
 </div>
 </div>
@@ -727,7 +760,7 @@ for a working tree on a portable device)</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-06-14 11:04:08 W. Europe Daylight Time
+Last updated 2017-10-12 21:18:06 Coordinated Universal Time
 </div>
 </div>
 </body>

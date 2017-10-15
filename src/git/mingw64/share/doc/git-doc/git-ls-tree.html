@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 1.5.4">
+<meta name="generator" content="Asciidoctor 1.5.5">
 <title>git-ls-tree(1)</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
@@ -17,7 +17,6 @@ audio:not([controls]){display:none;height:0}
 [hidden],template{display:none}
 script{display:none!important}
 html{font-family:sans-serif;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%}
-body{margin:0}
 a{background:transparent}
 a:focus{outline:thin dotted}
 a:active,a:hover{outline:0}
@@ -52,7 +51,7 @@ textarea{overflow:auto;vertical-align:top}
 table{border-collapse:collapse;border-spacing:0}
 *,*:before,*:after{-moz-box-sizing:border-box;-webkit-box-sizing:border-box;box-sizing:border-box}
 html,body{font-size:100%}
-body{background:#fff;color:rgba(0,0,0,.8);padding:0;margin:0;font-family:"Noto Serif","DejaVu Serif",serif;font-weight:400;font-style:normal;line-height:1;position:relative;cursor:auto}
+body{background:#fff;color:rgba(0,0,0,.8);padding:0;margin:0;font-family:"Noto Serif","DejaVu Serif",serif;font-weight:400;font-style:normal;line-height:1;position:relative;cursor:auto;tab-size:4;-moz-osx-font-smoothing:grayscale;-webkit-font-smoothing:antialiased}
 a:hover{cursor:pointer}
 img,object,embed{max-width:100%;height:auto}
 object,embed{height:100%}
@@ -64,7 +63,6 @@ img{-ms-interpolation-mode:bicubic}
 .text-center{text-align:center!important}
 .text-justify{text-align:justify!important}
 .hide{display:none}
-body{-webkit-font-smoothing:antialiased}
 img,object,svg{display:inline-block;vertical-align:middle}
 textarea{height:auto;min-height:50px}
 select{width:100%}
@@ -119,13 +117,16 @@ table thead tr th,table thead tr td,table tfoot tr th,table tfoot tr td{padding:
 table tr th,table tr td{padding:.5625em .625em;font-size:inherit;color:rgba(0,0,0,.8)}
 table tr.even,table tr.alt,table tr:nth-of-type(even){background:#f8f8f7}
 table thead tr th,table tfoot tr th,table tbody tr td,table tr td,table tfoot tr td{display:table-cell;line-height:1.6}
-body{tab-size:4}
 h1,h2,h3,#toctitle,.sidebarblock>.content>.title,h4,h5,h6{line-height:1.2;word-spacing:-.05em}
 h1 strong,h2 strong,h3 strong,#toctitle strong,.sidebarblock>.content>.title strong,h4 strong,h5 strong,h6 strong{font-weight:400}
 .clearfix:before,.clearfix:after,.float-group:before,.float-group:after{content:" ";display:table}
 .clearfix:after,.float-group:after{clear:both}
-*:not(pre)>code{font-size:.9375em;font-style:normal!important;letter-spacing:0;padding:.1em .5ex;word-spacing:-.15em;background-color:#f7f7f8;-webkit-border-radius:4px;border-radius:4px;line-height:1.45;text-rendering:optimizeSpeed}
+*:not(pre)>code{font-size:.9375em;font-style:normal!important;letter-spacing:0;padding:.1em .5ex;word-spacing:-.15em;background-color:#f7f7f8;-webkit-border-radius:4px;border-radius:4px;line-height:1.45;text-rendering:optimizeSpeed;word-wrap:break-word}
+*:not(pre)>code.nobreak{word-wrap:normal}
+*:not(pre)>code.nowrap{white-space:nowrap}
 pre,pre>code{line-height:1.45;color:rgba(0,0,0,.9);font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;font-weight:400;text-rendering:optimizeSpeed}
+em em{font-style:normal}
+strong strong{font-weight:400}
 .keyseq{color:rgba(51,51,51,.8)}
 kbd{font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;display:inline-block;color:rgba(0,0,0,.8);font-size:.65em;line-height:1.45;background-color:#f7f7f7;border:1px solid #ccc;-webkit-border-radius:3px;border-radius:3px;-webkit-box-shadow:0 1px 0 rgba(0,0,0,.2),0 0 0 .1em white inset;box-shadow:0 1px 0 rgba(0,0,0,.2),0 0 0 .1em #fff inset;margin:0 .15em;padding:.2em .5em;vertical-align:middle;position:relative;top:-.1em;white-space:nowrap}
 .keyseq kbd:first-child{margin-left:0}
@@ -448,7 +449,7 @@ in the current working directory.  Note that:</p>
 <li>
 <p>the behaviour is slightly different from that of "/bin/ls" in that the
 <em>&lt;path&gt;</em> denotes just a list of patterns to match, e.g. so specifying
-directory name (without <em>-r</em>) will behave differently, and order of the
+directory name (without <code>-r</code>) will behave differently, and order of the
 arguments does not matter.</p>
 </li>
 <li>
@@ -456,9 +457,9 @@ arguments does not matter.</p>
 taken as relative to the current working directory.  E.g. when you are
 in a directory <em>sub</em> that has a directory <em>dir</em>, you can run <em>git
 ls-tree -r HEAD dir</em> to list the contents of the tree (that is
-<em>sub/dir</em> in <em>HEAD</em>).  You don&#8217;t want to give a tree that is not at the
+<em>sub/dir</em> in <code>HEAD</code>).  You don&#8217;t want to give a tree that is not at the
 root level (e.g. <code>git ls-tree -r HEAD:sub dir</code>) in this case, as that
-would result in asking for <em>sub/sub/dir</em> in the <em>HEAD</em> commit.
+would result in asking for <em>sub/sub/dir</em> in the <code>HEAD</code> commit.
 However, the current working directory can be ignored by passing
 --full-tree option.</p>
 </li>
@@ -486,7 +487,7 @@ However, the current working directory can be ignored by passing
 <dt class="hdlist1">-t</dt>
 <dd>
 <p>Show tree entries even when going to recurse them. Has no effect
-if <em>-r</em> was not passed. <em>-d</em> implies <em>-t</em>.</p>
+if <code>-r</code> was not passed. <code>-d</code> implies <code>-t</code>.</p>
 </dd>
 <dt class="hdlist1">-l</dt>
 <dt class="hdlist1">--long</dt>
@@ -495,7 +496,8 @@ if <em>-r</em> was not passed. <em>-d</em> implies <em>-t</em>.</p>
 </dd>
 <dt class="hdlist1">-z</dt>
 <dd>
-<p>\0 line termination on output.</p>
+<p>\0 line termination on output and do not quote filenames.
+See OUTPUT FORMAT below for more information.</p>
 </dd>
 <dt class="hdlist1">--name-only</dt>
 <dt class="hdlist1">--name-status</dt>
@@ -537,9 +539,7 @@ implicitly uses the root level of the tree as the sole path argument.</p>
 </div>
 </div>
 <div class="paragraph">
-<p>Unless the <code>-z</code> option is used, TAB, LF, and backslash characters
-in pathnames are represented as <code>\t</code>, <code>\n</code>, and <code>\\</code>, respectively.
-This output format is compatible with what <code>--index-info --stdin</code> of
+<p>This output format is compatible with what <code>--index-info --stdin</code> of
 <em>git update-index</em> expects.</p>
 </div>
 <div class="paragraph">
@@ -555,6 +555,12 @@ This output format is compatible with what <code>--index-info --stdin</code> of
 with minimum width of 7 characters.  Object size is given only for blobs
 (file) entries; for other entries <code>-</code> character is used in place of size.</p>
 </div>
+<div class="paragraph">
+<p>Without the <code>-z</code> option, pathnames with "unusual" characters are
+quoted as explained for the configuration variable <code>core.quotePath</code>
+(see <a href="git-config.html">git-config</a>(1)).  Using <code>-z</code> the filename is output
+verbatim and the line is terminated by a NUL byte.</p>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -568,7 +574,7 @@ with minimum width of 7 characters.  Object size is given only for blobs
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-06-14 11:04:07 W. Europe Daylight Time
+Last updated 2017-10-12 21:18:05 Coordinated Universal Time
 </div>
 </div>
 </body>

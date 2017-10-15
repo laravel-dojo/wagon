@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 1.5.4">
+<meta name="generator" content="Asciidoctor 1.5.5">
 <title>git-send-email(1)</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
@@ -17,7 +17,6 @@ audio:not([controls]){display:none;height:0}
 [hidden],template{display:none}
 script{display:none!important}
 html{font-family:sans-serif;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%}
-body{margin:0}
 a{background:transparent}
 a:focus{outline:thin dotted}
 a:active,a:hover{outline:0}
@@ -52,7 +51,7 @@ textarea{overflow:auto;vertical-align:top}
 table{border-collapse:collapse;border-spacing:0}
 *,*:before,*:after{-moz-box-sizing:border-box;-webkit-box-sizing:border-box;box-sizing:border-box}
 html,body{font-size:100%}
-body{background:#fff;color:rgba(0,0,0,.8);padding:0;margin:0;font-family:"Noto Serif","DejaVu Serif",serif;font-weight:400;font-style:normal;line-height:1;position:relative;cursor:auto}
+body{background:#fff;color:rgba(0,0,0,.8);padding:0;margin:0;font-family:"Noto Serif","DejaVu Serif",serif;font-weight:400;font-style:normal;line-height:1;position:relative;cursor:auto;tab-size:4;-moz-osx-font-smoothing:grayscale;-webkit-font-smoothing:antialiased}
 a:hover{cursor:pointer}
 img,object,embed{max-width:100%;height:auto}
 object,embed{height:100%}
@@ -64,7 +63,6 @@ img{-ms-interpolation-mode:bicubic}
 .text-center{text-align:center!important}
 .text-justify{text-align:justify!important}
 .hide{display:none}
-body{-webkit-font-smoothing:antialiased}
 img,object,svg{display:inline-block;vertical-align:middle}
 textarea{height:auto;min-height:50px}
 select{width:100%}
@@ -119,13 +117,16 @@ table thead tr th,table thead tr td,table tfoot tr th,table tfoot tr td{padding:
 table tr th,table tr td{padding:.5625em .625em;font-size:inherit;color:rgba(0,0,0,.8)}
 table tr.even,table tr.alt,table tr:nth-of-type(even){background:#f8f8f7}
 table thead tr th,table tfoot tr th,table tbody tr td,table tr td,table tfoot tr td{display:table-cell;line-height:1.6}
-body{tab-size:4}
 h1,h2,h3,#toctitle,.sidebarblock>.content>.title,h4,h5,h6{line-height:1.2;word-spacing:-.05em}
 h1 strong,h2 strong,h3 strong,#toctitle strong,.sidebarblock>.content>.title strong,h4 strong,h5 strong,h6 strong{font-weight:400}
 .clearfix:before,.clearfix:after,.float-group:before,.float-group:after{content:" ";display:table}
 .clearfix:after,.float-group:after{clear:both}
-*:not(pre)>code{font-size:.9375em;font-style:normal!important;letter-spacing:0;padding:.1em .5ex;word-spacing:-.15em;background-color:#f7f7f8;-webkit-border-radius:4px;border-radius:4px;line-height:1.45;text-rendering:optimizeSpeed}
+*:not(pre)>code{font-size:.9375em;font-style:normal!important;letter-spacing:0;padding:.1em .5ex;word-spacing:-.15em;background-color:#f7f7f8;-webkit-border-radius:4px;border-radius:4px;line-height:1.45;text-rendering:optimizeSpeed;word-wrap:break-word}
+*:not(pre)>code.nobreak{word-wrap:normal}
+*:not(pre)>code.nowrap{white-space:nowrap}
 pre,pre>code{line-height:1.45;color:rgba(0,0,0,.9);font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;font-weight:400;text-rendering:optimizeSpeed}
+em em{font-style:normal}
+strong strong{font-weight:400}
 .keyseq{color:rgba(51,51,51,.8)}
 kbd{font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;display:inline-block;color:rgba(0,0,0,.8);font-size:.65em;line-height:1.45;background-color:#f7f7f7;border:1px solid #ccc;-webkit-border-radius:3px;border-radius:3px;-webkit-box-shadow:0 1px 0 rgba(0,0,0,.2),0 0 0 .1em white inset;box-shadow:0 1px 0 rgba(0,0,0,.2),0 0 0 .1em #fff inset;margin:0 .15em;padding:.2em .5em;vertical-align:middle;position:relative;top:-.1em;white-space:nowrap}
 .keyseq kbd:first-child{margin-left:0}
@@ -484,13 +485,13 @@ and the "Subject:" of the message as the second line.</p>
 <dt class="hdlist1">--annotate</dt>
 <dd>
 <p>Review and edit each patch you&#8217;re about to send. Default is the value
-of <em>sendemail.annotate</em>. See the CONFIGURATION section for
-<em>sendemail.multiEdit</em>.</p>
+of <code>sendemail.annotate</code>. See the CONFIGURATION section for
+<code>sendemail.multiEdit</code>.</p>
 </dd>
 <dt class="hdlist1">--bcc=&lt;address&gt;,&#8230;&#8203;</dt>
 <dd>
 <p>Specify a "Bcc:" value for each email. Default is the value of
-<em>sendemail.bcc</em>.</p>
+<code>sendemail.bcc</code>.</p>
 <div class="paragraph">
 <p>This option may be specified multiple times.</p>
 </div>
@@ -498,7 +499,7 @@ of <em>sendemail.annotate</em>. See the CONFIGURATION section for
 <dt class="hdlist1">--cc=&lt;address&gt;,&#8230;&#8203;</dt>
 <dd>
 <p>Specify a starting "Cc:" value for each email.
-Default is the value of <em>sendemail.cc</em>.</p>
+Default is the value of <code>sendemail.cc</code>.</p>
 <div class="paragraph">
 <p>This option may be specified multiple times.</p>
 </div>
@@ -508,7 +509,7 @@ Default is the value of <em>sendemail.cc</em>.</p>
 <p>Invoke a text editor (see GIT_EDITOR in <a href="git-var.html">git-var</a>(1))
 to edit an introductory message for the patch series.</p>
 <div class="paragraph">
-<p>When <em>--compose</em> is used, git send-email will use the From, Subject, and
+<p>When <code>--compose</code> is used, git send-email will use the From, Subject, and
 In-Reply-To headers specified in the message. If the body of the message
 (what you type after the headers and a blank line) only contains blank
 (or Git: prefixed) lines, the summary won&#8217;t be sent, but From, Subject,
@@ -518,14 +519,14 @@ and In-Reply-To headers will be used unless they are removed.</p>
 <p>Missing From or In-Reply-To headers will be prompted for.</p>
 </div>
 <div class="paragraph">
-<p>See the CONFIGURATION section for <em>sendemail.multiEdit</em>.</p>
+<p>See the CONFIGURATION section for <code>sendemail.multiEdit</code>.</p>
 </div>
 </dd>
 <dt class="hdlist1">--from=&lt;address&gt;</dt>
 <dd>
 <p>Specify the sender of the emails.  If not specified on the command line,
-the value of the <em>sendemail.from</em> configuration option is used.  If
-neither the command-line option nor <em>sendemail.from</em> are set, then the
+the value of the <code>sendemail.from</code> configuration option is used.  If
+neither the command-line option nor <code>sendemail.from</code> are set, then the
 user will be prompted for the value.  The default for the prompt will be
 the value of GIT_AUTHOR_IDENT, or GIT_COMMITTER_IDENT if that is not
 set, as returned by "git var -l".</p>
@@ -536,7 +537,7 @@ set, as returned by "git var -l".</p>
 reply to the given Message-Id, which avoids breaking threads to
 provide a new patch series.
 The second and subsequent emails will be sent as replies according to
-the <code>--[no]-chain-reply-to</code> setting.</p>
+the <code>--[no-]chain-reply-to</code> setting.</p>
 <div class="paragraph">
 <p>So for example when <code>--thread</code> and <code>--no-chain-reply-to</code> are specified, the
 second and subsequent patches will be replies to the first one like in the
@@ -568,7 +569,7 @@ is not set, this will be prompted for.</p>
 <dd>
 <p>Specify the primary recipient of the emails generated. Generally, this
 will be the upstream maintainer of the project involved. Default is the
-value of the <em>sendemail.to</em> configuration value; if that is unspecified,
+value of the <code>sendemail.to</code> configuration value; if that is unspecified,
 and --to-cmd is not specified, this will be prompted for.</p>
 <div class="paragraph">
 <p>This option may be specified multiple times.</p>
@@ -597,7 +598,7 @@ will be prompted for if any non-ASCII files are encountered.</p>
 can be useful when the repository contains files that contain carriage
 returns, but makes the raw patch email file (as saved from a MUA) much
 harder to inspect manually.  base64 is even more fool proof, but also
-even more opaque.  Default is the value of the <em>sendemail.transferEncoding</em>
+even more opaque.  Default is the value of the <code>sendemail.transferEncoding</code>
 configuration value; if that is unspecified, git will use 8bit and not
 add a Content-Transfer-Encoding header.</p>
 </dd>
@@ -622,14 +623,14 @@ This is useful if your default address is not the address that is
 subscribed to a list. In order to use the <em>From</em> address, set the
 value to "auto". If you use the sendmail binary, you must have
 suitable privileges for the -f parameter.  Default is the value of the
-<em>sendemail.envelopeSender</em> configuration variable; if that is
+<code>sendemail.envelopeSender</code> configuration variable; if that is
 unspecified, choosing the envelope sender is left to your MTA.</p>
 </dd>
 <dt class="hdlist1">--smtp-encryption=&lt;encryption&gt;</dt>
 <dd>
 <p>Specify the encryption to use, either <em>ssl</em> or <em>tls</em>.  Any other
 value reverts to plain SMTP.  Default is the value of
-<em>sendemail.smtpEncryption</em>.</p>
+<code>sendemail.smtpEncryption</code>.</p>
 </dd>
 <dt class="hdlist1">--smtp-domain=&lt;FQDN&gt;</dt>
 <dd>
@@ -637,7 +638,7 @@ value reverts to plain SMTP.  Default is the value of
 HELO/EHLO command to the SMTP server.  Some servers require the
 FQDN to match your IP address.  If not set, git send-email attempts
 to determine your FQDN automatically.  Default is the value of
-<em>sendemail.smtpDomain</em>.</p>
+<code>sendemail.smtpDomain</code>.</p>
 </dd>
 <dt class="hdlist1">--smtp-auth=&lt;mechanisms&gt;</dt>
 <dd>
@@ -651,7 +652,7 @@ forces using only the listed mechanisms. Example:</p>
 <div class="paragraph">
 <p>If at least one of the specified mechanisms matches the ones advertised by the
 SMTP server and if it is supported by the utilized SASL library, the mechanism
-is used for authentication. If neither <em>sendemail.smtpAuth</em> nor <em>--smtp-auth</em>
+is used for authentication. If neither <em>sendemail.smtpAuth</em> nor <code>--smtp-auth</code>
 is specified, all mechanisms supported by the SASL library can be used.</p>
 </div>
 </dd>
@@ -659,13 +660,13 @@ is specified, all mechanisms supported by the SASL library can be used.</p>
 <dd>
 <p>Password for SMTP-AUTH. The argument is optional: If no
 argument is specified, then the empty string is used as
-the password. Default is the value of <em>sendemail.smtpPass</em>,
-however <em>--smtp-pass</em> always overrides this value.</p>
+the password. Default is the value of <code>sendemail.smtpPass</code>,
+however <code>--smtp-pass</code> always overrides this value.</p>
 <div class="paragraph">
 <p>Furthermore, passwords need not be specified in configuration files
 or on the command line. If a username has been specified (with
-<em>--smtp-user</em> or a <em>sendemail.smtpUser</em>), but no password has been
-specified (with <em>--smtp-pass</em> or <em>sendemail.smtpPass</em>), then
+<code>--smtp-user</code> or a <code>sendemail.smtpUser</code>), but no password has been
+specified (with <code>--smtp-pass</code> or <code>sendemail.smtpPass</code>), then
 a password is obtained using <em>git-credential</em>.</p>
 </div>
 </dd>
@@ -675,7 +676,7 @@ a password is obtained using <em>git-credential</em>.</p>
 <code>smtp.example.com</code> or a raw IP address).  Alternatively it can
 specify a full pathname of a sendmail-like program instead;
 the program must support the <code>-i</code> option.  Default value can
-be specified by the <em>sendemail.smtpServer</em> configuration
+be specified by the <code>sendemail.smtpServer</code> configuration
 option; the built-in default is <code>/usr/sbin/sendmail</code> or
 <code>/usr/lib/sendmail</code> if such program is available, or
 <code>localhost</code> otherwise.</p>
@@ -687,12 +688,12 @@ servers typically listen to smtp port 25, but may also listen to
 submission port 587, or the common SSL smtp port 465);
 symbolic port names (e.g. "submission" instead of 587)
 are also accepted. The port can also be set with the
-<em>sendemail.smtpServerPort</em> configuration variable.</p>
+<code>sendemail.smtpServerPort</code> configuration variable.</p>
 </dd>
 <dt class="hdlist1">--smtp-server-option=&lt;option&gt;</dt>
 <dd>
 <p>If set, specifies the outgoing SMTP server option to use.
-Default value can be specified by the <em>sendemail.smtpServerOption</em>
+Default value can be specified by the <code>sendemail.smtpServerOption</code>
 configuration option.</p>
 <div class="paragraph">
 <p>The --smtp-server-option option must be repeated for each option you want
@@ -712,14 +713,14 @@ by <em>c_rehash</em>, or a single file containing one or more PEM format
 certificates concatenated together: see verify(1) -CAfile and
 -CApath for more information on these). Set it to an empty string
 to disable certificate verification. Defaults to the value of the
-<em>sendemail.smtpsslcertpath</em> configuration variable, if set, or the
+<code>sendemail.smtpsslcertpath</code> configuration variable, if set, or the
 backing SSL library&#8217;s compiled-in default otherwise (which should
 be the best choice on most platforms).</p>
 </dd>
 <dt class="hdlist1">--smtp-user=&lt;user&gt;</dt>
 <dd>
-<p>Username for SMTP-AUTH. Default is the value of <em>sendemail.smtpUser</em>;
-if a username is not specified (with <em>--smtp-user</em> or <em>sendemail.smtpUser</em>),
+<p>Username for SMTP-AUTH. Default is the value of <code>sendemail.smtpUser</code>;
+if a username is not specified (with <code>--smtp-user</code> or <code>sendemail.smtpUser</code>),
 then authentication is not attempted.</p>
 </dd>
 <dt class="hdlist1">--smtp-debug=0|1</dt>
@@ -727,6 +728,23 @@ then authentication is not attempted.</p>
 <p>Enable (1) or disable (0) debug output. If enabled, SMTP
 commands and replies will be printed. Useful to debug TLS
 connection and authentication problems.</p>
+</dd>
+<dt class="hdlist1">--batch-size=&lt;num&gt;</dt>
+<dd>
+<p>Some email servers (e.g. smtp.163.com) limit the number emails to be
+sent per session (connection) and this will lead to a faliure when
+sending many messages.  With this option, send-email will disconnect after
+sending $&lt;num&gt; messages and wait for a few seconds (see --relogin-delay)
+and reconnect, to work around such a limit.  You may want to
+use some form of credential helper to avoid having to retype
+your password every time this happens.  Defaults to the
+<code>sendemail.smtpBatchSize</code> configuration variable.</p>
+</dd>
+<dt class="hdlist1">--relogin-delay=&lt;int&gt;</dt>
+<dd>
+<p>Waiting $&lt;int&gt; seconds before reconnecting to SMTP server. Used together
+with --batch-size option.  Defaults to the <code>sendemail.smtpReloginDelay</code>
+configuration variable.</p>
 </dd>
 </dl>
 </div>
@@ -747,7 +765,7 @@ Default is the value of <em>sendemail.tocmd</em> configuration value.</p>
 <p>Specify a command to execute once per patch file which
 should generate patch file specific "Cc:" entries.
 Output of this command must be single email address per line.
-Default is the value of <em>sendemail.ccCmd</em> configuration value.</p>
+Default is the value of <code>sendemail.ccCmd</code> configuration value.</p>
 </dd>
 <dt class="hdlist1">--[no-]chain-reply-to</dt>
 <dd>
@@ -755,7 +773,7 @@ Default is the value of <em>sendemail.ccCmd</em> configuration value.</p>
 email sent.  If disabled with "--no-chain-reply-to", all emails after
 the first will be sent as replies to the first email sent.  When using
 this, it is recommended that the first file given be an overview of the
-entire patch series. Disabled by default, but the <em>sendemail.chainReplyTo</em>
+entire patch series. Disabled by default, but the <code>sendemail.chainReplyTo</code>
 configuration variable can be used to enable it.</p>
 </dd>
 <dt class="hdlist1">--identity=&lt;identity&gt;</dt>
@@ -763,12 +781,12 @@ configuration variable can be used to enable it.</p>
 <p>A configuration identity. When given, causes values in the
 <em>sendemail.&lt;identity&gt;</em> subsection to take precedence over
 values in the <em>sendemail</em> section. The default identity is
-the value of <em>sendemail.identity</em>.</p>
+the value of <code>sendemail.identity</code>.</p>
 </dd>
 <dt class="hdlist1">--[no-]signed-off-by-cc</dt>
 <dd>
 <p>If this is set, add emails found in Signed-off-by: or Cc: lines to the
-cc list. Default is the value of <em>sendemail.signedoffbycc</em> configuration
+cc list. Default is the value of <code>sendemail.signedoffbycc</code> configuration
 value; if that is unspecified, default to --signed-off-by-cc.</p>
 </dd>
 <dt class="hdlist1">--[no-]cc-cover</dt>
@@ -825,7 +843,7 @@ for self (use <em>self</em> for that).</p>
 </div>
 </div>
 <div class="paragraph">
-<p>Default is the value of <em>sendemail.suppresscc</em> configuration value; if
+<p>Default is the value of <code>sendemail.suppresscc</code> configuration value; if
 that is unspecified, default to <em>self</em> if --suppress-from is
 specified, as well as <em>body</em> if --no-signed-off-cc is specified.</p>
 </div>
@@ -833,7 +851,7 @@ specified, as well as <em>body</em> if --no-signed-off-cc is specified.</p>
 <dt class="hdlist1">--[no-]suppress-from</dt>
 <dd>
 <p>If this is set, do not add the From: address to the cc: list.
-Default is the value of <em>sendemail.suppressFrom</em> configuration
+Default is the value of <code>sendemail.suppressFrom</code> configuration
 value; if that is unspecified, default to --no-suppress-from.</p>
 </dd>
 <dt class="hdlist1">--[no-]thread</dt>
@@ -846,7 +864,7 @@ governed by "--[no-]chain-reply-to".</p>
 <div class="paragraph">
 <p>If disabled with "--no-thread", those headers will not be added
 (unless specified with --in-reply-to).  Default is the value of the
-<em>sendemail.thread</em> configuration value; if that is unspecified,
+<code>sendemail.thread</code> configuration value; if that is unspecified,
 default to --thread.</p>
 </div>
 <div class="paragraph">
@@ -892,7 +910,7 @@ added addresses from the patch to the Cc list</p>
 </div>
 </div>
 <div class="paragraph">
-<p>Default is the value of <em>sendemail.confirm</em> configuration value; if that
+<p>Default is the value of <code>sendemail.confirm</code> configuration value; if that
 is unspecified, default to <em>auto</em> unless any of the suppress options
 have been specified, in which case default to <em>compose</em>.</p>
 </div>
@@ -904,8 +922,8 @@ have been specified, in which case default to <em>compose</em>.</p>
 <dt class="hdlist1">--[no-]format-patch</dt>
 <dd>
 <p>When an argument may be understood either as a reference or as a file name,
-choose to understand it as a format-patch argument (<em>--format-patch</em>)
-or as a file name (<em>--no-format-patch</em>). By default, when such a conflict
+choose to understand it as a format-patch argument (<code>--format-patch</code>)
+or as a file name (<code>--no-format-patch</code>). By default, when such a conflict
 occurs, git send-email will fail.</p>
 </dd>
 <dt class="hdlist1">--quiet</dt>
@@ -922,6 +940,9 @@ Currently, validation means the following:</p>
 <div class="ulist">
 <ul>
 <li>
+<p>Invoke the sendemail-validate hook if present (see <a href="githooks.html">githooks</a>(5)).</p>
+</li>
+<li>
 <p>Warn of patches that contain lines longer than 998 characters; this
 is due to SMTP limits as described by <a href="http://www.ietf.org/rfc/rfc2821.txt" class="bare">http://www.ietf.org/rfc/rfc2821.txt</a>.</p>
 </li>
@@ -930,8 +951,8 @@ is due to SMTP limits as described by <a href="http://www.ietf.org/rfc/rfc2821.t
 </div>
 </div>
 <div class="paragraph">
-<p>Default is the value of <em>sendemail.validate</em>; if this is not set,
-default to <em>--validate</em>.</p>
+<p>Default is the value of <code>sendemail.validate</code>; if this is not set,
+default to <code>--validate</code>.</p>
 </div>
 </dd>
 <dt class="hdlist1">--force</dt>
@@ -965,7 +986,7 @@ See <em>sendemail.aliasesfile</em> for more information about aliases.</p>
 <dt class="hdlist1">sendemail.aliasesFile</dt>
 <dd>
 <p>To avoid typing long email addresses, point this to one or more
-email aliases files.  You must also supply <em>sendemail.aliasFileType</em>.</p>
+email aliases files.  You must also supply <code>sendemail.aliasFileType</code>.</p>
 </dd>
 <dt class="hdlist1">sendemail.aliasFileType</dt>
 <dd>
@@ -1012,14 +1033,14 @@ recognized by the parser.</p>
 <dt class="hdlist1">sendemail.multiEdit</dt>
 <dd>
 <p>If true (default), a single editor instance will be spawned to edit
-files you have to edit (patches when <em>--annotate</em> is used, and the
-summary when <em>--compose</em> is used). If false, files will be edited one
+files you have to edit (patches when <code>--annotate</code> is used, and the
+summary when <code>--compose</code> is used). If false, files will be edited one
 after the other, spawning a new editor each time.</p>
 </dd>
 <dt class="hdlist1">sendemail.confirm</dt>
 <dd>
 <p>Sets the default for whether to confirm before sending. Must be
-one of <em>always</em>, <em>never</em>, <em>cc</em>, <em>compose</em>, or <em>auto</em>. See <em>--confirm</em>
+one of <em>always</em>, <em>never</em>, <em>cc</em>, <em>compose</em>, or <em>auto</em>. See <code>--confirm</code>
 in the previous section for the meaning of these values.</p>
 </dd>
 </dl>
@@ -1097,7 +1118,7 @@ $ git send-email outgoing/*</pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-06-14 11:04:07 W. Europe Daylight Time
+Last updated 2017-10-12 21:18:06 Coordinated Universal Time
 </div>
 </div>
 </body>

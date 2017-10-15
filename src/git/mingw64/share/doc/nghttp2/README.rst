@@ -58,6 +58,11 @@ To build the documentation, you need to install:
 
 * sphinx (http://sphinx-doc.org/)
 
+If you need libnghttp2 (C library) only, then the above packages are
+all you need.  Use ``--enable-lib-only`` to ensure that only
+libnghttp2 is built.  This avoids potential build error related to
+building bundled applications.
+
 To build and run the application programs (``nghttp``, ``nghttpd``,
 ``nghttpx`` and ``h2load``) in the ``src`` directory, the following packages
 are required:
@@ -65,6 +70,7 @@ are required:
 * OpenSSL >= 1.0.1
 * libev >= 4.11
 * zlib >= 1.2.3
+* libc-ares >= 1.7.5
 
 ALPN support requires OpenSSL >= 1.0.2 (released 22 January 2015).
 LibreSSL >= 2.2.0 can be used instead of OpenSSL, but OpenSSL has more
@@ -75,10 +81,18 @@ To enable the SPDY protocol in the application program ``nghttpx`` and
 
 * spdylay >= 1.3.2
 
+We no longer recommend to build nghttp2 with SPDY protocol support
+enabled.  SPDY support will be removed soon.
+
 To enable ``-a`` option (getting linked assets from the downloaded
 resource) in ``nghttp``, the following package is required:
 
 * libxml2 >= 2.7.7
+
+To enable systemd support in nghttpx, the following package is
+required:
+
+* libsystemd-dev >= 209
 
 The HPACK tools require the following package:
 
@@ -93,6 +107,11 @@ To mitigate heap fragmentation in long running server programs
 
 * jemalloc
 
+  .. note::
+
+     Alpine Linux currently does not support malloc replacement
+     due to musl limitations. See details in issue `#762 <https://github.com/nghttp2/nghttp2/issues/762>`_.
+
 libnghttp2_asio C++ library requires the following packages:
 
 * libboost-dev >= 1.54.0
@@ -104,15 +123,17 @@ The Python bindings require the following packages:
 * python >= 2.7
 * python-setuptools
 
-If you are using Ubuntu 14.04 LTS (trusty) or Debian 7.0 (wheezy) and above run the following to install the needed packages:
+If you are using Ubuntu 16.04 LTS (Xenial Xerus) or Debian 8 (jessie)
+and above, run the following to install the required packages:
 
 .. code-block:: text
 
     sudo apt-get install g++ make binutils autoconf automake autotools-dev libtool pkg-config \
       zlib1g-dev libcunit1-dev libssl-dev libxml2-dev libev-dev libevent-dev libjansson-dev \
-      libjemalloc-dev cython python3-dev python-setuptools
+      libc-ares-dev libjemalloc-dev libsystemd-dev libspdylay-dev \
+      cython python3-dev python-setuptools
 
-From Ubuntu 15.10, spdylay has been available as a package named
+Since Ubuntu 15.10, spdylay has been available as a package named
 `libspdylay-dev`.  For the earlier Ubuntu release, you need to build
 it yourself: http://tatsuhiro-t.github.io/spdylay/
 
@@ -136,26 +157,12 @@ minimizes the risk of private key leakage when serious bug like
 Heartbleed is exploited.  The neverbleed is disabled by default.  To
 enable it, use ``--with-neverbleed`` configure option.
 
-Building from git
------------------
-
-Building from git is easy, but please be sure that at least autoconf 2.68 is
-used:
-
-.. code-block:: text
-
-    $ autoreconf -i
-    $ automake
-    $ autoconf
-    $ ./configure
-    $ make
-
-To compile the source code, gcc >= 4.8.3 or clang >= 3.4 is required.
+In ordre to compile the source code, gcc >= 4.8.3 or clang >= 3.4 is
+required.
 
 .. note::
 
-   To enable mruby support in nghttpx, run ``git submodule update
-   --init`` before running configure script, and use ``--with-mruby``
+   To enable mruby support in nghttpx, and use ``--with-mruby``
    configure option.
 
 .. note::
@@ -175,6 +182,79 @@ To compile the source code, gcc >= 4.8.3 or clang >= 3.4 is required.
    don't have to use it explicitly.  But if you found that
    applications were not built, then using ``--enable-app`` may find
    that cause, such as the missing dependency.
+
+.. note::
+
+   In order to detect third party libraries, pkg-config is used
+   (however we don't use pkg-config for some libraries (e.g., libev)).
+   By default, pkg-config searches ``*.pc`` file in the standard
+   locations (e.g., /usr/lib/pkgconfig).  If it is necessary to use
+   ``*.pc`` file in the custom location, specify paths to
+   ``PKG_CONFIG_PATH`` environment variable, and pass it to configure
+   script, like so:
+
+   .. code-block:: text
+
+       $ ./configure PKG_CONFIG_PATH=/path/to/pkgconfig
+
+   For pkg-config managed libraries, ``*_CFLAG`` and ``*_LIBS``
+   environment variables are defined (e.g., ``OPENSSL_CFLAGS``,
+   ``OPENSSL_LIBS``).  Specifying non-empty string to these variables
+   completely overrides pkg-config.  In other words, if they are
+   specified, pkg-config is not used for detection, and user is
+   responsible to specify the correct values to these variables.  For
+   complete list of these variables, run ``./configure -h``.
+
+Building nghttp2 from release tar archive
+-----------------------------------------
+
+The nghttp2 project regularly releases tar archives which includes
+nghttp2 source code, and generated build files.  They can be
+downloaded from `Releases
+<https://github.com/nghttp2/nghttp2/releases>`_ page.
+
+Building nghttp2 from git requires autotools development packages.
+Building from tar archives does not require them, and thus it is much
+easier.  The usual build step is as follows:
+
+.. code-block:: text
+
+    $ tar xf nghttp2-X.Y.Z.tar.bz2
+    $ cd nghttp2-X.Y.Z
+    $ ./configure
+    $ make
+
+Building from git
+-----------------
+
+Building from git is easy, but please be sure that at least autoconf 2.68 is
+used:
+
+.. code-block:: text
+
+    $ git submodule update --init
+    $ autoreconf -i
+    $ automake
+    $ autoconf
+    $ ./configure
+    $ make
+
+Notes for building on Windows (MSVC)
+------------------------------------
+
+The easiest way to build native Windows nghttp2 dll is use `cmake
+<https://cmake.org/>`_.  The free version of `Visual C++ Build Tools
+<http://landinghub.visualstudio.com/visual-cpp-build-tools>`_ works
+fine.
+
+1. Install cmake for windows
+2. Open "Visual C++ ... Native Build Tool Command Prompt", and inside
+   nghttp2 directly, run ``cmake``.
+3. Then run ``cmake --build`` to build library.
+4. nghttp2.dll, nghttp2.lib, nghttp2.exp are placed under lib directory.
+
+Note that the above steps most likely produce nghttp2 library only.
+No bundled applications are compiled.
 
 Notes for building on Windows (Mingw/Cygwin)
 --------------------------------------------
@@ -204,6 +284,18 @@ the sample command like this:
 If you want to compile the applications under ``examples/``, you need
 to remove or rename the ``event.h`` from libev's installation, because
 it conflicts with libevent's installation.
+
+Notes for installation on Linux systems
+--------------------------------------------
+After installing nghttp2 tool suite with ``make install`` one might experience a similar error:
+
+.. code-block:: text
+
+    nghttpx: error while loading shared libraries: libnghttp2.so.14: cannot open shared object file: No such file or directory
+
+This means that the tool is unable to locate the ``libnghttp2.so`` shared library.
+
+To update the shared library cache run ``sudo ldconfig``.
 
 Building the documentation
 --------------------------
@@ -1353,7 +1445,7 @@ The extension module is called ``nghttp2``.
 determined by the ``configure`` script.  If the detected Python version is not
 what you expect, specify a path to Python executable in a ``PYTHON``
 variable as an argument to configure script (e.g., ``./configure
-PYTHON=/usr/bin/python3.4``).
+PYTHON=/usr/bin/python3.5``).
 
 The following example code illustrates basic usage of the HPACK compressor
 and decompressor in Python:
@@ -1483,6 +1575,17 @@ See `Contribution Guidelines
 <https://nghttp2.org/documentation/contribute.html>`_ for more
 details.
 
+Reporting vulnerability
+-----------------------
+
+If you find a vulnerability in our software, please send the email to
+"tatsuhiro.t at gmail dot com" about its details instead of submitting
+issues on github issue page.  It is a standard practice not to
+disclose vulnerability information publicly until a fixed version is
+released, or mitigation is worked out.
+
+In the future, we may setup a dedicated mail address for this purpose.
+
 Release schedule
 ----------------
 
@@ -1495,3 +1598,8 @@ severe security bug fixes.
 
 We have no plan to break API compatibility changes involving soname
 bump, so MAJOR version will stay 1 for the foreseeable future.
+
+License
+-------
+
+The MIT License

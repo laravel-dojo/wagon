@@ -1,8 +1,9 @@
 # Generated from XSLoader.pm.PL (resolved %Config::Config value)
+# This file is unique for every OS
 
 package XSLoader;
 
-$VERSION = "0.20";
+$VERSION = "0.22";
 
 #use strict;
 
@@ -38,6 +39,31 @@ sub load {
     my $modpname = join('/',@modparts);
     my $c = () = split(/::/,$caller,-1);
     $modlibname =~ s,[\\/][^\\/]+$,, while $c--;    # Q&D basename
+    # Does this look like a relative path?
+    if ($modlibname !~ m{^/}) {
+        # Someone may have a #line directive that changes the file name, or
+        # may be calling XSLoader::load from inside a string eval.  We cer-
+        # tainly do not want to go loading some code that is not in @INC,
+        # as it could be untrusted.
+        #
+        # We could just fall back to DynaLoader here, but then the rest of
+        # this function would go untested in the perl core, since all @INC
+        # paths are relative during testing.  That would be a time bomb
+        # waiting to happen, since bugs could be introduced into the code.
+        #
+        # So look through @INC to see if $modlibname is in it.  A rela-
+        # tive $modlibname is not a common occurrence, so this block is
+        # not hot code.
+        FOUND: {
+            for (@INC) {
+                if ($_ eq $modlibname) {
+                    last FOUND;
+                }
+            }
+            # Not found.  Fall back to DynaLoader.
+            goto \&XSLoader::bootstrap_inherit;
+        }
+    }
     my $file = "$modlibname/auto/$modpname/$modfname.dll";
 
 #   print STDERR "XSLoader::load for $module ($file)\n" if $dl_debug;
@@ -67,17 +93,11 @@ sub load {
     # in this perl code simply because this was the last perl code
     # it executed.
 
-    my $libref = dl_load_file($file, 0) or do { 
+    my $libref = dl_load_file($file, 0) or do {
         require Carp;
         Carp::croak("Can't load '$file' for module $module: " . dl_error());
     };
     push(@DynaLoader::dl_librefs,$libref);  # record loaded object
-
-    my @unresolved = dl_undef_symbols();
-    if (@unresolved) {
-        require Carp;
-        Carp::carp("Undefined symbols present after loading $file: @unresolved\n");
-    }
 
     $boot_symbol_ref = dl_find_symbol($libref, $bootname) or do {
         require Carp;
@@ -110,7 +130,7 @@ XSLoader - Dynamically load C libraries into Perl code
 
 =head1 VERSION
 
-Version 0.17
+Version 0.22
 
 =head1 SYNOPSIS
 

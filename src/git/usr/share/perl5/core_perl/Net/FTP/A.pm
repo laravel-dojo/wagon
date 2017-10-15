@@ -1,4 +1,4 @@
-## 
+##
 ## Package to read/write on ASCII data connections
 ##
 
@@ -13,7 +13,7 @@ use Carp;
 use Net::FTP::dataconn;
 
 our @ISA     = qw(Net::FTP::dataconn);
-our $VERSION = "3.05";
+our $VERSION = "3.08_01";
 
 our $buf;
 

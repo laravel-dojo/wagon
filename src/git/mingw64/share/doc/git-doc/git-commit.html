@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 1.5.4">
+<meta name="generator" content="Asciidoctor 1.5.5">
 <title>git-commit(1)</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
@@ -17,7 +17,6 @@ audio:not([controls]){display:none;height:0}
 [hidden],template{display:none}
 script{display:none!important}
 html{font-family:sans-serif;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%}
-body{margin:0}
 a{background:transparent}
 a:focus{outline:thin dotted}
 a:active,a:hover{outline:0}
@@ -52,7 +51,7 @@ textarea{overflow:auto;vertical-align:top}
 table{border-collapse:collapse;border-spacing:0}
 *,*:before,*:after{-moz-box-sizing:border-box;-webkit-box-sizing:border-box;box-sizing:border-box}
 html,body{font-size:100%}
-body{background:#fff;color:rgba(0,0,0,.8);padding:0;margin:0;font-family:"Noto Serif","DejaVu Serif",serif;font-weight:400;font-style:normal;line-height:1;position:relative;cursor:auto}
+body{background:#fff;color:rgba(0,0,0,.8);padding:0;margin:0;font-family:"Noto Serif","DejaVu Serif",serif;font-weight:400;font-style:normal;line-height:1;position:relative;cursor:auto;tab-size:4;-moz-osx-font-smoothing:grayscale;-webkit-font-smoothing:antialiased}
 a:hover{cursor:pointer}
 img,object,embed{max-width:100%;height:auto}
 object,embed{height:100%}
@@ -64,7 +63,6 @@ img{-ms-interpolation-mode:bicubic}
 .text-center{text-align:center!important}
 .text-justify{text-align:justify!important}
 .hide{display:none}
-body{-webkit-font-smoothing:antialiased}
 img,object,svg{display:inline-block;vertical-align:middle}
 textarea{height:auto;min-height:50px}
 select{width:100%}
@@ -119,13 +117,16 @@ table thead tr th,table thead tr td,table tfoot tr th,table tfoot tr td{padding:
 table tr th,table tr td{padding:.5625em .625em;font-size:inherit;color:rgba(0,0,0,.8)}
 table tr.even,table tr.alt,table tr:nth-of-type(even){background:#f8f8f7}
 table thead tr th,table tfoot tr th,table tbody tr td,table tr td,table tfoot tr td{display:table-cell;line-height:1.6}
-body{tab-size:4}
 h1,h2,h3,#toctitle,.sidebarblock>.content>.title,h4,h5,h6{line-height:1.2;word-spacing:-.05em}
 h1 strong,h2 strong,h3 strong,#toctitle strong,.sidebarblock>.content>.title strong,h4 strong,h5 strong,h6 strong{font-weight:400}
 .clearfix:before,.clearfix:after,.float-group:before,.float-group:after{content:" ";display:table}
 .clearfix:after,.float-group:after{clear:both}
-*:not(pre)>code{font-size:.9375em;font-style:normal!important;letter-spacing:0;padding:.1em .5ex;word-spacing:-.15em;background-color:#f7f7f8;-webkit-border-radius:4px;border-radius:4px;line-height:1.45;text-rendering:optimizeSpeed}
+*:not(pre)>code{font-size:.9375em;font-style:normal!important;letter-spacing:0;padding:.1em .5ex;word-spacing:-.15em;background-color:#f7f7f8;-webkit-border-radius:4px;border-radius:4px;line-height:1.45;text-rendering:optimizeSpeed;word-wrap:break-word}
+*:not(pre)>code.nobreak{word-wrap:normal}
+*:not(pre)>code.nowrap{white-space:nowrap}
 pre,pre>code{line-height:1.45;color:rgba(0,0,0,.9);font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;font-weight:400;text-rendering:optimizeSpeed}
+em em{font-style:normal}
+strong strong{font-weight:400}
 .keyseq{color:rgba(51,51,51,.8)}
 kbd{font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;display:inline-block;color:rgba(0,0,0,.8);font-size:.65em;line-height:1.45;background-color:#f7f7f7;border:1px solid #ccc;-webkit-border-radius:3px;border-radius:3px;-webkit-box-shadow:0 1px 0 rgba(0,0,0,.2),0 0 0 .1em white inset;box-shadow:0 1px 0 rgba(0,0,0,.2),0 0 0 .1em #fff inset;margin:0 .15em;padding:.2em .5em;vertical-align:middle;position:relative;top:-.1em;white-space:nowrap}
 .keyseq kbd:first-child{margin-left:0}
@@ -461,7 +462,8 @@ files must be "added");</p>
 and the index, again before using the <em>commit</em> command;</p>
 </li>
 <li>
-<p>by listing files as arguments to the <em>commit</em> command, in which
+<p>by listing files as arguments to the <em>commit</em> command
+(without --interactive or --patch switch), in which
 case the commit will ignore changes staged in the index, and instead
 record the current content of the listed files (which must already
 be known to Git);</p>
@@ -475,7 +477,8 @@ actual commit;</p>
 </li>
 <li>
 <p>by using the --interactive or --patch switches with the <em>commit</em> command
-to decide one by one which files or hunks should be part of the commit,
+to decide one by one which files or hunks should be part of the commit
+in addition to contents in the index,
 before finalizing the operation. See the &#8220;Interactive Mode&#8221; section of
 <a href="git-add.html">git-add</a>(1) to learn how to operate these modes.</p>
 </li>
@@ -521,7 +524,7 @@ when creating the commit.</p>
 <dt class="hdlist1">-c &lt;commit&gt;</dt>
 <dt class="hdlist1">--reedit-message=&lt;commit&gt;</dt>
 <dd>
-<p>Like <em>-C</em>, but with <em>-c</em> the editor is invoked, so that
+<p>Like <em>-C</em>, but with <code>-c</code> the editor is invoked, so that
 the user can further edit the commit message.</p>
 </dd>
 <dt class="hdlist1">--fixup=&lt;commit&gt;</dt>
@@ -542,7 +545,7 @@ commit message options (<code>-m</code>/<code>-c</code>/<code>-C</code>/<code>-F
 <dt class="hdlist1">--reset-author</dt>
 <dd>
 <p>When used with -C/-c/--amend options, or when committing after a
-a conflicting cherry-pick, declare that the authorship of the
+conflicting cherry-pick, declare that the authorship of the
 resulting commit now belongs to the committer. This also renews
 the author timestamp.</p>
 </dd>
@@ -563,15 +566,18 @@ format. See <a href="git-status.html">git-status</a>(1) for details. Implies
 </dd>
 <dt class="hdlist1">--long</dt>
 <dd>
-<p>When doing a dry-run, give the output in a the long-format.
+<p>When doing a dry-run, give the output in the long-format.
 Implies <code>--dry-run</code>.</p>
 </dd>
 <dt class="hdlist1">-z</dt>
 <dt class="hdlist1">--null</dt>
 <dd>
-<p>When showing <code>short</code> or <code>porcelain</code> status output, terminate
-entries in the status output with NUL, instead of LF. If no
-format is given, implies the <code>--porcelain</code> output format.</p>
+<p>When showing <code>short</code> or <code>porcelain</code> status output, print the
+filename verbatim and terminate the entries with NUL, instead of LF.
+If no format is given, implies the <code>--porcelain</code> output format.
+Without the <code>-z</code> option, filenames with "unusual" characters are
+quoted as explained for the configuration variable <code>core.quotePath</code>
+(see <a href="git-config.html">git-config</a>(1)).</p>
 </dd>
 <dt class="hdlist1">-F &lt;file&gt;</dt>
 <dt class="hdlist1">--file=&lt;file&gt;</dt>
@@ -664,11 +670,14 @@ commentary and collapse consecutive empty lines.</p>
 </dd>
 <dt class="hdlist1">scissors</dt>
 <dd>
-<p>Same as <code>whitespace</code>, except that everything from (and
-including) the line
-"<code># ------------------------ &gt;8 ------------------------</code>"
-is truncated if the message is to be edited. "<code>#</code>" can be
-customized with core.commentChar.</p>
+<p>Same as <code>whitespace</code> except that everything from (and including)
+the line found below is truncated, if the message is to be edited.
+"<code>#</code>" can be customized with core.commentChar.</p>
+<div class="literalblock">
+<div class="content">
+<pre># ------------------------ &gt;8 ------------------------</pre>
+</div>
+</div>
 </dd>
 <dt class="hdlist1">default</dt>
 <dd>
@@ -680,7 +689,7 @@ Otherwise <code>whitespace</code>.</p>
 </div>
 </div>
 <div class="paragraph">
-<p>The default can be changed by the <em>commit.cleanup</em> configuration
+<p>The default can be changed by the <code>commit.cleanup</code> configuration
 variable (see <a href="git-config.html">git-config</a>(1)).</p>
 </div>
 </dd>
@@ -753,10 +762,11 @@ command line, disregarding any contents that have been
 staged for other paths. This is the default mode of operation of
 <em>git commit</em> if any paths are given on the command line,
 in which case this option can be omitted.
-If this option is specified together with <em>--amend</em>, then
+If this option is specified together with <code>--amend</code>, then
 no paths need to be specified, which can be used to amend
 the last commit without committing changes that have
-already been staged.</p>
+already been staged. If used together with <code>--allow-empty</code>
+paths are also not required, and an empty commit will be created.</p>
 </dd>
 <dt class="hdlist1">-u[&lt;mode&gt;]</dt>
 <dt class="hdlist1">--untracked-files[=&lt;mode&gt;]</dt>
@@ -861,7 +871,7 @@ of what have been staged before.</p>
 <h2 id="_date_formats">DATE FORMATS</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>The GIT_AUTHOR_DATE, GIT_COMMITTER_DATE environment variables
+<p>The <code>GIT_AUTHOR_DATE</code>, <code>GIT_COMMITTER_DATE</code> environment variables
 and the <code>--date</code> option
 support the following date formats:</p>
 </div>
@@ -872,7 +882,7 @@ support the following date formats:</p>
 <p>It is <code>&lt;unix timestamp&gt; &lt;time zone offset&gt;</code>, where <code>&lt;unix
 timestamp&gt;</code> is the number of seconds since the UNIX epoch.
 <code>&lt;time zone offset&gt;</code> is a positive or negative offset from UTC.
-For example CET (which is 2 hours ahead UTC) is <code>+0200</code>.</p>
+For example CET (which is 1 hour ahead of UTC) is <code>+0100</code>.</p>
 </dd>
 <dt class="hdlist1">RFC 2822</dt>
 <dd>
@@ -1081,12 +1091,12 @@ have i18n.commitencoding in <code>.git/config</code> file, like this:</p>
 <div class="listingblock">
 <div class="content">
 <pre>[i18n]
-	commitencoding = ISO-8859-1</pre>
+	commitEncoding = ISO-8859-1</pre>
 </div>
 </div>
 <div class="paragraph">
 <p>Commit objects created with the above setting record the value
-of <code>i18n.commitencoding</code> in its <code>encoding</code> header.  This is to
+of <code>i18n.commitEncoding</code> in its <code>encoding</code> header.  This is to
 help other people who look at them later.  Lack of this header
 implies that the commit log message is encoded in UTF-8.</p>
 </div>
@@ -1096,16 +1106,16 @@ implies that the commit log message is encoded in UTF-8.</p>
 <code>encoding</code> header of a commit object, and try to re-code the
 log message into UTF-8 unless otherwise specified.  You can
 specify the desired output encoding with
-<code>i18n.logoutputencoding</code> in <code>.git/config</code> file, like this:</p>
+<code>i18n.logOutputEncoding</code> in <code>.git/config</code> file, like this:</p>
 <div class="listingblock">
 <div class="content">
 <pre>[i18n]
-	logoutputencoding = ISO-8859-1</pre>
+	logOutputEncoding = ISO-8859-1</pre>
 </div>
 </div>
 <div class="paragraph">
 <p>If you do not have this configuration variable, the value of
-<code>i18n.commitencoding</code> is used instead.</p>
+<code>i18n.commitEncoding</code> is used instead.</p>
 </div>
 </li>
 </ol>
@@ -1123,8 +1133,8 @@ reversible operation.</p>
 <div class="sectionbody">
 <div class="paragraph">
 <p>The editor used to edit the commit log message will be chosen from the
-GIT_EDITOR environment variable, the core.editor configuration variable, the
-VISUAL environment variable, or the EDITOR environment variable (in that
+<code>GIT_EDITOR</code> environment variable, the core.editor configuration variable, the
+<code>VISUAL</code> environment variable, or the <code>EDITOR</code> environment variable (in that
 order).  See <a href="git-var.html">git-var</a>(1) for details.</p>
 </div>
 </div>
@@ -1134,7 +1144,7 @@ order).  See <a href="git-var.html">git-var</a>(1) for details.</p>
 <div class="sectionbody">
 <div class="paragraph">
 <p>This command can run <code>commit-msg</code>, <code>prepare-commit-msg</code>, <code>pre-commit</code>,
-and <code>post-commit</code> hooks.  See <a href="githooks.html">githooks</a>(5) for more
+<code>post-commit</code> and <code>post-rewrite</code> hooks.  See <a href="githooks.html">githooks</a>(5) for more
 information.</p>
 </div>
 </div>
@@ -1179,7 +1189,7 @@ overwritten by the next invocation of <code>git commit</code>.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-06-14 11:04:07 W. Europe Daylight Time
+Last updated 2017-10-12 21:18:05 Coordinated Universal Time
 </div>
 </div>
 </body>

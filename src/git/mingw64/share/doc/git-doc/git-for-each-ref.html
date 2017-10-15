@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 1.5.4">
+<meta name="generator" content="Asciidoctor 1.5.5">
 <title>git-for-each-ref(1)</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
@@ -17,7 +17,6 @@ audio:not([controls]){display:none;height:0}
 [hidden],template{display:none}
 script{display:none!important}
 html{font-family:sans-serif;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%}
-body{margin:0}
 a{background:transparent}
 a:focus{outline:thin dotted}
 a:active,a:hover{outline:0}
@@ -52,7 +51,7 @@ textarea{overflow:auto;vertical-align:top}
 table{border-collapse:collapse;border-spacing:0}
 *,*:before,*:after{-moz-box-sizing:border-box;-webkit-box-sizing:border-box;box-sizing:border-box}
 html,body{font-size:100%}
-body{background:#fff;color:rgba(0,0,0,.8);padding:0;margin:0;font-family:"Noto Serif","DejaVu Serif",serif;font-weight:400;font-style:normal;line-height:1;position:relative;cursor:auto}
+body{background:#fff;color:rgba(0,0,0,.8);padding:0;margin:0;font-family:"Noto Serif","DejaVu Serif",serif;font-weight:400;font-style:normal;line-height:1;position:relative;cursor:auto;tab-size:4;-moz-osx-font-smoothing:grayscale;-webkit-font-smoothing:antialiased}
 a:hover{cursor:pointer}
 img,object,embed{max-width:100%;height:auto}
 object,embed{height:100%}
@@ -64,7 +63,6 @@ img{-ms-interpolation-mode:bicubic}
 .text-center{text-align:center!important}
 .text-justify{text-align:justify!important}
 .hide{display:none}
-body{-webkit-font-smoothing:antialiased}
 img,object,svg{display:inline-block;vertical-align:middle}
 textarea{height:auto;min-height:50px}
 select{width:100%}
@@ -119,13 +117,16 @@ table thead tr th,table thead tr td,table tfoot tr th,table tfoot tr td{padding:
 table tr th,table tr td{padding:.5625em .625em;font-size:inherit;color:rgba(0,0,0,.8)}
 table tr.even,table tr.alt,table tr:nth-of-type(even){background:#f8f8f7}
 table thead tr th,table tfoot tr th,table tbody tr td,table tr td,table tfoot tr td{display:table-cell;line-height:1.6}
-body{tab-size:4}
 h1,h2,h3,#toctitle,.sidebarblock>.content>.title,h4,h5,h6{line-height:1.2;word-spacing:-.05em}
 h1 strong,h2 strong,h3 strong,#toctitle strong,.sidebarblock>.content>.title strong,h4 strong,h5 strong,h6 strong{font-weight:400}
 .clearfix:before,.clearfix:after,.float-group:before,.float-group:after{content:" ";display:table}
 .clearfix:after,.float-group:after{clear:both}
-*:not(pre)>code{font-size:.9375em;font-style:normal!important;letter-spacing:0;padding:.1em .5ex;word-spacing:-.15em;background-color:#f7f7f8;-webkit-border-radius:4px;border-radius:4px;line-height:1.45;text-rendering:optimizeSpeed}
+*:not(pre)>code{font-size:.9375em;font-style:normal!important;letter-spacing:0;padding:.1em .5ex;word-spacing:-.15em;background-color:#f7f7f8;-webkit-border-radius:4px;border-radius:4px;line-height:1.45;text-rendering:optimizeSpeed;word-wrap:break-word}
+*:not(pre)>code.nobreak{word-wrap:normal}
+*:not(pre)>code.nowrap{white-space:nowrap}
 pre,pre>code{line-height:1.45;color:rgba(0,0,0,.9);font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;font-weight:400;text-rendering:optimizeSpeed}
+em em{font-style:normal}
+strong strong{font-weight:400}
 .keyseq{color:rgba(51,51,51,.8)}
 kbd{font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;display:inline-block;color:rgba(0,0,0,.8);font-size:.65em;line-height:1.45;background-color:#f7f7f7;border:1px solid #ccc;-webkit-border-radius:3px;border-radius:3px;-webkit-box-shadow:0 1px 0 rgba(0,0,0,.2),0 0 0 .1em white inset;box-shadow:0 1px 0 rgba(0,0,0,.2),0 0 0 .1em #fff inset;margin:0 .15em;padding:.2em .5em;vertical-align:middle;position:relative;top:-.1em;white-space:nowrap}
 .keyseq kbd:first-child{margin-left:0}
@@ -433,7 +434,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <pre class="content"><em>git for-each-ref</em> [--count=&lt;count&gt;] [--shell|--perl|--python|--tcl]
 		   [(--sort=&lt;key&gt;)&#8230;&#8203;] [--format=&lt;format&gt;] [&lt;pattern&gt;&#8230;&#8203;]
 		   [--points-at &lt;object&gt;] [(--merged | --no-merged) [&lt;object&gt;]]
-		   [--contains [&lt;object&gt;]]</pre>
+		   [--contains [&lt;object&gt;]] [--no-contains [&lt;object&gt;]]</pre>
 </div>
 </div>
 </div>
@@ -471,11 +472,12 @@ key.</p>
 </dd>
 <dt class="hdlist1">&lt;format&gt;</dt>
 <dd>
-<p>A string that interpolates <code>%(fieldname)</code> from the
-object pointed at by a ref being shown.  If <code>fieldname</code>
+<p>A string that interpolates <code>%(fieldname)</code> from a ref being shown
+and the object it points at.  If <code>fieldname</code>
 is prefixed with an asterisk (<code>*</code>) and the ref points
-at a tag object, the value for the field in the object
-tag refers is used.  When unspecified, defaults to
+at a tag object, use the value for the field in the object
+which the tag object refers to (instead of the field in the tag object).
+When unspecified, <code>&lt;format&gt;</code> defaults to
 <code>%(objectname) SPC %(objecttype) TAB %(refname)</code>.
 It also interpolates <code>%%</code> to <code>%</code>, and <code>%xx</code> where <code>xx</code>
 are hex digits interpolates to character with hex code
@@ -506,17 +508,28 @@ a scriptlet that can directly be `eval`ed.</p>
 <dt class="hdlist1">--merged [&lt;object&gt;]</dt>
 <dd>
 <p>Only list refs whose tips are reachable from the
-specified commit (HEAD if not specified).</p>
+specified commit (HEAD if not specified),
+incompatible with <code>--no-merged</code>.</p>
 </dd>
 <dt class="hdlist1">--no-merged [&lt;object&gt;]</dt>
 <dd>
 <p>Only list refs whose tips are not reachable from the
-specified commit (HEAD if not specified).</p>
+specified commit (HEAD if not specified),
+incompatible with <code>--merged</code>.</p>
 </dd>
 <dt class="hdlist1">--contains [&lt;object&gt;]</dt>
 <dd>
 <p>Only list refs which contain the specified commit (HEAD if not
 specified).</p>
+</dd>
+<dt class="hdlist1">--no-contains [&lt;object&gt;]</dt>
+<dd>
+<p>Only list refs which don&#8217;t contain the specified commit (HEAD
+if not specified).</p>
+</dd>
+<dt class="hdlist1">--ignore-case</dt>
+<dd>
+<p>Sorting and filtering refs are case insensitive.</p>
 </dd>
 </dl>
 </div>
@@ -540,11 +553,21 @@ keys.</p>
 <p>The name of the ref (the part after $GIT_DIR/).
 For a non-ambiguous short name of the ref append <code>:short</code>.
 The option core.warnAmbiguousRefs is used to select the strict
-abbreviation mode. If <code>strip=&lt;N&gt;</code> is appended, strips <code>&lt;N&gt;</code>
-slash-separated path components from the front of the refname
-(e.g., <code>%(refname:strip=2)</code> turns <code>refs/tags/foo</code> into <code>foo</code>.
-<code>&lt;N&gt;</code> must be a positive integer.  If a displayed ref has fewer
-components than <code>&lt;N&gt;</code>, the command aborts with an error.</p>
+abbreviation mode. If <code>lstrip=&lt;N&gt;</code> (<code>rstrip=&lt;N&gt;</code>) is appended, strips <code>&lt;N&gt;</code>
+slash-separated path components from the front (back) of the refname
+(e.g. <code>%(refname:lstrip=2)</code> turns <code>refs/tags/foo</code> into <code>foo</code> and
+<code>%(refname:rstrip=2)</code> turns <code>refs/tags/foo</code> into <code>refs</code>).
+If <code>&lt;N&gt;</code> is a negative number, strip as many path components as
+necessary from the specified end to leave <code>-&lt;N&gt;</code> path components
+(e.g. <code>%(refname:lstrip=-2)</code> turns
+<code>refs/tags/foo</code> into <code>tags/foo</code> and <code>%(refname:rstrip=-1)</code>
+turns <code>refs/tags/foo</code> into <code>refs</code>). When the ref does not have
+enough components, the result becomes an empty string if
+stripping with positive &lt;N&gt;, or it becomes the full refname if
+stripping with negative &lt;N&gt;.  Neither is an error.</p>
+<div class="paragraph">
+<p><code>strip</code> can be used as a synomym to <code>lstrip</code>.</p>
+</div>
 </dd>
 <dt class="hdlist1">objecttype</dt>
 <dd>
@@ -557,24 +580,40 @@ components than <code>&lt;N&gt;</code>, the command aborts with an error.</p>
 <dt class="hdlist1">objectname</dt>
 <dd>
 <p>The object name (aka SHA-1).
-For a non-ambiguous abbreviation of the object name append <code>:short</code>.</p>
+For a non-ambiguous abbreviation of the object name append <code>:short</code>.
+For an abbreviation of the object name with desired length append
+<code>:short=&lt;length&gt;</code>, where the minimum length is MINIMUM_ABBREV. The
+length may be exceeded to ensure unique object names.</p>
 </dd>
 <dt class="hdlist1">upstream</dt>
 <dd>
 <p>The name of a local ref which can be considered &#8220;upstream&#8221;
-from the displayed ref. Respects <code>:short</code> in the same way as
-<code>refname</code> above.  Additionally respects <code>:track</code> to show
-"[ahead N, behind M]" and <code>:trackshort</code> to show the terse
-version: "&gt;" (ahead), "&lt;" (behind), "&lt;&gt;" (ahead and behind),
-or "=" (in sync).  Has no effect if the ref does not have
-tracking information associated with it.</p>
+from the displayed ref. Respects <code>:short</code>, <code>:lstrip</code> and
+<code>:rstrip</code> in the same way as <code>refname</code> above.  Additionally
+respects <code>:track</code> to show "[ahead N, behind M]" and
+<code>:trackshort</code> to show the terse version: "&gt;" (ahead), "&lt;"
+(behind), "&lt;&gt;" (ahead and behind), or "=" (in sync). <code>:track</code>
+also prints "[gone]" whenever unknown upstream ref is
+encountered. Append <code>:track,nobracket</code> to show tracking
+information without brackets (i.e "ahead N, behind M").</p>
+<div class="paragraph">
+<p>(EXPERIMENTAL) Also respects <code>:remotename</code> to state the name of the
+<strong>remote</strong> instead of the ref, and <code>:remoteref</code> to state the name of
+the <strong>reference</strong> as locally known by the remote.</p>
+</div>
+<div class="paragraph">
+<p>Has no effect if the ref does not have tracking information associated
+with it.  All the options apart from <code>nobracket</code> are mutually exclusive,
+but if used together the last option is selected.</p>
+</div>
 </dd>
 <dt class="hdlist1">push</dt>
 <dd>
-<p>The name of a local ref which represents the <code>@{push}</code> location
-for the displayed ref. Respects <code>:short</code>, <code>:track</code>, and
-<code>:trackshort</code> options as <code>upstream</code> does. Produces an empty
-string if no <code>@{push}</code> ref is configured.</p>
+<p>The name of a local ref which represents the <code>@{push}</code>
+location for the displayed ref. Respects <code>:short</code>, <code>:lstrip</code>,
+<code>:rstrip</code>, <code>:track</code>, <code>:trackshort</code>, (EXPERIMENTAL) <code>:remotename</code>,
+and (EXPERIMENTAL) <code>:remoteref</code> options as <code>upstream</code> does.
+Produces an empty string if no <code>@{push}</code> ref is configured.</p>
 </dd>
 <dt class="hdlist1">HEAD</dt>
 <dd>
@@ -583,8 +622,10 @@ otherwise.</p>
 </dd>
 <dt class="hdlist1">color</dt>
 <dd>
-<p>Change output color.  Followed by <code>:&lt;colorname&gt;</code>, where names
-are described in <code>color.branch.*</code>.</p>
+<p>Change output color. Followed by <code>:&lt;colorname&gt;</code>, where color
+names are described under Values in the "CONFIGURATION FILE"
+section of <a href="git-config.html">git-config</a>(1).  For example,
+<code>%(color:bold red)</code>.</p>
 </dd>
 <dt class="hdlist1">align</dt>
 <dd>
@@ -598,9 +639,30 @@ length of the content with alignment. For brevity, the
 &lt;width&gt; and &lt;position&gt; used instead.  For instance,
 <code>%(align:&lt;width&gt;,&lt;position&gt;)</code>. If the contents length is more
 than the width then no alignment is performed. If used with
-<em>--quote</em> everything in between %(align:&#8230;&#8203;) and %(end) is
+<code>--quote</code> everything in between %(align:&#8230;&#8203;) and %(end) is
 quoted, but if nested then only the topmost level performs
 quoting.</p>
+</dd>
+<dt class="hdlist1">if</dt>
+<dd>
+<p>Used as %(if)&#8230;&#8203;%(then)&#8230;&#8203;%(end) or
+%(if)&#8230;&#8203;%(then)&#8230;&#8203;%(else)&#8230;&#8203;%(end).  If there is an atom with
+value or string literal after the %(if) then everything after
+the %(then) is printed, else if the %(else) atom is used, then
+everything after %(else) is printed. We ignore space when
+evaluating the string before %(then), this is useful when we
+use the %(HEAD) atom which prints either "*" or " " and we
+want to apply the <em>if</em> condition only on the <em>HEAD</em> ref.
+Append ":equals=&lt;string&gt;" or ":notequals=&lt;string&gt;" to compare
+the value between the %(if:&#8230;&#8203;) and %(then) atoms with the
+given string.</p>
+</dd>
+<dt class="hdlist1">symref</dt>
+<dd>
+<p>The ref which the given symbolic ref refers to. If not a
+symbolic ref, nothing is printed. Respects the <code>:short</code>,
+<code>:lstrip</code> and <code>:rstrip</code> options in the same way as <code>refname</code>
+above.</p>
 </dd>
 </dl>
 </div>
@@ -626,7 +688,9 @@ Its first line is <code>contents:subject</code>, where subject is the concatenat
 of all lines of the commit message up to the first blank line.  The next
 line is <em>contents:body</em>, where body is all of the lines after the first
 blank line.  The optional GPG signature is <code>contents:signature</code>.  The
-first <code>N</code> lines of the message is obtained using <code>contents:lines=N</code>.</p>
+first <code>N</code> lines of the message is obtained using <code>contents:lines=N</code>.
+Additionally, the trailers as interpreted by <a href="git-interpret-trailers.html">git-interpret-trailers</a>(1)
+are obtained as <em>contents:trailers</em>.</p>
 </div>
 <div class="paragraph">
 <p>For sorting purposes, fields with numeric values sort in numeric order
@@ -646,6 +710,16 @@ returns an empty string instead.</p>
 <p>As a special case for the date-type fields, you may specify a format for
 the date by adding <code>:</code> followed by date format name (see the
 values the <code>--date</code> option to <a href="git-rev-list.html">git-rev-list</a>(1) takes).</p>
+</div>
+<div class="paragraph">
+<p>Some atoms like %(align) and %(if) always require a matching %(end).
+We call them "opening atoms" and sometimes denote them as %($open).</p>
+</div>
+<div class="paragraph">
+<p>When a scripting language specific quoting is in effect, everything
+between a top-level opening atom and its matching %(end) is evaluated
+according to the semantics of the opening atom and only its result
+from the top-level is quoted.</p>
 </div>
 </div>
 </div>
@@ -741,6 +815,24 @@ eval=`git for-each-ref --shell --format="$fmt" \
 eval "$eval"</pre>
 </div>
 </div>
+<div class="paragraph">
+<p>An example to show the usage of %(if)&#8230;&#8203;%(then)&#8230;&#8203;%(else)&#8230;&#8203;%(end).
+This prefixes the current branch with a star.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>git for-each-ref --format="%(if)%(HEAD)%(then)* %(else)  %(end)%(refname:short)" refs/heads/</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>An example to show the usage of %(if)&#8230;&#8203;%(then)&#8230;&#8203;%(end).
+This prints the authorname, if present.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>git for-each-ref --format="%(refname)%(if)%(authorname)%(then) Authored by: %(authorname)%(end)"</pre>
+</div>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -762,7 +854,7 @@ eval "$eval"</pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-06-14 11:04:07 W. Europe Daylight Time
+Last updated 2017-10-12 21:18:05 Coordinated Universal Time
 </div>
 </div>
 </body>

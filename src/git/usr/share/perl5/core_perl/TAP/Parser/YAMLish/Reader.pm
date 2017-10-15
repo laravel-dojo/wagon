@@ -5,7 +5,7 @@ use warnings;
 
 use base 'TAP::Object';
 
-our $VERSION = '3.35';
+our $VERSION = '3.36_01';
 
 # TODO:
 #   Handle blessed object syntax
@@ -81,7 +81,7 @@ sub _read {
     my $line = $self->_peek;
 
     # Do we have a document header?
-    if ( $line =~ /^ --- (?: \s* (.+?) \s* )? $/x ) {
+    if ( $line =~ /^ --- (?: \s* (.+?)? \s* )? $/x ) {
         $self->_next;
 
         return $self->_read_scalar($1) if defined $1;    # Inline?
@@ -116,7 +116,7 @@ sub _read_qq {
     }
 
     $str =~ s/\\"/"/gx;
-    $str =~ s/ \\ ( [tartan\\favez] | x([0-9a-fA-F]{2}) ) 
+    $str =~ s/ \\ ( [tartan\\favez] | x([0-9a-fA-F]{2}) )
                  / (length($1) > 1) ? pack("H2", $2) : $UNESCAPES{$1} /gex;
     return $str;
 }
@@ -269,7 +269,7 @@ TAP::Parser::YAMLish::Reader - Read YAMLish data from iterator
 
 =head1 VERSION
 
-Version 3.35
+Version 3.36
 
 =head1 SYNOPSIS
 
@@ -287,7 +287,7 @@ permission of Adam Kennedy.
 The constructor C<new> creates and returns an empty
 C<TAP::Parser::YAMLish::Reader> object.
 
- my $reader = TAP::Parser::YAMLish::Reader->new; 
+ my $reader = TAP::Parser::YAMLish::Reader->new;
 
 =head2 Instance Methods
 

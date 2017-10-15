@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 1.5.4">
+<meta name="generator" content="Asciidoctor 1.5.5">
 <title>gitmodules(5)</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
@@ -17,7 +17,6 @@ audio:not([controls]){display:none;height:0}
 [hidden],template{display:none}
 script{display:none!important}
 html{font-family:sans-serif;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%}
-body{margin:0}
 a{background:transparent}
 a:focus{outline:thin dotted}
 a:active,a:hover{outline:0}
@@ -52,7 +51,7 @@ textarea{overflow:auto;vertical-align:top}
 table{border-collapse:collapse;border-spacing:0}
 *,*:before,*:after{-moz-box-sizing:border-box;-webkit-box-sizing:border-box;box-sizing:border-box}
 html,body{font-size:100%}
-body{background:#fff;color:rgba(0,0,0,.8);padding:0;margin:0;font-family:"Noto Serif","DejaVu Serif",serif;font-weight:400;font-style:normal;line-height:1;position:relative;cursor:auto}
+body{background:#fff;color:rgba(0,0,0,.8);padding:0;margin:0;font-family:"Noto Serif","DejaVu Serif",serif;font-weight:400;font-style:normal;line-height:1;position:relative;cursor:auto;tab-size:4;-moz-osx-font-smoothing:grayscale;-webkit-font-smoothing:antialiased}
 a:hover{cursor:pointer}
 img,object,embed{max-width:100%;height:auto}
 object,embed{height:100%}
@@ -64,7 +63,6 @@ img{-ms-interpolation-mode:bicubic}
 .text-center{text-align:center!important}
 .text-justify{text-align:justify!important}
 .hide{display:none}
-body{-webkit-font-smoothing:antialiased}
 img,object,svg{display:inline-block;vertical-align:middle}
 textarea{height:auto;min-height:50px}
 select{width:100%}
@@ -119,13 +117,16 @@ table thead tr th,table thead tr td,table tfoot tr th,table tfoot tr td{padding:
 table tr th,table tr td{padding:.5625em .625em;font-size:inherit;color:rgba(0,0,0,.8)}
 table tr.even,table tr.alt,table tr:nth-of-type(even){background:#f8f8f7}
 table thead tr th,table tfoot tr th,table tbody tr td,table tr td,table tfoot tr td{display:table-cell;line-height:1.6}
-body{tab-size:4}
 h1,h2,h3,#toctitle,.sidebarblock>.content>.title,h4,h5,h6{line-height:1.2;word-spacing:-.05em}
 h1 strong,h2 strong,h3 strong,#toctitle strong,.sidebarblock>.content>.title strong,h4 strong,h5 strong,h6 strong{font-weight:400}
 .clearfix:before,.clearfix:after,.float-group:before,.float-group:after{content:" ";display:table}
 .clearfix:after,.float-group:after{clear:both}
-*:not(pre)>code{font-size:.9375em;font-style:normal!important;letter-spacing:0;padding:.1em .5ex;word-spacing:-.15em;background-color:#f7f7f8;-webkit-border-radius:4px;border-radius:4px;line-height:1.45;text-rendering:optimizeSpeed}
+*:not(pre)>code{font-size:.9375em;font-style:normal!important;letter-spacing:0;padding:.1em .5ex;word-spacing:-.15em;background-color:#f7f7f8;-webkit-border-radius:4px;border-radius:4px;line-height:1.45;text-rendering:optimizeSpeed;word-wrap:break-word}
+*:not(pre)>code.nobreak{word-wrap:normal}
+*:not(pre)>code.nowrap{white-space:nowrap}
 pre,pre>code{line-height:1.45;color:rgba(0,0,0,.9);font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;font-weight:400;text-rendering:optimizeSpeed}
+em em{font-style:normal}
+strong strong{font-weight:400}
 .keyseq{color:rgba(51,51,51,.8)}
 kbd{font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;display:inline-block;color:rgba(0,0,0,.8);font-size:.65em;line-height:1.45;background-color:#f7f7f7;border:1px solid #ccc;-webkit-border-radius:3px;border-radius:3px;-webkit-box-shadow:0 1px 0 rgba(0,0,0,.2),0 0 0 .1em white inset;box-shadow:0 1px 0 rgba(0,0,0,.2),0 0 0 .1em #fff inset;margin:0 .15em;padding:.2em .5em;vertical-align:middle;position:relative;top:-.1em;white-space:nowrap}
 .keyseq kbd:first-child{margin-left:0}
@@ -445,7 +446,7 @@ of <a href="git-config.html">git-config</a>(1).</p>
 <div class="paragraph">
 <p>The file contains one subsection per submodule, and the subsection value
 is the name of the submodule. The name is set to the path where the
-submodule has been added unless it was customized with the <em>--name</em>
+submodule has been added unless it was customized with the <code>--name</code>
 option of <em>git submodule add</em>. Each submodule section also contains the
 following required keys:</p>
 </div>
@@ -487,8 +488,11 @@ reasons.</p>
 <dt class="hdlist1">submodule.&lt;name&gt;.branch</dt>
 <dd>
 <p>A remote branch name for tracking updates in the upstream submodule.
-If the option is not specified, it defaults to <em>master</em>.  See the
-<code>--remote</code> documentation in <a href="git-submodule.html">git-submodule</a>(1) for details.</p>
+If the option is not specified, it defaults to <em>master</em>.  A special
+value of <code>.</code> is used to indicate that the name of the branch in the
+submodule should be the same name as the current branch in the
+current repository.  See the <code>--remote</code> documentation in
+<a href="git-submodule.html">git-submodule</a>(1) for details.</p>
 </dd>
 <dt class="hdlist1">submodule.&lt;name&gt;.fetchRecurseSubmodules</dt>
 <dd>
@@ -502,21 +506,51 @@ Both settings can be overridden on the command line by using the
 <dt class="hdlist1">submodule.&lt;name&gt;.ignore</dt>
 <dd>
 <p>Defines under what circumstances "git status" and the diff family show
-a submodule as modified. When set to "all", it will never be considered
-modified (but will nonetheless show up in the output of status and
-commit when it has been staged), "dirty" will ignore all changes
-to the submodules work tree and
-takes only differences between the HEAD of the submodule and the commit
-recorded in the superproject into account. "untracked" will additionally
-let submodules with modified tracked files in their work tree show up.
-Using "none" (the default when this option is not set) also shows
-submodules that have untracked files in their work tree as changed.
-If this option is also present in the submodules entry in .git/config of
-the superproject, the setting there will override the one found in
+a submodule as modified. The following values are supported:</p>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">all</dt>
+<dd>
+<p>The submodule will never be considered modified (but will
+nonetheless show up in the output of status and commit when it has
+been staged).</p>
+</dd>
+<dt class="hdlist1">dirty</dt>
+<dd>
+<p>All changes to the submodule&#8217;s work tree will be ignored, only
+committed differences between the HEAD of the submodule and its
+recorded state in the superproject are taken into account.</p>
+</dd>
+<dt class="hdlist1">untracked</dt>
+<dd>
+<p>Only untracked files in submodules will be ignored.
+Committed differences and modifications to tracked files will show
+up.</p>
+</dd>
+<dt class="hdlist1">none</dt>
+<dd>
+<p>No modifiations to submodules are ignored, all of committed
+differences, and modifications to tracked and untracked files are
+shown. This is the default option.</p>
+<div class="literalblock">
+<div class="content">
+<pre>If this option is also present in the submodules entry in .git/config
+of the superproject, the setting there will override the one found in
 .gitmodules.
 Both settings can be overridden on the command line by using the
-"--ignore-submodule" option. The <em>git submodule</em> commands are not
-affected by this setting.</p>
+"--ignore-submodule" option. The 'git submodule' commands are not
+affected by this setting.</pre>
+</div>
+</div>
+</dd>
+</dl>
+</div>
+</dd>
+<dt class="hdlist1">submodule.&lt;name&gt;.shallow</dt>
+<dd>
+<p>When set to true, a clone of this submodule will be performed as a
+shallow clone (with a history depth of 1) unless the user explicitly
+asks for a non-shallow clone.</p>
 </dd>
 </dl>
 </div>
@@ -568,7 +602,7 @@ submodules a URL is specified which can be used for cloning the submodules.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-06-14 11:04:08 W. Europe Daylight Time
+Last updated 2017-10-12 21:18:06 Coordinated Universal Time
 </div>
 </div>
 </body>

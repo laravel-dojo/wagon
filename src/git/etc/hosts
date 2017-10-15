@@ -20,6 +20,7 @@
 #	127.0.0.1       localhost
 #	::1             localhost
 
-192.168.10.10	homestead.app
-192.168.10.10	adminer.app
-192.168.10.10	todo.app
+192.168.10.10   adminer.app
+192.168.10.10   laravel.app
+192.168.10.10   oauth-server.app
+192.168.10.10   oauth-client.app

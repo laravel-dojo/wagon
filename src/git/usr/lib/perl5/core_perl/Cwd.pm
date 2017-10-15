@@ -3,9 +3,9 @@ use strict;
 use Exporter;
 use vars qw(@ISA @EXPORT @EXPORT_OK $VERSION);
 
-$VERSION = '3.56';
+$VERSION = '3.63_01';
 my $xs_version = $VERSION;
-$VERSION =~ tr/_//;
+$VERSION =~ tr/_//d;
 
 @ISA = qw/ Exporter /;
 @EXPORT = qw(cwd getcwd fastcwd fastgetcwd);
@@ -40,7 +40,10 @@ if ($^O eq 'os2') {
 my $use_vms_feature;
 BEGIN {
     if ($^O eq 'VMS') {
-        if (eval { local $SIG{__DIE__}; require VMS::Feature; }) {
+        if (eval { local $SIG{__DIE__};
+                   local @INC = @INC;
+                   pop @INC if $INC[-1] eq '.';
+                   require VMS::Feature; }) {
             $use_vms_feature = 1;
         }
     }
@@ -54,7 +57,7 @@ sub _vms_unix_rpt {
         $unix_rpt = VMS::Feature::current("filename_unix_report");
     } else {
         my $env_unix_rpt = $ENV{'DECC$FILENAME_UNIX_REPORT'} || '';
-        $unix_rpt = $env_unix_rpt =~ /^[ET1]/i; 
+        $unix_rpt = $env_unix_rpt =~ /^[ET1]/i;
     }
     return $unix_rpt;
 }
@@ -67,7 +70,7 @@ sub _vms_efs {
         $efs = VMS::Feature::current("efs_charset");
     } else {
         my $env_efs = $ENV{'DECC$EFS_CHARSET'} || '';
-        $efs = $env_efs =~ /^[ET1]/i; 
+        $efs = $env_efs =~ /^[ET1]/i;
     }
     return $efs;
 }
@@ -113,7 +116,7 @@ my %METHOD_MAP =
     realpath		=> 'fast_abs_path',
    },
 
-   dos => 
+   dos =>
    {
     cwd			=> '_dos_cwd',
     getcwd		=> '_dos_cwd',
@@ -167,6 +170,14 @@ my %METHOD_MAP =
     fastcwd		=> 'cwd',
     abs_path		=> 'fast_abs_path',
    },
+
+   amigaos =>
+   {
+    getcwd              => '_backtick_pwd',
+    fastgetcwd          => '_backtick_pwd',
+    fastcwd             => '_backtick_pwd',
+    abs_path            => 'fast_abs_path',
+   }
   );
 
 $METHOD_MAP{NT} = $METHOD_MAP{MSWin32};
@@ -219,10 +230,13 @@ sub _croak { require Carp; Carp::croak(@_) }
 
 # The 'natural and safe form' for UNIX (pwd may be setuid root)
 sub _backtick_pwd {
-    # Localize %ENV entries in a way that won't create new hash keys
-    my @localize = grep exists $ENV{$_}, qw(PATH IFS CDPATH ENV BASH_ENV);
-    local @ENV{@localize};
-    
+
+    # Localize %ENV entries in a way that won't create new hash keys.
+    # Under AmigaOS we don't want to localize as it stops perl from
+    # finding 'sh' in the PATH.
+    my @localize = grep exists $ENV{$_}, qw(PATH IFS CDPATH ENV BASH_ENV) if $^O ne "amigaos";
+    local @ENV{@localize} if @localize;
+
     my $cwd = `$pwd_cmd`;
     # Belt-and-suspenders in case someone said "undef $/".
     local $/ = "\n";
@@ -285,7 +299,7 @@ sub _perl_getcwd
 #
 # This is a faster version of getcwd.  It's also more dangerous because
 # you might chdir out of a directory that you can't chdir back into.
-    
+
 sub fastcwd_ {
     my($odev, $oino, $cdev, $cino, $tdev, $tino);
     my(@path, $path);
@@ -420,22 +434,22 @@ sub _perl_abs_path
     unless (-d _) {
         # Make sure we can be invoked on plain files, not just directories.
         # NOTE that this routine assumes that '/' is the only directory separator.
-	
+
         my ($dir, $file) = $start =~ m{^(.*)/(.+)$}
 	    or return cwd() . '/' . $start;
-	
+
 	# Can't use "-l _" here, because the previous stat was a stat(), not an lstat().
 	if (-l $start) {
 	    my $link_target = readlink($start);
 	    die "Can't resolve link $start: $!" unless defined $link_target;
-	    
+
 	    require File::Spec;
             $link_target = $dir . '/' . $link_target
                 unless File::Spec->file_name_is_absolute($link_target);
-	    
+
 	    return abs_path($link_target);
 	}
-	
+
 	return $dir ? abs_path($dir) . "/$file" : "/$file";
     }
 
@@ -503,20 +517,20 @@ sub fast_abs_path {
 
     unless (-d _) {
         # Make sure we can be invoked on plain files, not just directories.
-	
+
 	my ($vol, $dir, $file) = File::Spec->splitpath($path);
 	return File::Spec->catfile($cwd, $path) unless length $dir;
 
 	if (-l $path) {
 	    my $link_target = readlink($path);
 	    die "Can't resolve link $path: $!" unless defined $link_target;
-	    
+
 	    $link_target = File::Spec->catpath($vol, $dir, $link_target)
                 unless File::Spec->file_name_is_absolute($link_target);
-	    
+
 	    return fast_abs_path($link_target);
 	}
-	
+
 	return $dir eq File::Spec->rootdir
 	  ? File::Spec->catpath($vol, $dir, $file)
 	  : fast_abs_path(File::Spec->catpath($vol, $dir, '')) . '/' . $file;
@@ -604,62 +618,56 @@ sub _vms_abs_path {
     # may need to turn foo.dir into [.foo]
     my $pathified = VMS::Filespec::pathify($path);
     $path = $pathified if defined $pathified;
-	
+
     return VMS::Filespec::rmsexpand($path);
 }
 
 sub _os2_cwd {
-    $ENV{'PWD'} = `cmd /c cd`;
-    chomp $ENV{'PWD'};
-    $ENV{'PWD'} =~ s:\\:/:g ;
-    return $ENV{'PWD'};
+    my $pwd = `cmd /c cd`;
+    chomp $pwd;
+    $pwd =~ s:\\:/:g ;
+    $ENV{'PWD'} = $pwd;
+    return $pwd;
 }
 
 sub _win32_cwd_simple {
-    $ENV{'PWD'} = `cd`;
-    chomp $ENV{'PWD'};
-    $ENV{'PWD'} =~ s:\\:/:g ;
-    return $ENV{'PWD'};
+    my $pwd = `cd`;
+    chomp $pwd;
+    $pwd =~ s:\\:/:g ;
+    $ENV{'PWD'} = $pwd;
+    return $pwd;
 }
 
 sub _win32_cwd {
-    # Need to avoid taking any sort of reference to the typeglob or the code in
-    # the optree, so that this tests the runtime state of things, as the
-    # ExtUtils::MakeMaker tests for "miniperl" need to be able to fake things at
-    # runtime by deleting the subroutine. *foo{THING} syntax on a symbol table
-    # lookup avoids needing a string eval, which has been reported to cause
-    # problems (for reasons that we haven't been able to get to the bottom of -
-    # rt.cpan.org #56225)
-    if (*{$DynaLoader::{boot_DynaLoader}}{CODE}) {
-	$ENV{'PWD'} = Win32::GetCwd();
-    }
-    else { # miniperl
-	chomp($ENV{'PWD'} = `cd`);
-    }
-    $ENV{'PWD'} =~ s:\\:/:g ;
-    return $ENV{'PWD'};
+    my $pwd;
+    $pwd = Win32::GetCwd();
+    $pwd =~ s:\\:/:g ;
+    $ENV{'PWD'} = $pwd;
+    return $pwd;
 }
 
 *_NT_cwd = defined &Win32::GetCwd ? \&_win32_cwd : \&_win32_cwd_simple;
 
 sub _dos_cwd {
+    my $pwd;
     if (!defined &Dos::GetCwd) {
-        $ENV{'PWD'} = `command /c cd`;
-        chomp $ENV{'PWD'};
-        $ENV{'PWD'} =~ s:\\:/:g ;
+        chomp($pwd = `command /c cd`);
+        $pwd =~ s:\\:/:g ;
     } else {
-        $ENV{'PWD'} = Dos::GetCwd();
+        $pwd = Dos::GetCwd();
     }
-    return $ENV{'PWD'};
+    $ENV{'PWD'} = $pwd;
+    return $pwd;
 }
 
 sub _qnx_cwd {
 	local $ENV{PATH} = '';
 	local $ENV{CDPATH} = '';
 	local $ENV{ENV} = '';
-    $ENV{'PWD'} = `/usr/bin/fullpath -t`;
-    chomp $ENV{'PWD'};
-    return $ENV{'PWD'};
+    my $pwd = `/usr/bin/fullpath -t`;
+    chomp $pwd;
+    $ENV{'PWD'} = $pwd;
+    return $pwd;
 }
 
 sub _qnx_abs_path {
@@ -678,8 +686,7 @@ sub _qnx_abs_path {
 }
 
 sub _epoc_cwd {
-    $ENV{'PWD'} = EPOC::getcwd();
-    return $ENV{'PWD'};
+    return $ENV{'PWD'} = EPOC::getcwd();
 }
 
 
@@ -725,7 +732,7 @@ current working directory.  It is recommended that getcwd (or another
 *cwd() function) be used in I<all> code to ensure portability.
 
 By default, it exports the functions cwd(), getcwd(), fastcwd(), and
-fastgetcwd() (and, on Win32, getdcwd()) into the caller's namespace.  
+fastgetcwd() (and, on Win32, getdcwd()) into the caller's namespace.
 
 
 =head2 getcwd and friends
@@ -820,7 +827,7 @@ A more dangerous, but potentially faster version of abs_path.
 
 =head2 $ENV{PWD}
 
-If you ask to override your chdir() built-in function, 
+If you ask to override your chdir() built-in function,
 
   use Cwd qw(chdir);
 

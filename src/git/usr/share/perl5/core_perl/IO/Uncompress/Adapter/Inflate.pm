@@ -4,11 +4,11 @@ use strict;
 use warnings;
 #use bytes;
 
-use IO::Compress::Base::Common  2.068 qw(:Status);
-use Compress::Raw::Zlib  2.068 qw(Z_OK Z_BUF_ERROR Z_STREAM_END Z_FINISH MAX_WBITS);
+use IO::Compress::Base::Common  2.069 qw(:Status);
+use Compress::Raw::Zlib  2.069 qw(Z_OK Z_BUF_ERROR Z_STREAM_END Z_FINISH MAX_WBITS);
 
 our ($VERSION);
-$VERSION = '2.068';
+$VERSION = '2.069_001';
 
 
 
@@ -39,7 +39,7 @@ sub mkUncompObject
                                     WindowBits   => - MAX_WBITS ;
     }
 
-    return (undef, "Could not create Inflation object: $status", $status) 
+    return (undef, "Could not create Inflation object: $status", $status)
         if $status != Z_OK ;
 
     return bless {'Inf'        => $inflate,
@@ -47,8 +47,8 @@ sub mkUncompObject
                   'UnCompSize' => 0,
                   'Error'      => '',
                   'ConsumesInput' => 1,
-                 } ;     
-    
+                 } ;
+
 }
 
 sub uncompr
@@ -68,7 +68,7 @@ sub uncompr
         $self->{Error} = "Inflation Error: $status";
         return STATUS_ERROR;
     }
-            
+
     return STATUS_OK        if $status == Z_BUF_ERROR ; # ???
     return STATUS_OK        if $status == Z_OK ;
     return STATUS_ENDSTREAM if $status == Z_STREAM_END ;
@@ -116,8 +116,8 @@ sub adler32
 sub sync
 {
     my $self = shift ;
-    ( $self->{Inf}->inflateSync(@_) == Z_OK) 
-            ? STATUS_OK 
+    ( $self->{Inf}->inflateSync(@_) == Z_OK)
+            ? STATUS_OK
             : STATUS_ERROR ;
 }
 

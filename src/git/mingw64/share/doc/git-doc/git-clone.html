@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 1.5.4">
+<meta name="generator" content="Asciidoctor 1.5.5">
 <title>git-clone(1)</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
@@ -17,7 +17,6 @@ audio:not([controls]){display:none;height:0}
 [hidden],template{display:none}
 script{display:none!important}
 html{font-family:sans-serif;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%}
-body{margin:0}
 a{background:transparent}
 a:focus{outline:thin dotted}
 a:active,a:hover{outline:0}
@@ -52,7 +51,7 @@ textarea{overflow:auto;vertical-align:top}
 table{border-collapse:collapse;border-spacing:0}
 *,*:before,*:after{-moz-box-sizing:border-box;-webkit-box-sizing:border-box;box-sizing:border-box}
 html,body{font-size:100%}
-body{background:#fff;color:rgba(0,0,0,.8);padding:0;margin:0;font-family:"Noto Serif","DejaVu Serif",serif;font-weight:400;font-style:normal;line-height:1;position:relative;cursor:auto}
+body{background:#fff;color:rgba(0,0,0,.8);padding:0;margin:0;font-family:"Noto Serif","DejaVu Serif",serif;font-weight:400;font-style:normal;line-height:1;position:relative;cursor:auto;tab-size:4;-moz-osx-font-smoothing:grayscale;-webkit-font-smoothing:antialiased}
 a:hover{cursor:pointer}
 img,object,embed{max-width:100%;height:auto}
 object,embed{height:100%}
@@ -64,7 +63,6 @@ img{-ms-interpolation-mode:bicubic}
 .text-center{text-align:center!important}
 .text-justify{text-align:justify!important}
 .hide{display:none}
-body{-webkit-font-smoothing:antialiased}
 img,object,svg{display:inline-block;vertical-align:middle}
 textarea{height:auto;min-height:50px}
 select{width:100%}
@@ -119,13 +117,16 @@ table thead tr th,table thead tr td,table tfoot tr th,table tfoot tr td{padding:
 table tr th,table tr td{padding:.5625em .625em;font-size:inherit;color:rgba(0,0,0,.8)}
 table tr.even,table tr.alt,table tr:nth-of-type(even){background:#f8f8f7}
 table thead tr th,table tfoot tr th,table tbody tr td,table tr td,table tfoot tr td{display:table-cell;line-height:1.6}
-body{tab-size:4}
 h1,h2,h3,#toctitle,.sidebarblock>.content>.title,h4,h5,h6{line-height:1.2;word-spacing:-.05em}
 h1 strong,h2 strong,h3 strong,#toctitle strong,.sidebarblock>.content>.title strong,h4 strong,h5 strong,h6 strong{font-weight:400}
 .clearfix:before,.clearfix:after,.float-group:before,.float-group:after{content:" ";display:table}
 .clearfix:after,.float-group:after{clear:both}
-*:not(pre)>code{font-size:.9375em;font-style:normal!important;letter-spacing:0;padding:.1em .5ex;word-spacing:-.15em;background-color:#f7f7f8;-webkit-border-radius:4px;border-radius:4px;line-height:1.45;text-rendering:optimizeSpeed}
+*:not(pre)>code{font-size:.9375em;font-style:normal!important;letter-spacing:0;padding:.1em .5ex;word-spacing:-.15em;background-color:#f7f7f8;-webkit-border-radius:4px;border-radius:4px;line-height:1.45;text-rendering:optimizeSpeed;word-wrap:break-word}
+*:not(pre)>code.nobreak{word-wrap:normal}
+*:not(pre)>code.nowrap{white-space:nowrap}
 pre,pre>code{line-height:1.45;color:rgba(0,0,0,.9);font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;font-weight:400;text-rendering:optimizeSpeed}
+em em{font-style:normal}
+strong strong{font-weight:400}
 .keyseq{color:rgba(51,51,51,.8)}
 kbd{font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;display:inline-block;color:rgba(0,0,0,.8);font-size:.65em;line-height:1.45;background-color:#f7f7f7;border:1px solid #ccc;-webkit-border-radius:3px;border-radius:3px;-webkit-box-shadow:0 1px 0 rgba(0,0,0,.2),0 0 0 .1em white inset;box-shadow:0 1px 0 rgba(0,0,0,.2),0 0 0 .1em #fff inset;margin:0 .15em;padding:.2em .5em;vertical-align:middle;position:relative;top:-.1em;white-space:nowrap}
 .keyseq kbd:first-child{margin-left:0}
@@ -434,8 +435,8 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 	  [-l] [-s] [--no-hardlinks] [-q] [-n] [--bare] [--mirror]
 	  [-o &lt;name&gt;] [-b &lt;name&gt;] [-u &lt;upload-pack&gt;] [--reference &lt;repository&gt;]
 	  [--dissociate] [--separate-git-dir &lt;git dir&gt;]
-	  [--depth &lt;depth&gt;] [--[no-]single-branch]
-	  [--recursive | --recurse-submodules] [--[no-]shallow-submodules]
+	  [--depth &lt;depth&gt;] [--[no-]single-branch] [--no-tags]
+	  [--recurse-submodules] [--[no-]shallow-submodules]
 	  [--jobs &lt;n&gt;] [--] &lt;repository&gt; [&lt;directory&gt;]</pre>
 </div>
 </div>
@@ -527,14 +528,17 @@ its source repository, you can simply run <code>git repack -a</code> to copy all
 objects from the source repository into a pack in the cloned repository.</p>
 </div>
 </dd>
-<dt class="hdlist1">--reference &lt;repository&gt;</dt>
+<dt class="hdlist1">--reference[-if-able] &lt;repository&gt;</dt>
 <dd>
 <p>If the reference repository is on the local machine,
 automatically setup <code>.git/objects/info/alternates</code> to
 obtain objects from the reference repository.  Using
 an already existing repository as an alternate will
 require fewer objects to be copied from the repository
-being cloned, reducing network and local storage costs.</p>
+being cloned, reducing network and local storage costs.
+When using the <code>--reference-if-able</code>, a non existing
+directory is skipped with a warning instead of aborting
+the clone.</p>
 <div class="paragraph">
 <p><strong>NOTE</strong>: see the NOTE for the <code>--shared</code> option, and also the
 <code>--dissociate</code> option.</p>
@@ -643,9 +647,18 @@ additional fetch refspecs to the origin remote.</p>
 <p>Create a <em>shallow</em> clone with a history truncated to the
 specified number of commits. Implies <code>--single-branch</code> unless
 <code>--no-single-branch</code> is given to fetch the histories near the
-tips of all branches. This implies <code>--shallow-submodules</code>. If
-you want to have a shallow superproject clone, but full submodules,
-also pass <code>--no-shallow-submodules</code>.</p>
+tips of all branches. If you want to clone submodules shallowly,
+also pass <code>--shallow-submodules</code>.</p>
+</dd>
+<dt class="hdlist1">--shallow-since=&lt;date&gt;</dt>
+<dd>
+<p>Create a shallow clone with a history after the specified time.</p>
+</dd>
+<dt class="hdlist1">--shallow-exclude=&lt;revision&gt;</dt>
+<dd>
+<p>Create a shallow clone with a history, excluding commits
+reachable from a specified remote branch or tag.  This option
+can be specified multiple times.</p>
 </dd>
 <dt class="hdlist1">--[no-]single-branch</dt>
 <dd>
@@ -658,11 +671,29 @@ initial cloning.  If the HEAD at the remote did not point at any
 branch when <code>--single-branch</code> clone was made, no remote-tracking
 branch is created.</p>
 </dd>
-<dt class="hdlist1">--recursive</dt>
-<dt class="hdlist1">--recurse-submodules</dt>
+<dt class="hdlist1">--no-tags</dt>
 <dd>
-<p>After the clone is created, initialize all submodules within,
-using their default settings. This is equivalent to running
+<p>Don&#8217;t clone any tags, and set
+<code>remote.&lt;remote&gt;.tagOpt=--no-tags</code> in the config, ensuring
+that future <code>git pull</code> and <code>git fetch</code> operations won&#8217;t follow
+any tags. Subsequent explicit tag fetches will still work,
+(see <a href="git-fetch.html">git-fetch</a>(1)).</p>
+<div class="paragraph">
+<p>Can be used in conjunction with <code>--single-branch</code> to clone and
+maintain a branch with no references other than a single cloned
+branch. This is useful e.g. to maintain minimal clones of the default
+branch of some repository for search indexing.</p>
+</div>
+</dd>
+<dt class="hdlist1">--recurse-submodules[=&lt;pathspec]</dt>
+<dd>
+<p>After the clone is created, initialize and clone submodules
+within based on the provided pathspec.  If no pathspec is
+provided, all submodules are initialized and cloned.
+Submodules are initialized and cloned using their default
+settings.  The resulting clone has <code>submodule.active</code> set to
+the provided pathspec, or "." (meaning all submodules) if no
+pathspec is provided.  This is equivalent to running
 <code>git submodule update --init --recursive</code> immediately after
 the clone is finished. This option is ignored if the cloned
 repository does not have a worktree/checkout (i.e. if any of
@@ -921,7 +952,7 @@ $ cd my-linux</pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-06-14 11:04:07 W. Europe Daylight Time
+Last updated 2017-10-12 21:18:05 Coordinated Universal Time
 </div>
 </div>
 </body>

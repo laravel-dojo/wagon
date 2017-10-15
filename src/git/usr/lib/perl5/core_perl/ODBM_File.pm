@@ -7,7 +7,7 @@ require Tie::Hash;
 require XSLoader;
 
 our @ISA = qw(Tie::Hash);
-our $VERSION = "1.12";
+our $VERSION = "1.14";
 
 XSLoader::load();
 
@@ -26,7 +26,7 @@ ODBM_File - Tied access to odbm files
 
   # Now read and change the hash
   $h{newkey} = newvalue;
-  print $h{oldkey}; 
+  print $h{oldkey};
   ...
 
   untie %h;
@@ -49,14 +49,14 @@ C<tie> should be:
 
 The hash variable you want to tie.
 
-=item 2. 
+=item 2.
 
 The string C<"ODBM_File">.  (Ths tells Perl to use the C<ODBM_File>
 package to perform the functions of the hash.)
 
-=item 3. 
+=item 3.
 
-The name of the file you want to tie to the hash.  
+The name of the file you want to tie to the hash.
 
 =item 4.
 

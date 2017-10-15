@@ -5,7 +5,7 @@ use warnings;
 
 use base 'TAP::Object';
 
-our $VERSION = '3.35';
+our $VERSION = '3.36_01';
 
 my $ESCAPE_CHAR = qr{ [ \x00-\x1f \" ] }x;
 my $ESCAPE_KEY  = qr{ (?: ^\W ) | $ESCAPE_CHAR }x;
@@ -146,29 +146,29 @@ TAP::Parser::YAMLish::Writer - Write YAMLish data
 
 =head1 VERSION
 
-Version 3.35
+Version 3.36
 
 =head1 SYNOPSIS
 
     use TAP::Parser::YAMLish::Writer;
-    
+
     my $data = {
         one => 1,
         two => 2,
         three => [ 1, 2, 3 ],
     };
-    
+
     my $yw = TAP::Parser::YAMLish::Writer->new;
-    
+
     # Write to an array...
     $yw->write( $data, \@some_array );
-    
+
     # ...an open file handle...
     $yw->write( $data, $some_file_handle );
-    
+
     # ...a string ...
     $yw->write( $data, \$some_string );
-    
+
     # ...or a closure
     $yw->write( $data, sub {
         my $line = shift;
@@ -202,13 +202,13 @@ Encode a scalar, hash reference or array reference as YAML.
         my $line = shift;
         print SOMEFILE "$line\n";
     };
-    
+
     my $data = {
         one => 1,
         two => 2,
         three => [ 1, 2, 3 ],
     };
-    
+
     my $yw = TAP::Parser::YAMLish::Writer->new;
     $yw->write( $data, $writer );
 

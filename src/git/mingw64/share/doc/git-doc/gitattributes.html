@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 1.5.4">
+<meta name="generator" content="Asciidoctor 1.5.5">
 <title>gitattributes(5)</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
@@ -17,7 +17,6 @@ audio:not([controls]){display:none;height:0}
 [hidden],template{display:none}
 script{display:none!important}
 html{font-family:sans-serif;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%}
-body{margin:0}
 a{background:transparent}
 a:focus{outline:thin dotted}
 a:active,a:hover{outline:0}
@@ -52,7 +51,7 @@ textarea{overflow:auto;vertical-align:top}
 table{border-collapse:collapse;border-spacing:0}
 *,*:before,*:after{-moz-box-sizing:border-box;-webkit-box-sizing:border-box;box-sizing:border-box}
 html,body{font-size:100%}
-body{background:#fff;color:rgba(0,0,0,.8);padding:0;margin:0;font-family:"Noto Serif","DejaVu Serif",serif;font-weight:400;font-style:normal;line-height:1;position:relative;cursor:auto}
+body{background:#fff;color:rgba(0,0,0,.8);padding:0;margin:0;font-family:"Noto Serif","DejaVu Serif",serif;font-weight:400;font-style:normal;line-height:1;position:relative;cursor:auto;tab-size:4;-moz-osx-font-smoothing:grayscale;-webkit-font-smoothing:antialiased}
 a:hover{cursor:pointer}
 img,object,embed{max-width:100%;height:auto}
 object,embed{height:100%}
@@ -64,7 +63,6 @@ img{-ms-interpolation-mode:bicubic}
 .text-center{text-align:center!important}
 .text-justify{text-align:justify!important}
 .hide{display:none}
-body{-webkit-font-smoothing:antialiased}
 img,object,svg{display:inline-block;vertical-align:middle}
 textarea{height:auto;min-height:50px}
 select{width:100%}
@@ -119,13 +117,16 @@ table thead tr th,table thead tr td,table tfoot tr th,table tfoot tr td{padding:
 table tr th,table tr td{padding:.5625em .625em;font-size:inherit;color:rgba(0,0,0,.8)}
 table tr.even,table tr.alt,table tr:nth-of-type(even){background:#f8f8f7}
 table thead tr th,table tfoot tr th,table tbody tr td,table tr td,table tfoot tr td{display:table-cell;line-height:1.6}
-body{tab-size:4}
 h1,h2,h3,#toctitle,.sidebarblock>.content>.title,h4,h5,h6{line-height:1.2;word-spacing:-.05em}
 h1 strong,h2 strong,h3 strong,#toctitle strong,.sidebarblock>.content>.title strong,h4 strong,h5 strong,h6 strong{font-weight:400}
 .clearfix:before,.clearfix:after,.float-group:before,.float-group:after{content:" ";display:table}
 .clearfix:after,.float-group:after{clear:both}
-*:not(pre)>code{font-size:.9375em;font-style:normal!important;letter-spacing:0;padding:.1em .5ex;word-spacing:-.15em;background-color:#f7f7f8;-webkit-border-radius:4px;border-radius:4px;line-height:1.45;text-rendering:optimizeSpeed}
+*:not(pre)>code{font-size:.9375em;font-style:normal!important;letter-spacing:0;padding:.1em .5ex;word-spacing:-.15em;background-color:#f7f7f8;-webkit-border-radius:4px;border-radius:4px;line-height:1.45;text-rendering:optimizeSpeed;word-wrap:break-word}
+*:not(pre)>code.nobreak{word-wrap:normal}
+*:not(pre)>code.nowrap{white-space:nowrap}
 pre,pre>code{line-height:1.45;color:rgba(0,0,0,.9);font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;font-weight:400;text-rendering:optimizeSpeed}
+em em{font-style:normal}
+strong strong{font-weight:400}
 .keyseq{color:rgba(51,51,51,.8)}
 kbd{font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;display:inline-block;color:rgba(0,0,0,.8);font-size:.65em;line-height:1.45;background-color:#f7f7f7;border:1px solid #ccc;-webkit-border-radius:3px;border-radius:3px;-webkit-box-shadow:0 1px 0 rgba(0,0,0,.2),0 0 0 .1em white inset;box-shadow:0 1px 0 rgba(0,0,0,.2),0 0 0 .1em #fff inset;margin:0 .15em;padding:.2em .5em;vertical-align:middle;position:relative;top:-.1em;white-space:nowrap}
 .keyseq kbd:first-child{margin-left:0}
@@ -451,9 +452,11 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </div>
 <div class="paragraph">
 <p>That is, a pattern followed by an attributes list,
-separated by whitespaces.  When the pattern matches the
-path in question, the attributes listed on the line are given to
-the path.</p>
+separated by whitespaces. Leading and trailing whitespaces are
+ignored. Lines that begin with <em>#</em> are ignored. Patterns
+that begin with a double quote are quoted in C style.
+When the pattern matches the path in question, the attributes
+listed on the line are given to the path.</p>
 </div>
 <div class="paragraph">
 <p>Each attribute can be in one of these states for a given path:</p>
@@ -526,7 +529,7 @@ Attributes for all users on a system should be placed in the
 <code>$(prefix)/etc/gitattributes</code> file.</p>
 </div>
 <div class="paragraph">
-<p>Sometimes you would need to override an setting of an attribute
+<p>Sometimes you would need to override a setting of an attribute
 for a path to <code>Unspecified</code> state.  This can be done by listing
 the name of the attribute prefixed with an exclamation point <code>!</code>.</p>
 </div>
@@ -556,7 +559,8 @@ repository upon <em>git add</em> and <em>git commit</em>.</p>
 text file is normalized, its line endings are converted to LF in the
 repository.  To control what line ending style is used in the working
 directory, use the <code>eol</code> attribute for a single file and the
-<code>core.eol</code> configuration variable for all text files.</p>
+<code>core.eol</code> configuration variable for all text files.
+Note that <code>core.autocrlf</code> overrides <code>core.eol</code></p>
 </div>
 <div class="dlist">
 <dl>
@@ -574,8 +578,9 @@ attempt any end-of-line conversion upon checkin or checkout.</p>
 <dt class="hdlist1">Set to string value "auto"</dt>
 <dd>
 <p>When <code>text</code> is set to "auto", the path is marked for automatic
-end-of-line normalization.  If Git decides that the content is
-text, its line endings are normalized to LF on checkin.</p>
+end-of-line conversion.  If Git decides that the content is
+text, its line endings are converted to LF on checkin.
+When the file has been committed with CRLF, no conversion is done.</p>
 </dd>
 <dt class="hdlist1">Unspecified</dt>
 <dd>
@@ -594,7 +599,7 @@ unspecified.</p>
 <h4 id="__code_eol_code"><code>eol</code></h4>
 <div class="paragraph">
 <p>This attribute sets a specific line-ending style to be used in the
-working directory.  It enables end-of-line normalization without any
+working directory.  It enables end-of-line conversion without any
 content checks, effectively setting the <code>text</code> attribute.</p>
 </div>
 <div class="dlist">
@@ -636,28 +641,9 @@ normalize line endings to LF in the repository and, optionally, to
 convert them to CRLF when files are checked out.</p>
 </div>
 <div class="paragraph">
-<p>Here is an example that will make Git normalize .txt, .vcproj and .sh
-files, ensure that .vcproj files have CRLF and .sh files have LF in
-the working directory, and prevent .jpg files from being normalized
-regardless of their content.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>*.txt		text
-*.vcproj	eol=crlf
-*.sh		eol=lf
-*.jpg		-text</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Other source code management systems normalize all text files in their
-repositories, and there are two ways to enable similar automatic
-normalization in Git.</p>
-</div>
-<div class="paragraph">
 <p>If you simply want to have CRLF line endings in your working directory
 regardless of the repository you are working with, you can set the
-config variable "core.autocrlf" without changing any attributes.</p>
+config variable "core.autocrlf" without using any attributes.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -666,16 +652,15 @@ config variable "core.autocrlf" without changing any attributes.</p>
 </div>
 </div>
 <div class="paragraph">
-<p>This does not force normalization of all text files, but does ensure
+<p>This does not force normalization of text files, but does ensure
 that text files that you introduce to the repository have their line
 endings normalized to LF when they are added, and that files that are
 already normalized in the repository stay normalized.</p>
 </div>
 <div class="paragraph">
-<p>If you want to interoperate with a source code management system that
-enforces end-of-line normalization, or you simply want all text files
-in your repository to be normalized, you should instead set the <code>text</code>
-attribute to "auto" for <em>all</em> files.</p>
+<p>If you want to ensure that text files that any contributor introduces to
+the repository have their line endings normalized, you can set the
+<code>text</code> attribute to "auto" for <em>all</em> files.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -683,12 +668,21 @@ attribute to "auto" for <em>all</em> files.</p>
 </div>
 </div>
 <div class="paragraph">
-<p>This ensures that all files that Git considers to be text will have
-normalized (LF) line endings in the repository.  The <code>core.eol</code>
-configuration variable controls which line endings Git will use for
-normalized files in your working directory; the default is to use the
-native line ending for your platform, or CRLF if <code>core.autocrlf</code> is
-set.</p>
+<p>The attributes allow a fine-grained control, how the line endings
+are converted.
+Here is an example that will make Git normalize .txt, .vcproj and .sh
+files, ensure that .vcproj files have CRLF and .sh files have LF in
+the working directory, and prevent .jpg files from being normalized
+regardless of their content.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>*               text=auto
+*.txt		text
+*.vcproj	text eol=crlf
+*.sh		text eol=lf
+*.jpg		-text</pre>
+</div>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -697,23 +691,22 @@ set.</p>
 <div class="title">Note</div>
 </td>
 <td class="content">
-When <code>text=auto</code> normalization is enabled in an existing
-repository, any text files containing CRLFs should be normalized.  If
-they are not they will be normalized the next time someone tries to
-change them, causing unfortunate misattribution.  From a clean working
-directory:
+When <code>text=auto</code> conversion is enabled in a cross-platform
+project using push and pull to a central repository the text files
+containing CRLFs should be normalized.
 </td>
 </tr>
 </table>
 </div>
+<div class="paragraph">
+<p>From a clean working directory:</p>
+</div>
 <div class="listingblock">
 <div class="content">
-<pre>$ echo "* text=auto" &gt;&gt;.gitattributes
-$ rm .git/index     # Remove the index to force Git to
-$ git reset         # re-scan the working directory
+<pre>$ echo "* text=auto" &gt;.gitattributes
+$ git read-tree --empty   # Clean index, force re-scan of working directory
+$ git add .
 $ git status        # Show files that will be normalized
-$ git add -u
-$ git add .gitattributes
 $ git commit -m "Introduce end-of-line normalization"</pre>
 </div>
 </div>
@@ -788,7 +781,15 @@ checkout, when the <code>smudge</code> command is specified, the command is
 fed the blob object from its standard input, and its standard
 output is used to update the worktree file.  Similarly, the
 <code>clean</code> command is used to convert the contents of worktree file
-upon checkin.</p>
+upon checkin. By default these commands process only a single
+blob and terminate. If a long running <code>process</code> filter is used
+in place of <code>clean</code> and/or <code>smudge</code> filters, then Git can process
+all blobs with a single filter command invocation for the entire
+life of a single Git command, for example <code>git add --all</code>. If a
+long running <code>process</code> filter is configured then it always takes
+precedence over a configured single blob filter. See section
+below for the description of the protocol used to communicate with
+a <code>process</code> filter.</p>
 </div>
 <div class="paragraph">
 <p>One use of the content filtering is to massage the content into a shape
@@ -875,6 +876,259 @@ substitution.  For example:</p>
 	clean = git-p4-filter --clean %f
 	smudge = git-p4-filter --smudge %f</pre>
 </div>
+</div>
+<div class="paragraph">
+<p>Note that "%f" is the name of the path that is being worked on. Depending
+on the version that is being filtered, the corresponding file on disk may
+not exist, or may have different contents. So, smudge and clean commands
+should not try to access the file on disk, but only act as filters on the
+content provided to them on standard input.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_long_running_filter_process">Long Running Filter Process</h4>
+<div class="paragraph">
+<p>If the filter command (a string value) is defined via
+<code>filter.&lt;driver&gt;.process</code> then Git can process all blobs with a
+single filter invocation for the entire life of a single Git
+command. This is achieved by using a packet format (pkt-line,
+see technical/protocol-common.txt) based protocol over standard
+input and standard output as follows. All packets, except for the
+"*CONTENT" packets and the "0000" flush packet, are considered
+text and therefore are terminated by a LF.</p>
+</div>
+<div class="paragraph">
+<p>Git starts the filter when it encounters the first file
+that needs to be cleaned or smudged. After the filter started
+Git sends a welcome message ("git-filter-client"), a list of supported
+protocol version numbers, and a flush packet. Git expects to read a welcome
+response message ("git-filter-server"), exactly one protocol version number
+from the previously sent list, and a flush packet. All further
+communication will be based on the selected version. The remaining
+protocol description below documents "version=2". Please note that
+"version=42" in the example below does not exist and is only there
+to illustrate how the protocol would look like with more than one
+version.</p>
+</div>
+<div class="paragraph">
+<p>After the version negotiation Git sends a list of all capabilities that
+it supports and a flush packet. Git expects to read a list of desired
+capabilities, which must be a subset of the supported capabilities list,
+and a flush packet as response:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>packet:          git&gt; git-filter-client
+packet:          git&gt; version=2
+packet:          git&gt; version=42
+packet:          git&gt; 0000
+packet:          git&lt; git-filter-server
+packet:          git&lt; version=2
+packet:          git&lt; 0000
+packet:          git&gt; capability=clean
+packet:          git&gt; capability=smudge
+packet:          git&gt; capability=not-yet-invented
+packet:          git&gt; 0000
+packet:          git&lt; capability=clean
+packet:          git&lt; capability=smudge
+packet:          git&lt; 0000</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Supported filter capabilities in version 2 are "clean", "smudge",
+and "delay".</p>
+</div>
+<div class="paragraph">
+<p>Afterwards Git sends a list of "key=value" pairs terminated with
+a flush packet. The list will contain at least the filter command
+(based on the supported capabilities) and the pathname of the file
+to filter relative to the repository root. Right after the flush packet
+Git sends the content split in zero or more pkt-line packets and a
+flush packet to terminate content. Please note, that the filter
+must not send any response before it received the content and the
+final flush packet. Also note that the "value" of a "key=value" pair
+can contain the "=" character whereas the key would never contain
+that character.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>packet:          git&gt; command=smudge
+packet:          git&gt; pathname=path/testfile.dat
+packet:          git&gt; 0000
+packet:          git&gt; CONTENT
+packet:          git&gt; 0000</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The filter is expected to respond with a list of "key=value" pairs
+terminated with a flush packet. If the filter does not experience
+problems then the list must contain a "success" status. Right after
+these packets the filter is expected to send the content in zero
+or more pkt-line packets and a flush packet at the end. Finally, a
+second list of "key=value" pairs terminated with a flush packet
+is expected. The filter can change the status in the second list
+or keep the status as is with an empty list. Please note that the
+empty list must be terminated with a flush packet regardless.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>packet:          git&lt; status=success
+packet:          git&lt; 0000
+packet:          git&lt; SMUDGED_CONTENT
+packet:          git&lt; 0000
+packet:          git&lt; 0000  # empty list, keep "status=success" unchanged!</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If the result content is empty then the filter is expected to respond
+with a "success" status and a flush packet to signal the empty content.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>packet:          git&lt; status=success
+packet:          git&lt; 0000
+packet:          git&lt; 0000  # empty content!
+packet:          git&lt; 0000  # empty list, keep "status=success" unchanged!</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In case the filter cannot or does not want to process the content,
+it is expected to respond with an "error" status.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>packet:          git&lt; status=error
+packet:          git&lt; 0000</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If the filter experiences an error during processing, then it can
+send the status "error" after the content was (partially or
+completely) sent.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>packet:          git&lt; status=success
+packet:          git&lt; 0000
+packet:          git&lt; HALF_WRITTEN_ERRONEOUS_CONTENT
+packet:          git&lt; 0000
+packet:          git&lt; status=error
+packet:          git&lt; 0000</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In case the filter cannot or does not want to process the content
+as well as any future content for the lifetime of the Git process,
+then it is expected to respond with an "abort" status at any point
+in the protocol.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>packet:          git&lt; status=abort
+packet:          git&lt; 0000</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Git neither stops nor restarts the filter process in case the
+"error"/"abort" status is set. However, Git sets its exit code
+according to the <code>filter.&lt;driver&gt;.required</code> flag, mimicking the
+behavior of the <code>filter.&lt;driver&gt;.clean</code> / <code>filter.&lt;driver&gt;.smudge</code>
+mechanism.</p>
+</div>
+<div class="paragraph">
+<p>If the filter dies during the communication or does not adhere to
+the protocol then Git will stop the filter process and restart it
+with the next file that needs to be processed. Depending on the
+<code>filter.&lt;driver&gt;.required</code> flag Git will interpret that as error.</p>
+</div>
+<div class="paragraph">
+<p>After the filter has processed a command it is expected to wait for
+a "key=value" list containing the next command. Git will close
+the command pipe on exit. The filter is expected to detect EOF
+and exit gracefully on its own. Git will wait until the filter
+process has stopped.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_delay">Delay</h4>
+<div class="paragraph">
+<p>If the filter supports the "delay" capability, then Git can send the
+flag "can-delay" after the filter command and pathname. This flag
+denotes that the filter can delay filtering the current blob (e.g. to
+compensate network latencies) by responding with no content but with
+the status "delayed" and a flush packet.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>packet:          git&gt; command=smudge
+packet:          git&gt; pathname=path/testfile.dat
+packet:          git&gt; can-delay=1
+packet:          git&gt; 0000
+packet:          git&gt; CONTENT
+packet:          git&gt; 0000
+packet:          git&lt; status=delayed
+packet:          git&lt; 0000</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If the filter supports the "delay" capability then it must support the
+"list_available_blobs" command. If Git sends this command, then the
+filter is expected to return a list of pathnames representing blobs
+that have been delayed earlier and are now available.
+The list must be terminated with a flush packet followed
+by a "success" status that is also terminated with a flush packet. If
+no blobs for the delayed paths are available, yet, then the filter is
+expected to block the response until at least one blob becomes
+available. The filter can tell Git that it has no more delayed blobs
+by sending an empty list. As soon as the filter responds with an empty
+list, Git stops asking. All blobs that Git has not received at this
+point are considered missing and will result in an error.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>packet:          git&gt; command=list_available_blobs
+packet:          git&gt; 0000
+packet:          git&lt; pathname=path/testfile.dat
+packet:          git&lt; pathname=path/otherfile.dat
+packet:          git&lt; 0000
+packet:          git&lt; status=success
+packet:          git&lt; 0000</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>After Git received the pathnames, it will request the corresponding
+blobs again. These requests contain a pathname and an empty content
+section. The filter is expected to respond with the smudged content
+in the usual way as explained above.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>packet:          git&gt; command=smudge
+packet:          git&gt; pathname=path/testfile.dat
+packet:          git&gt; 0000
+packet:          git&gt; 0000  # empty content!
+packet:          git&lt; status=success
+packet:          git&lt; 0000
+packet:          git&lt; SMUDGED_CONTENT
+packet:          git&lt; 0000
+packet:          git&lt; 0000  # empty list, keep "status=success" unchanged!</pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_example">Example</h4>
+<div class="paragraph">
+<p>A long running filter demo implementation can be found in
+<code>contrib/long-running-filter/example.pl</code> located in the Git
+core repository. If you develop your own long running filter
+process then the <code>GIT_TRACE_PACKET</code> environment variables can be
+very helpful for debugging (see <a href="git.html">git</a>(1)).</p>
+</div>
+<div class="paragraph">
+<p>Please note that you cannot use an existing <code>filter.&lt;driver&gt;.clean</code>
+or <code>filter.&lt;driver&gt;.smudge</code> command with <code>filter.&lt;driver&gt;.process</code>
+because the former two use a different inter process communication
+protocol than the latter one.</p>
 </div>
 </div>
 <div class="sect3">
@@ -1052,6 +1306,9 @@ patterns are available:</p>
 </li>
 <li>
 <p><code>csharp</code> suitable for source code in the C# language.</p>
+</li>
+<li>
+<p><code>css</code> suitable for cascading style sheets.</p>
 </li>
 <li>
 <p><code>fortran</code> suitable for source code in the Fortran language.</p>
@@ -1559,7 +1816,7 @@ to:</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_example">EXAMPLE</h2>
+<h2 id="_example_2">EXAMPLE</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>If you have these three <code>gitattributes</code> file:</p>
@@ -1639,7 +1896,7 @@ frotz	unspecified</pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-06-14 11:04:08 W. Europe Daylight Time
+Last updated 2017-10-12 21:18:06 Coordinated Universal Time
 </div>
 </div>
 </body>

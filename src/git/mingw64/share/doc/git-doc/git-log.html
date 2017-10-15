@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 1.5.4">
+<meta name="generator" content="Asciidoctor 1.5.5">
 <title>git-log(1)</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
@@ -17,7 +17,6 @@ audio:not([controls]){display:none;height:0}
 [hidden],template{display:none}
 script{display:none!important}
 html{font-family:sans-serif;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%}
-body{margin:0}
 a{background:transparent}
 a:focus{outline:thin dotted}
 a:active,a:hover{outline:0}
@@ -52,7 +51,7 @@ textarea{overflow:auto;vertical-align:top}
 table{border-collapse:collapse;border-spacing:0}
 *,*:before,*:after{-moz-box-sizing:border-box;-webkit-box-sizing:border-box;box-sizing:border-box}
 html,body{font-size:100%}
-body{background:#fff;color:rgba(0,0,0,.8);padding:0;margin:0;font-family:"Noto Serif","DejaVu Serif",serif;font-weight:400;font-style:normal;line-height:1;position:relative;cursor:auto}
+body{background:#fff;color:rgba(0,0,0,.8);padding:0;margin:0;font-family:"Noto Serif","DejaVu Serif",serif;font-weight:400;font-style:normal;line-height:1;position:relative;cursor:auto;tab-size:4;-moz-osx-font-smoothing:grayscale;-webkit-font-smoothing:antialiased}
 a:hover{cursor:pointer}
 img,object,embed{max-width:100%;height:auto}
 object,embed{height:100%}
@@ -64,7 +63,6 @@ img{-ms-interpolation-mode:bicubic}
 .text-center{text-align:center!important}
 .text-justify{text-align:justify!important}
 .hide{display:none}
-body{-webkit-font-smoothing:antialiased}
 img,object,svg{display:inline-block;vertical-align:middle}
 textarea{height:auto;min-height:50px}
 select{width:100%}
@@ -119,13 +117,16 @@ table thead tr th,table thead tr td,table tfoot tr th,table tfoot tr td{padding:
 table tr th,table tr td{padding:.5625em .625em;font-size:inherit;color:rgba(0,0,0,.8)}
 table tr.even,table tr.alt,table tr:nth-of-type(even){background:#f8f8f7}
 table thead tr th,table tfoot tr th,table tbody tr td,table tr td,table tfoot tr td{display:table-cell;line-height:1.6}
-body{tab-size:4}
 h1,h2,h3,#toctitle,.sidebarblock>.content>.title,h4,h5,h6{line-height:1.2;word-spacing:-.05em}
 h1 strong,h2 strong,h3 strong,#toctitle strong,.sidebarblock>.content>.title strong,h4 strong,h5 strong,h6 strong{font-weight:400}
 .clearfix:before,.clearfix:after,.float-group:before,.float-group:after{content:" ";display:table}
 .clearfix:after,.float-group:after{clear:both}
-*:not(pre)>code{font-size:.9375em;font-style:normal!important;letter-spacing:0;padding:.1em .5ex;word-spacing:-.15em;background-color:#f7f7f8;-webkit-border-radius:4px;border-radius:4px;line-height:1.45;text-rendering:optimizeSpeed}
+*:not(pre)>code{font-size:.9375em;font-style:normal!important;letter-spacing:0;padding:.1em .5ex;word-spacing:-.15em;background-color:#f7f7f8;-webkit-border-radius:4px;border-radius:4px;line-height:1.45;text-rendering:optimizeSpeed;word-wrap:break-word}
+*:not(pre)>code.nobreak{word-wrap:normal}
+*:not(pre)>code.nowrap{white-space:nowrap}
 pre,pre>code{line-height:1.45;color:rgba(0,0,0,.9);font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;font-weight:400;text-rendering:optimizeSpeed}
+em em{font-style:normal}
+strong strong{font-weight:400}
 .keyseq{color:rgba(51,51,51,.8)}
 kbd{font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;display:inline-block;color:rgba(0,0,0,.8);font-size:.65em;line-height:1.45;background-color:#f7f7f7;border:1px solid #ccc;-webkit-border-radius:3px;border-radius:3px;-webkit-box-shadow:0 1px 0 rgba(0,0,0,.2),0 0 0 .1em white inset;box-shadow:0 1px 0 rgba(0,0,0,.2),0 0 0 .1em #fff inset;margin:0 .15em;padding:.2em .5em;vertical-align:middle;position:relative;top:-.1em;white-space:nowrap}
 .keyseq kbd:first-child{margin-left:0}
@@ -675,10 +676,16 @@ instead of the default basic regular expressions.</p>
 <p>Consider the limiting patterns to be fixed strings (don&#8217;t interpret
 pattern as a regular expression).</p>
 </dd>
+<dt class="hdlist1">-P</dt>
 <dt class="hdlist1">--perl-regexp</dt>
 <dd>
-<p>Consider the limiting patterns to be Perl-compatible regular expressions.
-Requires libpcre to be compiled in.</p>
+<p>Consider the limiting patterns to be Perl-compatible regular
+expressions.</p>
+<div class="paragraph">
+<p>Support for these types of regular expressions is an optional
+compile-time dependency. If Git wasn&#8217;t compiled with support for them
+providing this option will cause it to die.</p>
+</div>
 </dd>
 <dt class="hdlist1">--remove-empty</dt>
 <dd>
@@ -726,8 +733,8 @@ for all following revision specifiers, up to the next <code>--not</code>.</p>
 </dd>
 <dt class="hdlist1">--all</dt>
 <dd>
-<p>Pretend as if all the refs in <code>refs/</code> are listed on the
-command line as <em>&lt;commit&gt;</em>.</p>
+<p>Pretend as if all the refs in <code>refs/</code>, along with <code>HEAD</code>, are
+listed on the command line as <em>&lt;commit&gt;</em>.</p>
 </dd>
 <dt class="hdlist1">--branches[=&lt;pattern&gt;]</dt>
 <dd>
@@ -793,7 +800,7 @@ line. Cannot be combined with --first-parent.</p>
 <dt class="hdlist1">--stdin</dt>
 <dd>
 <p>In addition to the <em>&lt;commit&gt;</em> listed on the command
-line, read them from the standard input. If a <em>--</em> separator is
+line, read them from the standard input. If a <code>--</code> separator is
 seen, stop reading commits and start reading paths to limit the
 result.</p>
 </dd>
@@ -820,7 +827,7 @@ excluded from the output.</p>
 <dt class="hdlist1">--left-only</dt>
 <dt class="hdlist1">--right-only</dt>
 <dd>
-<p>List only commits on the respective side of a symmetric range,
+<p>List only commits on the respective side of a symmetric difference,
 i.e. only those which would be marked <code>&lt;</code> resp. <code>&gt;</code> by
 <code>--left-right</code>.</p>
 <div class="paragraph">
@@ -850,15 +857,46 @@ and <em>commit1...commit2</em> notations cannot be used).</p>
 <div class="paragraph">
 <p>With <code>--pretty</code> format other than <code>oneline</code> (for obvious reasons),
 this causes the output to have two extra lines of information
-taken from the reflog.  By default, <em>commit@{Nth}</em> notation is
-used in the output.  When the starting commit is specified as
-<em>commit@{now}</em>, output also uses <em>commit@{timestamp}</em> notation
-instead.  Under <code>--pretty=oneline</code>, the commit message is
+taken from the reflog.  The reflog designator in the output may be shown
+as <code>ref@{Nth}</code> (where <code>Nth</code> is the reverse-chronological index in the
+reflog) or as <code>ref@{timestamp}</code> (with the timestamp for that entry),
+depending on a few rules:</p>
+</div>
+</dd>
+</dl>
+</div>
+</div>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>If the starting point is specified as <code>ref@{Nth}</code>, show the index
+format.</p>
+</li>
+<li>
+<p>If the starting point was specified as <code>ref@{now}</code>, show the
+timestamp format.</p>
+</li>
+<li>
+<p>If neither was used, but <code>--date</code> was given on the command line, show
+the timestamp in the format requested by <code>--date</code>.</p>
+</li>
+<li>
+<p>Otherwise, show the index format.</p>
+</li>
+</ol>
+</div>
+<div class="openblock">
+<div class="content">
+<div class="paragraph">
+<p>+
+Under <code>--pretty=oneline</code>, the commit message is
 prefixed with this information on the same line.
 This option cannot be combined with <code>--reverse</code>.
 See also <a href="git-reflog.html">git-reflog</a>(1).</p>
 </div>
-</dd>
+<div class="dlist">
+<dl>
 <dt class="hdlist1">--merge</dt>
 <dd>
 <p>After a failed merge, show refs that touch files having a
@@ -1284,8 +1322,9 @@ together.</p>
 </dd>
 <dt class="hdlist1">--reverse</dt>
 <dd>
-<p>Output the commits in reverse order.
-Cannot be combined with <code>--walk-reflogs</code>.</p>
+<p>Output the commits chosen to be shown (see Commit Limiting
+section above) in reverse order. Cannot be combined with
+<code>--walk-reflogs</code>.</p>
 </dd>
 </dl>
 </div>
@@ -1351,7 +1390,7 @@ people using 80-column terminals.</p>
 <dd>
 <p>Show the full 40-byte hexadecimal commit object name. This negates
 <code>--abbrev-commit</code> and those options which imply it such as
-"--oneline". It also overrides the <em>log.abbrevCommit</em> variable.</p>
+"--oneline". It also overrides the <code>log.abbrevCommit</code> variable.</p>
 </dd>
 <dt class="hdlist1">--oneline</dt>
 <dd>
@@ -1394,7 +1433,7 @@ there is no <code>--pretty</code>, <code>--format</code>, or <code>--oneline</co
 on the command line.</p>
 <div class="paragraph">
 <p>By default, the notes shown are from the notes refs listed in the
-<em>core.notesRef</em> and <em>notes.displayRef</em> variables (or corresponding
+<code>core.notesRef</code> and <code>notes.displayRef</code> variables (or corresponding
 environment overrides). See <a href="git-config.html">git-config</a>(1) for more details.</p>
 </div>
 <div class="paragraph">
@@ -1443,8 +1482,8 @@ author&#8217;s). If <code>-local</code> is appended to the format (e.g.,
 <code>iso-local</code>), the user&#8217;s local time zone is used instead.</p>
 <div class="paragraph">
 <p><code>--date=relative</code> shows dates relative to the current time,
-e.g. &#8220;2 hours ago&#8221;. The <code>-local</code> option cannot be used with
-<code>--raw</code> or <code>--relative</code>.</p>
+e.g. &#8220;2 hours ago&#8221;. The <code>-local</code> option has no effect for
+<code>--date=relative</code>.</p>
 </div>
 <div class="paragraph">
 <p><code>--date=local</code> is an alias for <code>--date=default-local</code>.</p>
@@ -1481,11 +1520,25 @@ format, often found in email messages.</p>
 </div>
 <div class="paragraph">
 <p>+
-<code>--date=raw</code> shows the date in the internal raw Git format <code>%s %z</code> format.</p>
+<code>--date=raw</code> shows the date as seconds since the epoch (1970-01-01
+00:00:00 UTC), followed by a space, and then the timezone as an offset
+from UTC (a <code>+</code> or <code>-</code> with four digits; the first two are hours, and
+the second two are minutes). I.e., as if the timestamp were formatted
+with <code>strftime("%s %z")</code>).
+Note that the <code>-local</code> option does not affect the seconds-since-epoch
+value (which is always measured in UTC), but does switch the accompanying
+timezone value.</p>
 </div>
 <div class="paragraph">
 <p>+
-<code>--date=format:...</code> feeds the format <code>...</code> to your system <code>strftime</code>.
+<code>--date=unix</code> shows the date as a Unix epoch timestamp (seconds since
+1970).  As with <code>--raw</code>, this is always in UTC and therefore <code>-local</code>
+has no effect.</p>
+</div>
+<div class="paragraph">
+<p>+
+<code>--date=format:...</code> feeds the format <code>...</code> to your system <code>strftime</code>,
+except for %z and %Z, which are handled internally.
 Use <code>--date=format:%c</code> to show the date in your system locale&#8217;s
 preferred format.  See the <code>strftime</code> manual for a complete list of
 format placeholders. When using <code>-local</code>, the correct syntax is
@@ -1519,7 +1572,7 @@ Also enables parent rewriting, see <em>History Simplification</em> below.</p>
 </dd>
 <dt class="hdlist1">--left-right</dt>
 <dd>
-<p>Mark which side of a symmetric diff a commit is reachable from.
+<p>Mark which side of a symmetric difference a commit is reachable from.
 Commits from the left side are prefixed with <code>&lt;</code> and those from
 the right with <code>&gt;</code>.  If combined with <code>--boundary</code>, those
 commits are prefixed with <code>-</code>.</p>
@@ -1897,8 +1950,14 @@ or <a href="git-blame.html">git-blame</a>(1))</p>
 <p><em>%GG</em>: raw verification message from GPG for a signed commit</p>
 </li>
 <li>
-<p><em>%G?</em>: show "G" for a good (valid) signature, "B" for a bad signature,
-"U" for a good signature with unknown validity and "N" for no signature</p>
+<p><em>%G?</em>: show "G" for a good (valid) signature,
+"B" for a bad signature,
+"U" for a good signature with unknown validity,
+"X" for a good signature that has expired,
+"Y" for a good signature made by an expired key,
+"R" for a good signature made by a revoked key,
+"E" if the signature cannot be checked (e.g. missing key)
+and "N" for no signature</p>
 </li>
 <li>
 <p><em>%GS</em>: show the name of the signer for a signed commit</p>
@@ -1907,10 +1966,16 @@ or <a href="git-blame.html">git-blame</a>(1))</p>
 <p><em>%GK</em>: show the key used to sign a signed commit</p>
 </li>
 <li>
-<p><em>%gD</em>: reflog selector, e.g., <code>refs/stash@{1}</code></p>
+<p><em>%gD</em>: reflog selector, e.g., <code>refs/stash@{1}</code> or
+<code>refs/stash@{2 minutes ago</code>}; the format follows the rules described
+for the <code>-g</code> option. The portion before the <code>@</code> is the refname as
+given on the command line (so <code>git log -g refs/heads/master</code> would
+yield <code>refs/heads/master@{0}</code>).</p>
 </li>
 <li>
-<p><em>%gd</em>: shortened reflog selector, e.g., <code>stash@{1}</code></p>
+<p><em>%gd</em>: shortened reflog selector; same as <code>%gD</code>, but the refname
+portion is shortened for human readability (so <code>refs/heads/master</code>
+becomes just <code>master</code>).</p>
 </li>
 <li>
 <p><em>%gn</em>: reflog identity name</p>
@@ -1942,15 +2007,21 @@ or <a href="git-blame.html">git-blame</a>(1))</p>
 <p><em>%Creset</em>: reset color</p>
 </li>
 <li>
-<p><em>%C(&#8230;&#8203;)</em>: color specification, as described in color.branch.* config option;
-adding <code>auto,</code> at the beginning will emit color only when colors are
-enabled for log output (by <code>color.diff</code>, <code>color.ui</code>, or <code>--color</code>, and
-respecting the <code>auto</code> settings of the former if we are going to a
-terminal). <code>auto</code> alone (i.e. <code>%C(auto)</code>) will turn on auto coloring
-on the next placeholders until the color is switched again.</p>
+<p><em>%C(&#8230;&#8203;)</em>: color specification, as described under Values in the
+"CONFIGURATION FILE" section of <a href="git-config.html">git-config</a>(1).
+By default, colors are shown only when enabled for log output (by
+<code>color.diff</code>, <code>color.ui</code>, or <code>--color</code>, and respecting the <code>auto</code>
+settings of the former if we are going to a terminal). <code>%C(auto,...)</code>
+is accepted as a historical synonym for the default (e.g.,
+<code>%C(auto,red)</code>). Specifying <code>%C(always,...) will show the colors
+even when color is not otherwise enabled (though consider
+just using `--color=always</code> to enable color for the whole output,
+including this format and anything else git might color).  <code>auto</code>
+alone (i.e. <code>%C(auto)</code>) will turn on auto coloring on the next
+placeholders until the color is switched again.</p>
 </li>
 <li>
-<p><em>%m</em>: left, right or boundary mark</p>
+<p><em>%m</em>: left (<code>&lt;</code>), right (<code>&gt;</code>) or boundary (<code>-</code>) mark</p>
 </li>
 <li>
 <p><em>%n</em>: newline</p>
@@ -1989,6 +2060,10 @@ than given and there are spaces on its left, use those spaces</p>
 <p><em>%&gt;&lt;(&lt;N&gt;)</em>, <em>%&gt;&lt;|(&lt;N&gt;)</em>: similar to <em>% &lt;(&lt;N&gt;)</em>, <em>%&lt;|(&lt;N&gt;)</em>
 respectively, but padding both sides (i.e. the text is centered)</p>
 </li>
+<li>
+<p>%(trailers): display the trailers of the body as interpreted by
+<a href="git-interpret-trailers.html">git-interpret-trailers</a>(1)</p>
+</li>
 </ul>
 </div>
 </li>
@@ -2017,8 +2092,8 @@ is inserted immediately before the expansion if and only if the
 placeholder expands to a non-empty string.</p>
 </div>
 <div class="paragraph">
-<p>If you add a <code>-</code> (minus sign) after <em>%</em> of a placeholder, line-feeds that
-immediately precede the expansion are deleted if and only if the
+<p>If you add a <code>-</code> (minus sign) after <em>%</em> of a placeholder, all consecutive
+line-feeds immediately preceding the expansion are deleted if and only if the
 placeholder expands to an empty string.</p>
 </div>
 <div class="paragraph">
@@ -2104,13 +2179,12 @@ itself in raw format, which you can achieve with
 <dd>
 <p>Synonym for <code>-p --raw</code>.</p>
 </dd>
-<dt class="hdlist1">--compaction-heuristic</dt>
-<dt class="hdlist1">--no-compaction-heuristic</dt>
+<dt class="hdlist1">--indent-heuristic</dt>
+<dt class="hdlist1">--no-indent-heuristic</dt>
 <dd>
-<p>These are to help debugging and tuning an experimental
-heuristic (which is off by default) that shifts the hunk
-boundary in an attempt to make the resulting patch easier
-to read.</p>
+<p>These are to help debugging and tuning experimental heuristics
+(which are off by default) that shift diff hunk boundaries to
+make patches easier to read.</p>
 </dd>
 <dt class="hdlist1">--minimal</dt>
 <dd>
@@ -2272,10 +2346,9 @@ such as creations, renames and mode changes.</p>
 pathnames and use NULs as output field terminators.</p>
 </div>
 <div class="paragraph">
-<p>Without this option, each pathname output will have TAB, LF, double quotes,
-and backslash characters replaced with <code>\t</code>, <code>\n</code>, <code>\"</code>, and <code>\\</code>,
-respectively, and the pathname will be enclosed in double quotes if
-any of those replacements occurred.</p>
+<p>Without this option, pathnames with "unusual" characters are quoted as
+explained for the configuration variable <code>core.quotePath</code> (see
+<a href="git-config.html">git-config</a>(1)).</p>
 </div>
 </dd>
 <dt class="hdlist1">--name-only</dt>
@@ -2289,13 +2362,16 @@ of the <code>--diff-filter</code> option on what the status letters mean.</p>
 </dd>
 <dt class="hdlist1">--submodule[=&lt;format&gt;]</dt>
 <dd>
-<p>Specify how differences in submodules are shown.  When <code>--submodule</code>
-or <code>--submodule=log</code> is given, the <em>log</em> format is used.  This format lists
-the commits in the range like <a href="git-submodule.html">git-submodule</a>(1) <code>summary</code> does.
-Omitting the <code>--submodule</code> option or specifying <code>--submodule=short</code>,
-uses the <em>short</em> format. This format just shows the names of the commits
-at the beginning and end of the range.  Can be tweaked via the
-<code>diff.submodule</code> configuration variable.</p>
+<p>Specify how differences in submodules are shown.  When specifying
+<code>--submodule=short</code> the <em>short</em> format is used.  This format just
+shows the names of the commits at the beginning and end of the range.
+When <code>--submodule</code> or <code>--submodule=log</code> is specified, the <em>log</em>
+format is used.  This format lists the commits in the range like
+<a href="git-submodule.html">git-submodule</a>(1) <code>summary</code> does.  When <code>--submodule=diff</code>
+is specified, the <em>diff</em> format is used.  This format shows an
+inline diff of the changes in the submodule contents between the
+commit range.  Defaults to <code>diff.submodule</code> or the <em>short</em> format
+if the config option is unset.</p>
 </dd>
 <dt class="hdlist1">--color[=&lt;when&gt;]</dt>
 <dd>
@@ -2398,13 +2474,14 @@ with --exit-code.</p>
 </dd>
 <dt class="hdlist1">--ws-error-highlight=&lt;kind&gt;</dt>
 <dd>
-<p>Highlight whitespace errors on lines specified by &lt;kind&gt;
-in the color specified by <code>color.diff.whitespace</code>.  &lt;kind&gt;
-is a comma separated list of <code>old</code>, <code>new</code>, <code>context</code>.  When
-this option is not given, only whitespace errors in <code>new</code>
-lines are highlighted.  E.g. <code>--ws-error-highlight=new,old</code>
-highlights whitespace errors on both deleted and added lines.
-<code>all</code> can be used as a short-hand for <code>old,new,context</code>.</p>
+<p>Highlight whitespace errors in the <code>context</code>, <code>old</code> or <code>new</code>
+lines of the diff.  Multiple values are separated by comma,
+<code>none</code> resets previous values, <code>default</code> reset the list to
+<code>new</code> and <code>all</code> is a shorthand for <code>old,new,context</code>.  When
+this option is not given, and the configuration variable
+<code>diff.wsErrorHighlight</code> is not set, only whitespace errors in
+<code>new</code> lines are highlighted. The whitespace errors are colored
+whith <code>color.diff.whitespace</code>.</p>
 </dd>
 <dt class="hdlist1">--full-index</dt>
 <dd>
@@ -2491,7 +2568,7 @@ projects, so use it with caution.  Giving more than one
 the diff between the preimage and <code>/dev/null</code>. The resulting patch
 is not meant to be applied with <code>patch</code> or <code>git apply</code>; this is
 solely for people who want to just concentrate on reviewing the
-text after the change. In addition, the output obviously lack
+text after the change. In addition, the output obviously lacks
 enough information to apply such a patch in reverse, even manually,
 hence the name of the option.</p>
 <div class="paragraph">
@@ -2519,6 +2596,10 @@ When <code>*</code> (All-or-none) is added to the combination, all
 paths are selected if there is any file that matches
 other criteria in the comparison; if there is no file
 that matches other criteria, nothing is selected.</p>
+<div class="paragraph">
+<p>Also, these upper-case letters can be downcased to exclude.  E.g.
+<code>--diff-filter=ad</code> excludes added and deleted paths.</p>
+</div>
 </dd>
 <dt class="hdlist1">-S&lt;string&gt;</dt>
 <dd>
@@ -2572,11 +2653,53 @@ expression to match.</p>
 </dd>
 <dt class="hdlist1">-O&lt;orderfile&gt;</dt>
 <dd>
-<p>Output the patch in the order specified in the
-&lt;orderfile&gt;, which has one shell glob pattern per line.
+<p>Control the order in which files appear in the output.
 This overrides the <code>diff.orderFile</code> configuration variable
 (see <a href="git-config.html">git-config</a>(1)).  To cancel <code>diff.orderFile</code>,
 use <code>-O/dev/null</code>.</p>
+<div class="paragraph">
+<p>The output order is determined by the order of glob patterns in
+&lt;orderfile&gt;.
+All files with pathnames that match the first pattern are output
+first, all files with pathnames that match the second pattern (but not
+the first) are output next, and so on.
+All files with pathnames that do not match any pattern are output
+last, as if there was an implicit match-all pattern at the end of the
+file.
+If multiple pathnames have the same rank (they match the same pattern
+but no earlier patterns), their output order relative to each other is
+the normal order.</p>
+</div>
+<div class="paragraph">
+<p>&lt;orderfile&gt; is parsed as follows:</p>
+</div>
+<div class="openblock">
+<div class="content">
+<div class="ulist">
+<ul>
+<li>
+<p>Blank lines are ignored, so they can be used as separators for
+readability.</p>
+</li>
+<li>
+<p>Lines starting with a hash ("<code>#</code>") are ignored, so they can be used
+for comments.  Add a backslash ("<code>\</code>") to the beginning of the
+pattern if it starts with a hash.</p>
+</li>
+<li>
+<p>Each other line contains a single pattern.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Patterns have the same syntax and semantics as patterns used for
+fnmantch(3) without the FNM_PATHNAME flag, except a pathname also
+matches a pattern if removing any number of the final pathname
+components matches the pattern.  For example, the pattern "<code>foo*bar</code>"
+matches "<code>fooasdfbar</code>" and "<code>foo/bar/baz/asdf</code>" but not "<code>foobarx</code>".</p>
+</div>
 </dd>
 <dt class="hdlist1">-R</dt>
 <dd>
@@ -2622,7 +2745,9 @@ line has none.</p>
 <dt class="hdlist1">--inter-hunk-context=&lt;lines&gt;</dt>
 <dd>
 <p>Show the context between diff hunks, up to the specified number
-of lines, thereby fusing hunks that are close to each other.</p>
+of lines, thereby fusing hunks that are close to each other.
+Defaults to <code>diff.interHunkContext</code> or 0 if the config option
+is unset.</p>
 </dd>
 <dt class="hdlist1">-W</dt>
 <dt class="hdlist1">--function-context</dt>
@@ -2677,6 +2802,19 @@ the behavior until 1.7.0). Using "all" hides all changes to submodules.</p>
 <dd>
 <p>Do not show any source or destination prefix.</p>
 </dd>
+<dt class="hdlist1">--line-prefix=&lt;prefix&gt;</dt>
+<dd>
+<p>Prepend an additional prefix to every line of output.</p>
+</dd>
+<dt class="hdlist1">--ita-invisible-in-index</dt>
+<dd>
+<p>By default entries added by "git add -N" appear as an existing
+empty file in "git diff" and a new file in "git diff --cached".
+This option makes the entry appear as a new file in "git diff"
+and non-existent in "git diff --cached". This option could be
+reverted with <code>--ita-visible-in-index</code>. Both options are
+experimental and could be removed in future.</p>
+</dd>
 </dl>
 </div>
 <div class="paragraph">
@@ -2690,11 +2828,11 @@ the behavior until 1.7.0). Using "all" hides all changes to submodules.</p>
 <div class="sectionbody">
 <div class="paragraph">
 <p>When "git-diff-index", "git-diff-tree", or "git-diff-files" are run
-with a <em>-p</em> option, "git diff" without the <em>--raw</em> option, or
+with a <code>-p</code> option, "git diff" without the <code>--raw</code> option, or
 "git log" with the "-p" option, they
 do not produce the output described above; instead they produce a
 patch file.  You can customize the creation of such patches via the
-GIT_EXTERNAL_DIFF and the GIT_DIFF_OPTS environment variables.</p>
+<code>GIT_EXTERNAL_DIFF</code> and the <code>GIT_DIFF_OPTS</code> environment variables.</p>
 </div>
 <div class="paragraph">
 <p>What the -p option produces is slightly different from the traditional
@@ -2759,10 +2897,9 @@ separate lines indicate the old and the new mode.</p>
 </div>
 </li>
 <li>
-<p>TAB, LF, double quote and backslash characters in pathnames
-are represented as <code>\t</code>, <code>\n</code>, <code>\"</code> and <code>\\</code>, respectively.
-If there is need for such substitution then the whole
-pathname is put in double quotes.</p>
+<p>Pathnames with "unusual" characters are quoted as explained for
+the configuration variable <code>core.quotePath</code> (see
+<a href="git-config.html">git-config</a>(1)).</p>
 </li>
 <li>
 <p>All the <code>file1</code> files in the output refer to files before the
@@ -2833,14 +2970,14 @@ index fabadb8,cc95eb0..4866510
 <ol class="arabic">
 <li>
 <p>It is preceded with a "git diff" header, that looks like
-this (when <em>-c</em> option is used):</p>
+this (when <code>-c</code> option is used):</p>
 <div class="literalblock">
 <div class="content">
 <pre>diff --combined file</pre>
 </div>
 </div>
 <div class="paragraph">
-<p>or like this (when <em>--cc</em> option is used):</p>
+<p>or like this (when <code>--cc</code> option is used):</p>
 </div>
 <div class="literalblock">
 <div class="content">
@@ -3056,12 +3193,12 @@ have i18n.commitencoding in <code>.git/config</code> file, like this:</p>
 <div class="listingblock">
 <div class="content">
 <pre>[i18n]
-	commitencoding = ISO-8859-1</pre>
+	commitEncoding = ISO-8859-1</pre>
 </div>
 </div>
 <div class="paragraph">
 <p>Commit objects created with the above setting record the value
-of <code>i18n.commitencoding</code> in its <code>encoding</code> header.  This is to
+of <code>i18n.commitEncoding</code> in its <code>encoding</code> header.  This is to
 help other people who look at them later.  Lack of this header
 implies that the commit log message is encoded in UTF-8.</p>
 </div>
@@ -3071,16 +3208,16 @@ implies that the commit log message is encoded in UTF-8.</p>
 <code>encoding</code> header of a commit object, and try to re-code the
 log message into UTF-8 unless otherwise specified.  You can
 specify the desired output encoding with
-<code>i18n.logoutputencoding</code> in <code>.git/config</code> file, like this:</p>
+<code>i18n.logOutputEncoding</code> in <code>.git/config</code> file, like this:</p>
 <div class="listingblock">
 <div class="content">
 <pre>[i18n]
-	logoutputencoding = ISO-8859-1</pre>
+	logOutputEncoding = ISO-8859-1</pre>
 </div>
 </div>
 <div class="paragraph">
 <p>If you do not have this configuration variable, the value of
-<code>i18n.commitencoding</code> is used instead.</p>
+<code>i18n.commitEncoding</code> is used instead.</p>
 </div>
 </li>
 </ol>
@@ -3133,6 +3270,11 @@ initial commit as a big creation event.  Any root commits in
 <code>git log -p</code> output would be shown without a diff attached.
 The default is <code>true</code>.</p>
 </dd>
+<dt class="hdlist1">log.showSignature</dt>
+<dd>
+<p>If <code>true</code>, <code>git log</code> and related commands will act as if the
+<code>--show-signature</code> option was passed to them.</p>
+</dd>
 <dt class="hdlist1">mailmap.*</dt>
 <dd>
 <p>See <a href="git-shortlog.html">git-shortlog</a>(1).</p>
@@ -3140,7 +3282,7 @@ The default is <code>true</code>.</p>
 <dt class="hdlist1">notes.displayRef</dt>
 <dd>
 <p>Which refs, in addition to the default set by <code>core.notesRef</code>
-or <em>GIT_NOTES_REF</em>, to read notes from when showing commit
+or <code>GIT_NOTES_REF</code>, to read notes from when showing commit
 messages with the <code>log</code> family of commands.  See
 <a href="git-notes.html">git-notes</a>(1).</p>
 <div class="paragraph">
@@ -3150,7 +3292,7 @@ but a glob that does not match any refs is silently ignored.</p>
 </div>
 <div class="paragraph">
 <p>This setting can be disabled by the <code>--no-notes</code> option,
-overridden by the <em>GIT_NOTES_DISPLAY_REF</em> environment variable,
+overridden by the <code>GIT_NOTES_DISPLAY_REF</code> environment variable,
 and overridden by the <code>--notes=&lt;ref&gt;</code> option.</p>
 </div>
 </dd>
@@ -3169,7 +3311,7 @@ and overridden by the <code>--notes=&lt;ref&gt;</code> option.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-06-14 11:04:07 W. Europe Daylight Time
+Last updated 2017-10-12 21:18:05 Coordinated Universal Time
 </div>
 </div>
 </body>

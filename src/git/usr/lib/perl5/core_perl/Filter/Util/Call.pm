@@ -1,11 +1,11 @@
-
 # Call.pm
 #
 # Copyright (c) 1995-2011 Paul Marquess. All rights reserved.
+# Copyright (c) 2011-2014 Reini Urban. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
- 
+
 package Filter::Util::Call ;
 
 require 5.005 ;
@@ -18,7 +18,7 @@ use vars qw($VERSION @ISA @EXPORT) ;
 
 @ISA = qw(Exporter DynaLoader);
 @EXPORT = qw( filter_add filter_del filter_read filter_read_exact) ;
-$VERSION = "1.54" ;
+$VERSION = "1.55" ;
 
 sub filter_read_exact($)
 {
@@ -72,7 +72,7 @@ Filter::Util::Call - Perl Source Filter Utility Module
 =head1 DESCRIPTION
 
 This module provides you with the framework to write I<Source Filters>
-in Perl. 
+in Perl.
 
 An alternate interface to Filter::Util::Call is now available. See
 L<Filter::Simple> for more details.
@@ -116,7 +116,7 @@ and this is the equivalent skeleton for the I<closure filter>:
         my($type, @arguments) = @_ ;
 
         filter_add(
-            sub 
+            sub
             {
                 my($status) ;
                 $status = filter_read() ;
@@ -129,7 +129,7 @@ and this is the equivalent skeleton for the I<closure filter>:
 To make use of either of the two filter modules above, place the line
 below in a Perl source file.
 
-    use MyFilter; 
+    use MyFilter;
 
 In fact, the skeleton modules shown above are fully functional I<Source
 Filters>, albeit fairly useless ones. All they does is filter the
@@ -292,6 +292,29 @@ See L<Example 4: Using filter_del> for details.
 Internal function which adds the filter, based on the L<filter_add>
 argument type.
 
+=item I<unimport()>
+
+May be used to disable a filter, but is rarely needed. See L<filter_del>.
+
+=back
+
+=head1 LIMITATIONS
+
+See L<perlfilter/LIMITATIONS> for an overview of the general problems
+filtering code in a textual line-level only.
+
+=over
+
+=item __DATA__ is ignored
+
+The content from the __DATA__ block is not filtered.
+This is a serious limitation, e.g. for the L<Switch> module.
+See L<http://search.cpan.org/perldoc?Switch#LIMITATIONS> for more.
+
+=item Max. codesize limited to 32-bit
+
+Currently internal buffer lengths are limited to 32-bit only.
+
 =back
 
 =head1 EXAMPLES
@@ -359,7 +382,7 @@ C<Subst>.
             unless @_ == 3 ;
         my ($self, $from, $to) = @_ ;
         filter_add(
-            sub 
+            sub
             {
                 my ($status) ;
                 s/$from/$to/
@@ -456,8 +479,8 @@ Here is the module.
         croak("usage: use Subst qw(start stop from to)")
             unless @_ == 5 ;
 
-        filter_add( 
-            sub 
+        filter_add(
+            sub
             {
                 my ($status) ;
 
@@ -492,7 +515,7 @@ applications. It's available at
 
 =head1 AUTHOR
 
-Paul Marquess 
+Paul Marquess
 
 =head1 DATE
 

@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 1.5.4">
+<meta name="generator" content="Asciidoctor 1.5.5">
 <title>gitattributes API</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
@@ -17,7 +17,6 @@ audio:not([controls]){display:none;height:0}
 [hidden],template{display:none}
 script{display:none!important}
 html{font-family:sans-serif;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%}
-body{margin:0}
 a{background:transparent}
 a:focus{outline:thin dotted}
 a:active,a:hover{outline:0}
@@ -52,7 +51,7 @@ textarea{overflow:auto;vertical-align:top}
 table{border-collapse:collapse;border-spacing:0}
 *,*:before,*:after{-moz-box-sizing:border-box;-webkit-box-sizing:border-box;box-sizing:border-box}
 html,body{font-size:100%}
-body{background:#fff;color:rgba(0,0,0,.8);padding:0;margin:0;font-family:"Noto Serif","DejaVu Serif",serif;font-weight:400;font-style:normal;line-height:1;position:relative;cursor:auto}
+body{background:#fff;color:rgba(0,0,0,.8);padding:0;margin:0;font-family:"Noto Serif","DejaVu Serif",serif;font-weight:400;font-style:normal;line-height:1;position:relative;cursor:auto;tab-size:4;-moz-osx-font-smoothing:grayscale;-webkit-font-smoothing:antialiased}
 a:hover{cursor:pointer}
 img,object,embed{max-width:100%;height:auto}
 object,embed{height:100%}
@@ -64,7 +63,6 @@ img{-ms-interpolation-mode:bicubic}
 .text-center{text-align:center!important}
 .text-justify{text-align:justify!important}
 .hide{display:none}
-body{-webkit-font-smoothing:antialiased}
 img,object,svg{display:inline-block;vertical-align:middle}
 textarea{height:auto;min-height:50px}
 select{width:100%}
@@ -119,13 +117,16 @@ table thead tr th,table thead tr td,table tfoot tr th,table tfoot tr td{padding:
 table tr th,table tr td{padding:.5625em .625em;font-size:inherit;color:rgba(0,0,0,.8)}
 table tr.even,table tr.alt,table tr:nth-of-type(even){background:#f8f8f7}
 table thead tr th,table tfoot tr th,table tbody tr td,table tr td,table tfoot tr td{display:table-cell;line-height:1.6}
-body{tab-size:4}
 h1,h2,h3,#toctitle,.sidebarblock>.content>.title,h4,h5,h6{line-height:1.2;word-spacing:-.05em}
 h1 strong,h2 strong,h3 strong,#toctitle strong,.sidebarblock>.content>.title strong,h4 strong,h5 strong,h6 strong{font-weight:400}
 .clearfix:before,.clearfix:after,.float-group:before,.float-group:after{content:" ";display:table}
 .clearfix:after,.float-group:after{clear:both}
-*:not(pre)>code{font-size:.9375em;font-style:normal!important;letter-spacing:0;padding:.1em .5ex;word-spacing:-.15em;background-color:#f7f7f8;-webkit-border-radius:4px;border-radius:4px;line-height:1.45;text-rendering:optimizeSpeed}
+*:not(pre)>code{font-size:.9375em;font-style:normal!important;letter-spacing:0;padding:.1em .5ex;word-spacing:-.15em;background-color:#f7f7f8;-webkit-border-radius:4px;border-radius:4px;line-height:1.45;text-rendering:optimizeSpeed;word-wrap:break-word}
+*:not(pre)>code.nobreak{word-wrap:normal}
+*:not(pre)>code.nowrap{white-space:nowrap}
 pre,pre>code{line-height:1.45;color:rgba(0,0,0,.9);font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;font-weight:400;text-rendering:optimizeSpeed}
+em em{font-style:normal}
+strong strong{font-weight:400}
 .keyseq{color:rgba(51,51,51,.8)}
 kbd{font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;display:inline-block;color:rgba(0,0,0,.8);font-size:.65em;line-height:1.45;background-color:#f7f7f7;border:1px solid #ccc;-webkit-border-radius:3px;border-radius:3px;-webkit-box-shadow:0 1px 0 rgba(0,0,0,.2),0 0 0 .1em white inset;box-shadow:0 1px 0 rgba(0,0,0,.2),0 0 0 .1em #fff inset;margin:0 .15em;padding:.2em .5em;vertical-align:middle;position:relative;top:-.1em;white-space:nowrap}
 .keyseq kbd:first-child{margin-left:0}
@@ -443,10 +444,15 @@ this type.  The internal representation of this structure is
 of no interest to the calling programs.  The name of the
 attribute can be retrieved by calling <code>git_attr_name()</code>.</p>
 </dd>
-<dt class="hdlist1"><code>struct git_attr_check</code></dt>
+<dt class="hdlist1"><code>struct attr_check_item</code></dt>
 <dd>
-<p>This structure represents a set of attributes to check in a call
-to <code>git_check_attr()</code> function, and receives the results.</p>
+<p>This structure represents one attribute and its value.</p>
+</dd>
+<dt class="hdlist1"><code>struct attr_check</code></dt>
+<dd>
+<p>This structure represents a collection of <code>attr_check_item</code>.
+It is passed to <code>git_check_attr()</code> function, specifying the
+attributes to check, and receives their values.</p>
 </dd>
 </dl>
 </div>
@@ -458,7 +464,7 @@ to <code>git_check_attr()</code> function, and receives the results.</p>
 <div class="paragraph">
 <p>An attribute for a path can be in one of four states: Set, Unset,
 Unspecified or set to a string, and <code>.value</code> member of <code>struct
-git_attr_check</code> records it.  There are three macros to check these:</p>
+attr_check_item</code> records it.  There are three macros to check these:</p>
 </div>
 <div class="dlist">
 <dl>
@@ -488,16 +494,20 @@ value of the attribute for the path.</p>
 <div class="ulist">
 <ul>
 <li>
-<p>Prepare an array of <code>struct git_attr_check</code> to define the list of
-attributes you would want to check.  To populate this array, you would
-need to define necessary attributes by calling <code>git_attr()</code> function.</p>
+<p>Prepare <code>struct attr_check</code> using attr_check_initl()
+function, enumerating the names of attributes whose values you are
+interested in, terminated with a NULL pointer.  Alternatively, an
+empty <code>struct attr_check</code> can be prepared by calling
+<code>attr_check_alloc()</code> function and then attributes you want to
+ask about can be added to it with <code>attr_check_append()</code>
+function.</p>
 </li>
 <li>
 <p>Call <code>git_check_attr()</code> to check the attributes for the path.</p>
 </li>
 <li>
-<p>Inspect <code>git_attr_check</code> structure to see how each of the attribute in
-the array is defined for the path.</p>
+<p>Inspect <code>attr_check</code> structure to see how each of the
+attribute in the array is defined for the path.</p>
 </li>
 </ul>
 </div>
@@ -507,33 +517,31 @@ the array is defined for the path.</p>
 <h2 id="_example">Example</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>To see how attributes "crlf" and "indent" are set for different paths.</p>
+<p>To see how attributes "crlf" and "ident" are set for different paths.</p>
 </div>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>Prepare an array of <code>struct git_attr_check</code> with two elements (because
-we are checking two attributes).  Initialize their <code>attr</code> member with
-pointers to <code>struct git_attr</code> obtained by calling <code>git_attr()</code>:</p>
+<p>Prepare a <code>struct attr_check</code> with two elements (because
+we are checking two attributes):</p>
 </li>
 </ol>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>static struct git_attr_check check[2];
+<pre>static struct attr_check *check;
 static void setup_check(void)
 {
-	if (check[0].attr)
+	if (check)
 		return; /* already done */
-	check[0].attr = git_attr("crlf");
-	check[1].attr = git_attr("ident");
+	check = attr_check_initl("crlf", "ident", NULL);
 }</pre>
 </div>
 </div>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>Call <code>git_check_attr()</code> with the prepared array of <code>struct git_attr_check</code>:</p>
+<p>Call <code>git_check_attr()</code> with the prepared <code>struct attr_check</code>:</p>
 </li>
 </ol>
 </div>
@@ -542,19 +550,19 @@ static void setup_check(void)
 <pre>	const char *path;
 
 	setup_check();
-	git_check_attr(path, ARRAY_SIZE(check), check);</pre>
+	git_check_attr(path, check);</pre>
 </div>
 </div>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>Act on <code>.value</code> member of the result, left in <code>check[]</code>:</p>
+<p>Act on <code>.value</code> member of the result, left in <code>check-&gt;items[]</code>:</p>
 </li>
 </ol>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>	const char *value = check[0].value;
+<pre>	const char *value = check-&gt;items[0].value;
 
 	if (ATTR_TRUE(value)) {
 		The attribute is Set, by listing only the name of the
@@ -573,6 +581,24 @@ static void setup_check(void)
 	}</pre>
 </div>
 </div>
+<div class="paragraph">
+<p>To see how attributes in argv[] are set for different paths, only
+the first step in the above would be different.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>static struct attr_check *check;
+static void setup_check(const char **argv)
+{
+	check = attr_check_alloc();
+	while (*argv) {
+		struct git_attr *attr = git_attr(*argv);
+		attr_check_append(check, attr);
+		argv++;
+	}
+}</pre>
+</div>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -584,19 +610,23 @@ static void setup_check(void)
 <div class="ulist">
 <ul>
 <li>
-<p>Call <code>git_all_attrs()</code>, which returns an array of <code>git_attr_check</code>
-structures.</p>
+<p>Prepare an empty <code>attr_check</code> structure by calling
+<code>attr_check_alloc()</code>.</p>
 </li>
 <li>
-<p>Iterate over the <code>git_attr_check</code> array to examine the attribute
-names and values.  The name of the attribute described by a
-<code>git_attr_check</code> object can be retrieved via
-<code>git_attr_name(check[i].attr)</code>.  (Please note that no items will be
-returned for unset attributes, so <code>ATTR_UNSET()</code> will return false
-for all returned <code>git_array_check</code> objects.)</p>
+<p>Call <code>git_all_attrs()</code>, which populates the <code>attr_check</code>
+with the attributes attached to the path.</p>
 </li>
 <li>
-<p>Free the <code>git_array_check</code> array.</p>
+<p>Iterate over the <code>attr_check.items[]</code> array to examine
+the attribute names and values.  The name of the attribute
+described by a  <code>attr_check.items[]</code> object can be retrieved via
+<code>git_attr_name(check-&gt;items[i].attr)</code>.  (Please note that no items
+will be returned for unset attributes, so <code>ATTR_UNSET()</code> will return
+false for all returned <code>attr_check.items[]</code> objects.)</p>
+</li>
+<li>
+<p>Free the <code>attr_check</code> struct by calling <code>attr_check_free()</code>.</p>
 </li>
 </ul>
 </div>
@@ -605,7 +635,7 @@ for all returned <code>git_array_check</code> objects.)</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-06-14 11:04:08 W. Europe Daylight Time
+Last updated 2017-10-12 21:18:06 Coordinated Universal Time
 </div>
 </div>
 </body>

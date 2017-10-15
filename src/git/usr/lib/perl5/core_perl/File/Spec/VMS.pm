@@ -4,8 +4,8 @@ use strict;
 use vars qw(@ISA $VERSION);
 require File::Spec::Unix;
 
-$VERSION = '3.56';
-$VERSION =~ tr/_//;
+$VERSION = '3.63_01';
+$VERSION =~ tr/_//d;
 
 @ISA = qw(File::Spec::Unix);
 
@@ -26,7 +26,7 @@ See File::Spec::Unix for a documentation of the methods provided
 there. This package overrides the implementation of these methods, not
 the semantics.
 
-The default behavior is to allow either VMS or Unix syntax on input and to 
+The default behavior is to allow either VMS or Unix syntax on input and to
 return VMS syntax on output unless Unix syntax has been explicitly requested
 via the C<DECC$FILENAME_UNIX_REPORT> CRTL feature.
 
@@ -39,7 +39,10 @@ via the C<DECC$FILENAME_UNIX_REPORT> CRTL feature.
 
 my $use_feature;
 BEGIN {
-    if (eval { local $SIG{__DIE__}; require VMS::Feature; }) {
+    if (eval { local $SIG{__DIE__};
+               local @INC = @INC;
+               pop @INC if $INC[-1] eq '.';
+               require VMS::Feature; }) {
         $use_feature = 1;
     }
 }
@@ -52,7 +55,7 @@ sub _unix_rpt {
         $unix_rpt = VMS::Feature::current("filename_unix_report");
     } else {
         my $env_unix_rpt = $ENV{'DECC$FILENAME_UNIX_REPORT'} || '';
-        $unix_rpt = $env_unix_rpt =~ /^[ET1]/i; 
+        $unix_rpt = $env_unix_rpt =~ /^[ET1]/i;
     }
     return $unix_rpt;
 }
@@ -136,7 +139,7 @@ sub catdir {
     if (@dirs) {
 	my $path = (@dirs == 1 ? $dirs[0] : $self->catdir(@dirs));
 	my ($spath,$sdir) = ($path,$dir);
-	$spath =~ s/\.dir\Z(?!\n)//i; $sdir =~ s/\.dir\Z(?!\n)//i; 
+	$spath =~ s/\.dir\Z(?!\n)//i; $sdir =~ s/\.dir\Z(?!\n)//i;
 
 	if ($unix_rpt) {
 	    $spath = unixify($spath) unless $spath =~ m#/#;
@@ -413,12 +416,12 @@ Construct a complete filespec.
 
 sub catpath {
     my($self,$dev,$dir,$file) = @_;
-    
+
     # We look for a volume in $dev, then in $dir, but not both
     my ($dir_volume, $dir_dir, $dir_file) = $self->splitpath($dir);
     $dev = $dir_volume unless length $dev;
     $dir = length $dir_file ? $self->catfile($dir_dir, $dir_file) : $dir_dir;
-    
+
     if ($dev =~ m|^(?<!\^)/+([^/]+)|) { $dev = "$1:"; }
     else { $dev .= ':' unless $dev eq '' or $dev =~ /:\Z(?!\n)/; }
     if (length($dev) or length($dir)) {
@@ -437,31 +440,29 @@ Attempt to convert an absolute file specification to a relative specification.
 
 sub abs2rel {
     my $self = shift;
-    return vmspath(File::Spec::Unix::abs2rel( $self, @_ ))
-        if ((grep m{/}, @_) && !(grep m{(?<!\^)[\[<:]}, @_));
-
     my($path,$base) = @_;
+
     $base = $self->_cwd() unless defined $base and length $base;
 
     # If there is no device or directory syntax on $base, make sure it
     # is treated as a directory.
-    $base = VMS::Filespec::vmspath($base) unless $base =~ m{(?<!\^)[\[<:]};
+    $base = vmspath($base) unless $base =~ m{(?<!\^)[\[<:]};
 
     for ($path, $base) { $_ = $self->rel2abs($_) }
 
     # Are we even starting $path on the same (node::)device as $base?  Note that
-    # logical paths or nodename differences may be on the "same device" 
-    # but the comparison that ignores device differences so as to concatenate 
-    # [---] up directory specs is not even a good idea in cases where there is 
+    # logical paths or nodename differences may be on the "same device"
+    # but the comparison that ignores device differences so as to concatenate
+    # [---] up directory specs is not even a good idea in cases where there is
     # a logical path difference between $path and $base nodename and/or device.
     # Hence we fall back to returning the absolute $path spec
     # if there is a case blind device (or node) difference of any sort
     # and we do not even try to call $parse() or consult %ENV for $trnlnm()
     # (this module needs to run on non VMS platforms after all).
-    
+
     my ($path_volume, $path_directories, $path_file) = $self->splitpath($path);
     my ($base_volume, $base_directories, $base_file) = $self->splitpath($base);
-    return $path unless lc($path_volume) eq lc($base_volume);
+    return $self->canonpath( $path ) unless lc($path_volume) eq lc($base_volume);
 
     # Now, remove all leading components that are the same
     my @pathchunks = $self->splitdir( $path_directories );
@@ -471,9 +472,9 @@ sub abs2rel {
     my $basechunks = @basechunks;
     unshift(@basechunks,'000000') unless $basechunks[0] eq '000000';
 
-    while ( @pathchunks && 
-            @basechunks && 
-            lc( $pathchunks[0] ) eq lc( $basechunks[0] ) 
+    while ( @pathchunks &&
+            @basechunks &&
+            lc( $pathchunks[0] ) eq lc( $basechunks[0] )
           ) {
         shift @pathchunks ;
         shift @basechunks ;

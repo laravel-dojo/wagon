@@ -58,11 +58,11 @@ TAP::Formatter::Base - Base class for harness output delegates
 
 =head1 VERSION
 
-Version 3.35
+Version 3.36
 
 =cut
 
-our $VERSION = '3.35';
+our $VERSION = '3.36_01';
 
 =head1 DESCRIPTION
 
@@ -205,7 +205,7 @@ Any keys for which the value is C<undef> will be ignored.
 
 =head3 C<prepare>
 
-Called by Test::Harness before any test output is generated. 
+Called by Test::Harness before any test output is generated.
 
 This is an advisory and may not be called in the case where tests are
 being supplied to Test::Harness by an iterator.

@@ -13,7 +13,7 @@ use Exporter ();
 our(@ISA, @EXPORT_OK, @EXPORT, $VERSION);
 
 @ISA = qw(Exporter);
-$VERSION = "0.09";
+$VERSION = "0.10";
 
 @EXPORT = qw( POLLIN
 	      POLLOUT
@@ -23,12 +23,12 @@ $VERSION = "0.09";
 	    );
 
 @EXPORT_OK = qw(
- POLLPRI   
+ POLLPRI
  POLLRDNORM
  POLLWRNORM
  POLLRDBAND
  POLLWRBAND
- POLLNORM  
+ POLLNORM
 	       );
 
 # [0] maps fd's to requested masks
@@ -63,7 +63,7 @@ sub mask {
           delete $self->[2]{$io};
 	}
     }
-    
+
     return unless exists $self->[0]{$fd} and exists $self->[0]{$fd}{$io};
 	return $self->[0]{$fd}{$io};
 }
@@ -83,7 +83,7 @@ sub poll {
 	push(@poll,$fd => $mask);
     }
 
-    my $ret = @poll ? _poll(defined($timeout) ? $timeout * 1000 : -1,@poll) : 0;
+    my $ret = _poll(defined($timeout) ? $timeout * 1000 : -1,@poll);
 
     return $ret
 	unless $ret > 0;
@@ -93,14 +93,14 @@ sub poll {
 	$self->[1]{$fd} = $got if $got;
     }
 
-    return $ret;  
+    return $ret;
 }
 
 sub events {
     my $self = shift;
     my $io = shift;
     my $fd = fileno($io);
-    exists $self->[1]{$fd} and exists $self->[0]{$fd}{$io} 
+    exists $self->[1]{$fd} and exists $self->[0]{$fd}{$io}
                 ? $self->[1]{$fd} & ($self->[0]{$fd}{$io}|POLLHUP|POLLERR|POLLNVAL)
 	: 0;
 }

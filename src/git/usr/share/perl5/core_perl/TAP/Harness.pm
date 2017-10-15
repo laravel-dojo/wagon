@@ -16,11 +16,11 @@ TAP::Harness - Run test scripts with statistics
 
 =head1 VERSION
 
-Version 3.35
+Version 3.36
 
 =cut
 
-our $VERSION = '3.35';
+our $VERSION = '3.36_01';
 
 $ENV{HARNESS_ACTIVE}  = 1;
 $ENV{HARNESS_VERSION} = $VERSION;
@@ -149,7 +149,7 @@ Set the verbosity level:
 
      1   verbose        Print individual test results to STDOUT.
      0   normal
-    -1   quiet          Suppress some test output (mostly failures 
+    -1   quiet          Suppress some test output (mostly failures
                         while tests are running).
     -2   really quiet   Suppress everything but the tests summary.
     -3   silent         Suppress everything.

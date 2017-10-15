@@ -11,7 +11,7 @@ use vars qw( @ISA $VERSION $MATCH_SUPERS $USING_LANGUAGE_TAGS
 BEGIN { unless(defined &DEBUG) { *DEBUG = sub () {0} } }
  # define the constant 'DEBUG' at compile-time
 
-$VERSION = "1.05";
+$VERSION = "1.05_01";
 @ISA = ();
 use I18N::LangTags qw(alternate_language_tags locale2language_tag);
 
@@ -34,7 +34,7 @@ sub detect () { return __PACKAGE__->ambient_langprefs; }
 
 sub ambient_langprefs { # always returns things untainted
   my $base_class = $_[0];
-  
+
   return $base_class->http_accept_langs
    if length( $ENV{'REQUEST_METHOD'} || '' ); # I'm a CGI
        # it's off in its own routine because it's complicated
@@ -56,7 +56,7 @@ sub ambient_langprefs { # always returns things untainted
     ;
     last; # first one wins
   }
-  
+
   if($ENV{'IGNORE_WIN32_LOCALE'}) {
     # no-op
   } elsif(&_try_use('Win32::Locale')) {
@@ -81,7 +81,7 @@ sub http_accept_langs {
   return() unless defined $in and length $in;
 
   $in =~ s/\([^\)]*\)//g; # nix just about any comment
-  
+
   if( $in =~ m/^\s*([a-zA-Z][-a-zA-Z]+)\s*$/s ) {
     # Very common case: just one language tag
     return _normalize $1;
@@ -95,7 +95,7 @@ sub http_accept_langs {
   $in =~ s/\s+//g;  # Yes, we can just do without the WS!
   my @in = $in =~ m/([^,]+)/g;
   my %pref;
-  
+
   my $q;
   foreach my $tag (@in) {
     next unless $tag =~
@@ -145,6 +145,8 @@ sub _try_use {   # Basically a wrapper around "require Modulename"
   print " About to use $module ...\n" if DEBUG;
   {
     local $SIG{'__DIE__'};
+    local @INC = @INC;
+    pop @INC if $INC[-1] eq '.';
     eval "require $module"; # used to be "use $module", but no point in that.
   }
   if($@) {

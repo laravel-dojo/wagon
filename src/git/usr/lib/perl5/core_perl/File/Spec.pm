@@ -3,8 +3,8 @@ package File::Spec;
 use strict;
 use vars qw(@ISA $VERSION);
 
-$VERSION = '3.56';
-$VERSION =~ tr/_//;
+$VERSION = '3.63_01';
+$VERSION =~ tr/_//d;
 
 my %module = (MacOS   => 'Mac',
 	      MSWin32 => 'Win32',
@@ -15,7 +15,8 @@ my %module = (MacOS   => 'Mac',
 	      symbian => 'Win32', # Yes, File::Spec::Win32 works on symbian.
 	      dos     => 'OS2',   # Yes, File::Spec::OS2 works on DJGPP.
 	      cygwin  => 'Cygwin',
-	      msys    => 'Cygwin');
+	      msys    => 'Cygwin',
+	      amigaos => 'AmigaOS');
 
 
 my $module = $module{$^O} || 'Unix';
@@ -198,14 +199,14 @@ join is the same as catfile.
 X<splitpath> X<split, path>
 
 Splits a path in to volume, directory, and filename portions. On systems
-with no concept of volume, returns '' for volume. 
+with no concept of volume, returns '' for volume.
 
     ($volume,$directories,$file) =
                        File::Spec->splitpath( $path );
     ($volume,$directories,$file) =
                        File::Spec->splitpath( $path, $no_file );
 
-For systems with no syntax differentiating filenames from directories, 
+For systems with no syntax differentiating filenames from directories,
 assumes that the last file is a path unless C<$no_file> is true or a
 trailing separator or F</.> or F</..> is present. On Unix, this means that C<$no_file>
 true makes this return ( '', $path, '' ).
@@ -222,7 +223,7 @@ The opposite of L</catdir>.
 
     @dirs = File::Spec->splitdir( $directories );
 
-C<$directories> must be only the directory portion of the path on systems 
+C<$directories> must be only the directory portion of the path on systems
 that have the concept of a volume or that have path syntax that differentiates
 files from directories.
 
@@ -258,7 +259,7 @@ paths, and we will instead simply return C<$path>.  Note that previous
 versions of this module ignored the volume of C<$base>, which resulted in
 garbage results part of the time.
 
-On systems that have a grammar that indicates filenames, this ignores the 
+On systems that have a grammar that indicates filenames, this ignores the
 C<$base> filename as well. Otherwise all path components are assumed to be
 directories.
 
@@ -274,7 +275,7 @@ Based on code written by Shigio Yamaguchi.
 =item rel2abs()
 X<rel2abs> X<absolute, path> X<relative, path>
 
-Converts a relative path to an absolute path. 
+Converts a relative path to an absolute path.
 
     $abs_path = File::Spec->rel2abs( $path ) ;
     $abs_path = File::Spec->rel2abs( $path, $base ) ;
@@ -289,7 +290,7 @@ paths, and we will instead simply return C<$path>.  Note that previous
 versions of this module ignored the volume of C<$base>, which resulted in
 garbage results part of the time.
 
-On systems that have a grammar that indicates filenames, this ignores the 
+On systems that have a grammar that indicates filenames, this ignores the
 C<$base> filename as well. Otherwise all path components are assumed to be
 directories.
 

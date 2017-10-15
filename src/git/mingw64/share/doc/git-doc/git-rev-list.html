@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 1.5.4">
+<meta name="generator" content="Asciidoctor 1.5.5">
 <title>git-rev-list(1)</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
@@ -17,7 +17,6 @@ audio:not([controls]){display:none;height:0}
 [hidden],template{display:none}
 script{display:none!important}
 html{font-family:sans-serif;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%}
-body{margin:0}
 a{background:transparent}
 a:focus{outline:thin dotted}
 a:active,a:hover{outline:0}
@@ -52,7 +51,7 @@ textarea{overflow:auto;vertical-align:top}
 table{border-collapse:collapse;border-spacing:0}
 *,*:before,*:after{-moz-box-sizing:border-box;-webkit-box-sizing:border-box;box-sizing:border-box}
 html,body{font-size:100%}
-body{background:#fff;color:rgba(0,0,0,.8);padding:0;margin:0;font-family:"Noto Serif","DejaVu Serif",serif;font-weight:400;font-style:normal;line-height:1;position:relative;cursor:auto}
+body{background:#fff;color:rgba(0,0,0,.8);padding:0;margin:0;font-family:"Noto Serif","DejaVu Serif",serif;font-weight:400;font-style:normal;line-height:1;position:relative;cursor:auto;tab-size:4;-moz-osx-font-smoothing:grayscale;-webkit-font-smoothing:antialiased}
 a:hover{cursor:pointer}
 img,object,embed{max-width:100%;height:auto}
 object,embed{height:100%}
@@ -64,7 +63,6 @@ img{-ms-interpolation-mode:bicubic}
 .text-center{text-align:center!important}
 .text-justify{text-align:justify!important}
 .hide{display:none}
-body{-webkit-font-smoothing:antialiased}
 img,object,svg{display:inline-block;vertical-align:middle}
 textarea{height:auto;min-height:50px}
 select{width:100%}
@@ -119,13 +117,16 @@ table thead tr th,table thead tr td,table tfoot tr th,table tfoot tr td{padding:
 table tr th,table tr td{padding:.5625em .625em;font-size:inherit;color:rgba(0,0,0,.8)}
 table tr.even,table tr.alt,table tr:nth-of-type(even){background:#f8f8f7}
 table thead tr th,table tfoot tr th,table tbody tr td,table tr td,table tfoot tr td{display:table-cell;line-height:1.6}
-body{tab-size:4}
 h1,h2,h3,#toctitle,.sidebarblock>.content>.title,h4,h5,h6{line-height:1.2;word-spacing:-.05em}
 h1 strong,h2 strong,h3 strong,#toctitle strong,.sidebarblock>.content>.title strong,h4 strong,h5 strong,h6 strong{font-weight:400}
 .clearfix:before,.clearfix:after,.float-group:before,.float-group:after{content:" ";display:table}
 .clearfix:after,.float-group:after{clear:both}
-*:not(pre)>code{font-size:.9375em;font-style:normal!important;letter-spacing:0;padding:.1em .5ex;word-spacing:-.15em;background-color:#f7f7f8;-webkit-border-radius:4px;border-radius:4px;line-height:1.45;text-rendering:optimizeSpeed}
+*:not(pre)>code{font-size:.9375em;font-style:normal!important;letter-spacing:0;padding:.1em .5ex;word-spacing:-.15em;background-color:#f7f7f8;-webkit-border-radius:4px;border-radius:4px;line-height:1.45;text-rendering:optimizeSpeed;word-wrap:break-word}
+*:not(pre)>code.nobreak{word-wrap:normal}
+*:not(pre)>code.nowrap{white-space:nowrap}
 pre,pre>code{line-height:1.45;color:rgba(0,0,0,.9);font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;font-weight:400;text-rendering:optimizeSpeed}
+em em{font-style:normal}
+strong strong{font-weight:400}
 .keyseq{color:rgba(51,51,51,.8)}
 kbd{font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;display:inline-block;color:rgba(0,0,0,.8);font-size:.65em;line-height:1.45;background-color:#f7f7f7;border:1px solid #ccc;-webkit-border-radius:3px;border-radius:3px;-webkit-box-shadow:0 1px 0 rgba(0,0,0,.2),0 0 0 .1em white inset;box-shadow:0 1px 0 rgba(0,0,0,.2),0 0 0 .1em #fff inset;margin:0 .15em;padding:.2em .5em;vertical-align:middle;position:relative;top:-.1em;white-space:nowrap}
 .keyseq kbd:first-child{margin-left:0}
@@ -650,10 +651,16 @@ instead of the default basic regular expressions.</p>
 <p>Consider the limiting patterns to be fixed strings (don&#8217;t interpret
 pattern as a regular expression).</p>
 </dd>
+<dt class="hdlist1">-P</dt>
 <dt class="hdlist1">--perl-regexp</dt>
 <dd>
-<p>Consider the limiting patterns to be Perl-compatible regular expressions.
-Requires libpcre to be compiled in.</p>
+<p>Consider the limiting patterns to be Perl-compatible regular
+expressions.</p>
+<div class="paragraph">
+<p>Support for these types of regular expressions is an optional
+compile-time dependency. If Git wasn&#8217;t compiled with support for them
+providing this option will cause it to die.</p>
+</div>
 </dd>
 <dt class="hdlist1">--remove-empty</dt>
 <dd>
@@ -701,8 +708,8 @@ for all following revision specifiers, up to the next <code>--not</code>.</p>
 </dd>
 <dt class="hdlist1">--all</dt>
 <dd>
-<p>Pretend as if all the refs in <code>refs/</code> are listed on the
-command line as <em>&lt;commit&gt;</em>.</p>
+<p>Pretend as if all the refs in <code>refs/</code>, along with <code>HEAD</code>, are
+listed on the command line as <em>&lt;commit&gt;</em>.</p>
 </dd>
 <dt class="hdlist1">--branches[=&lt;pattern&gt;]</dt>
 <dd>
@@ -761,7 +768,7 @@ the bad input was not given.</p>
 <dt class="hdlist1">--stdin</dt>
 <dd>
 <p>In addition to the <em>&lt;commit&gt;</em> listed on the command
-line, read them from the standard input. If a <em>--</em> separator is
+line, read them from the standard input. If a <code>--</code> separator is
 seen, stop reading commits and start reading paths to limit the
 result.</p>
 </dd>
@@ -796,7 +803,7 @@ excluded from the output.</p>
 <dt class="hdlist1">--left-only</dt>
 <dt class="hdlist1">--right-only</dt>
 <dd>
-<p>List only commits on the respective side of a symmetric range,
+<p>List only commits on the respective side of a symmetric difference,
 i.e. only those which would be marked <code>&lt;</code> resp. <code>&gt;</code> by
 <code>--left-right</code>.</p>
 <div class="paragraph">
@@ -826,15 +833,46 @@ and <em>commit1...commit2</em> notations cannot be used).</p>
 <div class="paragraph">
 <p>With <code>--pretty</code> format other than <code>oneline</code> (for obvious reasons),
 this causes the output to have two extra lines of information
-taken from the reflog.  By default, <em>commit@{Nth}</em> notation is
-used in the output.  When the starting commit is specified as
-<em>commit@{now}</em>, output also uses <em>commit@{timestamp}</em> notation
-instead.  Under <code>--pretty=oneline</code>, the commit message is
+taken from the reflog.  The reflog designator in the output may be shown
+as <code>ref@{Nth}</code> (where <code>Nth</code> is the reverse-chronological index in the
+reflog) or as <code>ref@{timestamp}</code> (with the timestamp for that entry),
+depending on a few rules:</p>
+</div>
+</dd>
+</dl>
+</div>
+</div>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>If the starting point is specified as <code>ref@{Nth}</code>, show the index
+format.</p>
+</li>
+<li>
+<p>If the starting point was specified as <code>ref@{now}</code>, show the
+timestamp format.</p>
+</li>
+<li>
+<p>If neither was used, but <code>--date</code> was given on the command line, show
+the timestamp in the format requested by <code>--date</code>.</p>
+</li>
+<li>
+<p>Otherwise, show the index format.</p>
+</li>
+</ol>
+</div>
+<div class="openblock">
+<div class="content">
+<div class="paragraph">
+<p>+
+Under <code>--pretty=oneline</code>, the commit message is
 prefixed with this information on the same line.
 This option cannot be combined with <code>--reverse</code>.
 See also <a href="git-reflog.html">git-reflog</a>(1).</p>
 </div>
-</dd>
+<div class="dlist">
+<dl>
 <dt class="hdlist1">--merge</dt>
 <dd>
 <p>After a failed merge, show refs that touch files having a
@@ -850,6 +888,11 @@ prefixed with <code>-</code>.</p>
 <p>Try to speed up the traversal using the pack bitmap index (if
 one is available). Note that when traversing with <code>--objects</code>,
 trees and blobs will not have their associated path printed.</p>
+</dd>
+<dt class="hdlist1">--progress=&lt;header&gt;</dt>
+<dd>
+<p>Show progress reports on stderr as objects are considered. The
+<code>&lt;header&gt;</code> text will be printed with each progress update.</p>
 </dd>
 </dl>
 </div>
@@ -1333,8 +1376,9 @@ together.</p>
 </dd>
 <dt class="hdlist1">--reverse</dt>
 <dd>
-<p>Output the commits in reverse order.
-Cannot be combined with <code>--walk-reflogs</code>.</p>
+<p>Output the commits chosen to be shown (see Commit Limiting
+section above) in reverse order. Cannot be combined with
+<code>--walk-reflogs</code>.</p>
 </dd>
 </dl>
 </div>
@@ -1437,7 +1481,7 @@ people using 80-column terminals.</p>
 <dd>
 <p>Show the full 40-byte hexadecimal commit object name. This negates
 <code>--abbrev-commit</code> and those options which imply it such as
-"--oneline". It also overrides the <em>log.abbrevCommit</em> variable.</p>
+"--oneline". It also overrides the <code>log.abbrevCommit</code> variable.</p>
 </dd>
 <dt class="hdlist1">--oneline</dt>
 <dd>
@@ -1490,8 +1534,8 @@ author&#8217;s). If <code>-local</code> is appended to the format (e.g.,
 <code>iso-local</code>), the user&#8217;s local time zone is used instead.</p>
 <div class="paragraph">
 <p><code>--date=relative</code> shows dates relative to the current time,
-e.g. &#8220;2 hours ago&#8221;. The <code>-local</code> option cannot be used with
-<code>--raw</code> or <code>--relative</code>.</p>
+e.g. &#8220;2 hours ago&#8221;. The <code>-local</code> option has no effect for
+<code>--date=relative</code>.</p>
 </div>
 <div class="paragraph">
 <p><code>--date=local</code> is an alias for <code>--date=default-local</code>.</p>
@@ -1528,11 +1572,25 @@ format, often found in email messages.</p>
 </div>
 <div class="paragraph">
 <p>+
-<code>--date=raw</code> shows the date in the internal raw Git format <code>%s %z</code> format.</p>
+<code>--date=raw</code> shows the date as seconds since the epoch (1970-01-01
+00:00:00 UTC), followed by a space, and then the timezone as an offset
+from UTC (a <code>+</code> or <code>-</code> with four digits; the first two are hours, and
+the second two are minutes). I.e., as if the timestamp were formatted
+with <code>strftime("%s %z")</code>).
+Note that the <code>-local</code> option does not affect the seconds-since-epoch
+value (which is always measured in UTC), but does switch the accompanying
+timezone value.</p>
 </div>
 <div class="paragraph">
 <p>+
-<code>--date=format:...</code> feeds the format <code>...</code> to your system <code>strftime</code>.
+<code>--date=unix</code> shows the date as a Unix epoch timestamp (seconds since
+1970).  As with <code>--raw</code>, this is always in UTC and therefore <code>-local</code>
+has no effect.</p>
+</div>
+<div class="paragraph">
+<p>+
+<code>--date=format:...</code> feeds the format <code>...</code> to your system <code>strftime</code>,
+except for %z and %Z, which are handled internally.
 Use <code>--date=format:%c</code> to show the date in your system locale&#8217;s
 preferred format.  See the <code>strftime</code> manual for a complete list of
 format placeholders. When using <code>-local</code>, the correct syntax is
@@ -1575,7 +1633,7 @@ Also enables parent rewriting, see <em>History Simplification</em> below.</p>
 </dd>
 <dt class="hdlist1">--left-right</dt>
 <dd>
-<p>Mark which side of a symmetric diff a commit is reachable from.
+<p>Mark which side of a symmetric difference a commit is reachable from.
 Commits from the left side are prefixed with <code>&lt;</code> and those from
 the right with <code>&gt;</code>.  If combined with <code>--boundary</code>, those
 commits are prefixed with <code>-</code>.</p>
@@ -1916,8 +1974,14 @@ or <a href="git-blame.html">git-blame</a>(1))</p>
 <p><em>%GG</em>: raw verification message from GPG for a signed commit</p>
 </li>
 <li>
-<p><em>%G?</em>: show "G" for a good (valid) signature, "B" for a bad signature,
-"U" for a good signature with unknown validity and "N" for no signature</p>
+<p><em>%G?</em>: show "G" for a good (valid) signature,
+"B" for a bad signature,
+"U" for a good signature with unknown validity,
+"X" for a good signature that has expired,
+"Y" for a good signature made by an expired key,
+"R" for a good signature made by a revoked key,
+"E" if the signature cannot be checked (e.g. missing key)
+and "N" for no signature</p>
 </li>
 <li>
 <p><em>%GS</em>: show the name of the signer for a signed commit</p>
@@ -1926,10 +1990,16 @@ or <a href="git-blame.html">git-blame</a>(1))</p>
 <p><em>%GK</em>: show the key used to sign a signed commit</p>
 </li>
 <li>
-<p><em>%gD</em>: reflog selector, e.g., <code>refs/stash@{1}</code></p>
+<p><em>%gD</em>: reflog selector, e.g., <code>refs/stash@{1}</code> or
+<code>refs/stash@{2 minutes ago</code>}; the format follows the rules described
+for the <code>-g</code> option. The portion before the <code>@</code> is the refname as
+given on the command line (so <code>git log -g refs/heads/master</code> would
+yield <code>refs/heads/master@{0}</code>).</p>
 </li>
 <li>
-<p><em>%gd</em>: shortened reflog selector, e.g., <code>stash@{1}</code></p>
+<p><em>%gd</em>: shortened reflog selector; same as <code>%gD</code>, but the refname
+portion is shortened for human readability (so <code>refs/heads/master</code>
+becomes just <code>master</code>).</p>
 </li>
 <li>
 <p><em>%gn</em>: reflog identity name</p>
@@ -1961,15 +2031,21 @@ or <a href="git-blame.html">git-blame</a>(1))</p>
 <p><em>%Creset</em>: reset color</p>
 </li>
 <li>
-<p><em>%C(&#8230;&#8203;)</em>: color specification, as described in color.branch.* config option;
-adding <code>auto,</code> at the beginning will emit color only when colors are
-enabled for log output (by <code>color.diff</code>, <code>color.ui</code>, or <code>--color</code>, and
-respecting the <code>auto</code> settings of the former if we are going to a
-terminal). <code>auto</code> alone (i.e. <code>%C(auto)</code>) will turn on auto coloring
-on the next placeholders until the color is switched again.</p>
+<p><em>%C(&#8230;&#8203;)</em>: color specification, as described under Values in the
+"CONFIGURATION FILE" section of <a href="git-config.html">git-config</a>(1).
+By default, colors are shown only when enabled for log output (by
+<code>color.diff</code>, <code>color.ui</code>, or <code>--color</code>, and respecting the <code>auto</code>
+settings of the former if we are going to a terminal). <code>%C(auto,...)</code>
+is accepted as a historical synonym for the default (e.g.,
+<code>%C(auto,red)</code>). Specifying <code>%C(always,...) will show the colors
+even when color is not otherwise enabled (though consider
+just using `--color=always</code> to enable color for the whole output,
+including this format and anything else git might color).  <code>auto</code>
+alone (i.e. <code>%C(auto)</code>) will turn on auto coloring on the next
+placeholders until the color is switched again.</p>
 </li>
 <li>
-<p><em>%m</em>: left, right or boundary mark</p>
+<p><em>%m</em>: left (<code>&lt;</code>), right (<code>&gt;</code>) or boundary (<code>-</code>) mark</p>
 </li>
 <li>
 <p><em>%n</em>: newline</p>
@@ -2008,6 +2084,10 @@ than given and there are spaces on its left, use those spaces</p>
 <p><em>%&gt;&lt;(&lt;N&gt;)</em>, <em>%&gt;&lt;|(&lt;N&gt;)</em>: similar to <em>% &lt;(&lt;N&gt;)</em>, <em>%&lt;|(&lt;N&gt;)</em>
 respectively, but padding both sides (i.e. the text is centered)</p>
 </li>
+<li>
+<p>%(trailers): display the trailers of the body as interpreted by
+<a href="git-interpret-trailers.html">git-interpret-trailers</a>(1)</p>
+</li>
 </ul>
 </div>
 </li>
@@ -2036,8 +2116,8 @@ is inserted immediately before the expansion if and only if the
 placeholder expands to a non-empty string.</p>
 </div>
 <div class="paragraph">
-<p>If you add a <code>-</code> (minus sign) after <em>%</em> of a placeholder, line-feeds that
-immediately precede the expansion are deleted if and only if the
+<p>If you add a <code>-</code> (minus sign) after <em>%</em> of a placeholder, all consecutive
+line-feeds immediately preceding the expansion are deleted if and only if the
 placeholder expands to an empty string.</p>
 </div>
 <div class="paragraph">
@@ -2098,7 +2178,7 @@ $ git log -2 --pretty=%h 4da45bef</pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-06-14 11:04:07 W. Europe Daylight Time
+Last updated 2017-10-12 21:18:06 Coordinated Universal Time
 </div>
 </div>
 </body>

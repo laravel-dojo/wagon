@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 1.5.4">
+<meta name="generator" content="Asciidoctor 1.5.5">
 <title>git-svn(1)</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
@@ -17,7 +17,6 @@ audio:not([controls]){display:none;height:0}
 [hidden],template{display:none}
 script{display:none!important}
 html{font-family:sans-serif;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%}
-body{margin:0}
 a{background:transparent}
 a:focus{outline:thin dotted}
 a:active,a:hover{outline:0}
@@ -52,7 +51,7 @@ textarea{overflow:auto;vertical-align:top}
 table{border-collapse:collapse;border-spacing:0}
 *,*:before,*:after{-moz-box-sizing:border-box;-webkit-box-sizing:border-box;box-sizing:border-box}
 html,body{font-size:100%}
-body{background:#fff;color:rgba(0,0,0,.8);padding:0;margin:0;font-family:"Noto Serif","DejaVu Serif",serif;font-weight:400;font-style:normal;line-height:1;position:relative;cursor:auto}
+body{background:#fff;color:rgba(0,0,0,.8);padding:0;margin:0;font-family:"Noto Serif","DejaVu Serif",serif;font-weight:400;font-style:normal;line-height:1;position:relative;cursor:auto;tab-size:4;-moz-osx-font-smoothing:grayscale;-webkit-font-smoothing:antialiased}
 a:hover{cursor:pointer}
 img,object,embed{max-width:100%;height:auto}
 object,embed{height:100%}
@@ -64,7 +63,6 @@ img{-ms-interpolation-mode:bicubic}
 .text-center{text-align:center!important}
 .text-justify{text-align:justify!important}
 .hide{display:none}
-body{-webkit-font-smoothing:antialiased}
 img,object,svg{display:inline-block;vertical-align:middle}
 textarea{height:auto;min-height:50px}
 select{width:100%}
@@ -119,13 +117,16 @@ table thead tr th,table thead tr td,table tfoot tr th,table tfoot tr td{padding:
 table tr th,table tr td{padding:.5625em .625em;font-size:inherit;color:rgba(0,0,0,.8)}
 table tr.even,table tr.alt,table tr:nth-of-type(even){background:#f8f8f7}
 table thead tr th,table tfoot tr th,table tbody tr td,table tr td,table tfoot tr td{display:table-cell;line-height:1.6}
-body{tab-size:4}
 h1,h2,h3,#toctitle,.sidebarblock>.content>.title,h4,h5,h6{line-height:1.2;word-spacing:-.05em}
 h1 strong,h2 strong,h3 strong,#toctitle strong,.sidebarblock>.content>.title strong,h4 strong,h5 strong,h6 strong{font-weight:400}
 .clearfix:before,.clearfix:after,.float-group:before,.float-group:after{content:" ";display:table}
 .clearfix:after,.float-group:after{clear:both}
-*:not(pre)>code{font-size:.9375em;font-style:normal!important;letter-spacing:0;padding:.1em .5ex;word-spacing:-.15em;background-color:#f7f7f8;-webkit-border-radius:4px;border-radius:4px;line-height:1.45;text-rendering:optimizeSpeed}
+*:not(pre)>code{font-size:.9375em;font-style:normal!important;letter-spacing:0;padding:.1em .5ex;word-spacing:-.15em;background-color:#f7f7f8;-webkit-border-radius:4px;border-radius:4px;line-height:1.45;text-rendering:optimizeSpeed;word-wrap:break-word}
+*:not(pre)>code.nobreak{word-wrap:normal}
+*:not(pre)>code.nowrap{white-space:nowrap}
 pre,pre>code{line-height:1.45;color:rgba(0,0,0,.9);font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;font-weight:400;text-rendering:optimizeSpeed}
+em em{font-style:normal}
+strong strong{font-weight:400}
 .keyseq{color:rgba(51,51,51,.8)}
 kbd{font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;display:inline-block;color:rgba(0,0,0,.8);font-size:.65em;line-height:1.45;background-color:#f7f7f7;border:1px solid #ccc;-webkit-border-radius:3px;border-radius:3px;-webkit-box-shadow:0 1px 0 rgba(0,0,0,.2),0 0 0 .1em white inset;box-shadow:0 1px 0 rgba(0,0,0,.2),0 0 0 .1em #fff inset;margin:0 .15em;padding:.2em .5em;vertical-align:middle;position:relative;top:-.1em;white-space:nowrap}
 .keyseq kbd:first-child{margin-left:0}
@@ -554,17 +555,23 @@ your Perl&#8217;s Getopt::Long is &lt; v2.37).
 </table>
 </div>
 </dd>
+<dt class="hdlist1">--ignore-refs=&lt;regex&gt;</dt>
+<dd>
+<p>When passed to <em>init</em> or <em>clone</em> this regular expression will
+be preserved as a config key.  See <em>fetch</em> for a description
+of <code>--ignore-refs</code>.</p>
+</dd>
 <dt class="hdlist1">--ignore-paths=&lt;regex&gt;</dt>
 <dd>
 <p>When passed to <em>init</em> or <em>clone</em> this regular expression will
 be preserved as a config key.  See <em>fetch</em> for a description
-of <em>--ignore-paths</em>.</p>
+of <code>--ignore-paths</code>.</p>
 </dd>
 <dt class="hdlist1">--include-paths=&lt;regex&gt;</dt>
 <dd>
 <p>When passed to <em>init</em> or <em>clone</em> this regular expression will
 be preserved as a config key.  See <em>fetch</em> for a description
-of <em>--include-paths</em>.</p>
+of <code>--include-paths</code>.</p>
 </dd>
 <dt class="hdlist1">--no-minimize-url</dt>
 <dd>
@@ -574,7 +581,7 @@ to the root (or highest allowed level) of the Subversion
 repository.  This default allows better tracking of history if
 entire projects are moved within a repository, but may cause
 issues on repositories where read access restrictions are in
-place.  Passing <em>--no-minimize-url</em> will allow git svn to
+place.  Passing <code>--no-minimize-url</code> will allow git svn to
 accept URLs as-is without attempting to connect to a higher
 level directory.  This option is off by default when only
 one URL/branch is tracked (it would do little good).</p>
@@ -611,11 +618,25 @@ the same local time zone.</p>
 <dd>
 <p>Fetch only from the SVN parent of the current HEAD.</p>
 </dd>
+<dt class="hdlist1">--ignore-refs=&lt;regex&gt;</dt>
+<dd>
+<p>Ignore refs for branches or tags matching the Perl regular
+expression. A "negative look-ahead assertion" like
+<code>^refs/remotes/origin/(?!tags/wanted-tag|wanted-branch).*$</code>
+can be used to allow only certain refs.</p>
+<div class="verseblock">
+<pre class="content">config key: svn-remote.&lt;name&gt;.ignore-refs</pre>
+</div>
+<div class="paragraph">
+<p>If the ignore-refs configuration key is set, and the command-line
+option is also given, both regular expressions will be used.</p>
+</div>
+</dd>
 <dt class="hdlist1">--ignore-paths=&lt;regex&gt;</dt>
 <dd>
 <p>This allows one to specify a Perl regular expression that will
 cause skipping of all matching paths from checkout from SVN.
-The <em>--ignore-paths</em> option should match for every <em>fetch</em>
+The <code>--ignore-paths</code> option should match for every <em>fetch</em>
 (including automatic fetches due to <em>clone</em>, <em>dcommit</em>,
 <em>rebase</em>, etc) on a given repository.</p>
 <div class="verseblock">
@@ -657,10 +678,10 @@ option is also given, both regular expressions will be used.</p>
 <dd>
 <p>This allows one to specify a Perl regular expression that will
 cause the inclusion of only matching paths from checkout from SVN.
-The <em>--include-paths</em> option should match for every <em>fetch</em>
+The <code>--include-paths</code> option should match for every <em>fetch</em>
 (including automatic fetches due to <em>clone</em>, <em>dcommit</em>,
-<em>rebase</em>, etc) on a given repository. <em>--ignore-paths</em> takes
-precedence over <em>--include-paths</em>.</p>
+<em>rebase</em>, etc) on a given repository. <code>--ignore-paths</code> takes
+precedence over <code>--include-paths</code>.</p>
 <div class="verseblock">
 <pre class="content">config key: svn-remote.&lt;name&gt;.include-paths</pre>
 </div>
@@ -683,7 +704,7 @@ directory based on the basename of the URL passed to it;
 or if a second argument is passed; it will create a directory
 and work within that.  It accepts all arguments that the
 <em>init</em> and <em>fetch</em> commands accept; with the exception of
-<em>--fetch-all</em> and <em>--parent</em>.  After a repository is cloned,
+<code>--fetch-all</code> and <code>--parent</code>.  After a repository is cloned,
 the <em>fetch</em> command will be able to update revisions without
 affecting the working tree; and the <em>rebase</em> command will be
 able to update the working tree with the latest changes.</p>
@@ -716,7 +737,7 @@ it preserves linear history with <em>git rebase</em> instead of
 </div>
 <div class="paragraph">
 <p>This accepts all options that <em>git svn fetch</em> and <em>git rebase</em>
-accept.  However, <em>--fetch-all</em> only fetches from the current
+accept.  However, <code>--fetch-all</code> only fetches from the current
 [svn-remote], and not all [svn-remote] definitions.</p>
 </div>
 <div class="paragraph">
@@ -1038,6 +1059,28 @@ URL of the target Subversion repository.  The final argument
 (URL) may be omitted if you are working from a <em>git svn</em>-aware
 repository (that has been <code>init</code>-ed with <em>git svn</em>).
 The -r&lt;revision&gt; option is required for this.</p>
+<div class="paragraph">
+<p>The commit message is supplied either directly with the <code>-m</code> or <code>-F</code>
+option, or indirectly from the tag or commit when the second tree-ish
+denotes such an object, or it is requested by invoking an editor (see
+<code>--edit</code> option below).</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">-m &lt;msg&gt;</dt>
+<dt class="hdlist1">--message=&lt;msg&gt;</dt>
+<dd>
+<p>Use the given <code>msg</code> as the commit message. This option
+disables the <code>--edit</code> option.</p>
+</dd>
+<dt class="hdlist1">-F &lt;filename&gt;</dt>
+<dt class="hdlist1">--file=&lt;filename&gt;</dt>
+<dd>
+<p>Take the commit message from the given file. This option
+disables the <code>--edit</code> option.</p>
+</dd>
+</dl>
+</div>
 </dd>
 <dt class="hdlist1"><em>info</em></dt>
 <dd>
@@ -1056,6 +1099,24 @@ Subversion revision.</p>
 <dd>
 <p>Gets the Subversion property given as the first argument, for a
 file.  A specific revision can be specified with -r/--revision.</p>
+</dd>
+<dt class="hdlist1"><em>propset</em></dt>
+<dd>
+<p>Sets the Subversion property given as the first argument, to the
+value given as the second argument for the file given as the
+third argument.</p>
+<div class="paragraph">
+<p>Example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>git svn propset svn:keywords "FreeBSD=%H" devel/py-tipper/Makefile</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This will set the property <em>svn:keywords</em> to <em>FreeBSD=%H</em> for the file
+<em>devel/py-tipper/Makefile</em>.</p>
+</div>
 </dd>
 <dt class="hdlist1"><em>show-externals</em></dt>
 <dd>
@@ -1249,6 +1310,9 @@ does not exist in the authors file, the given file is executed
 with the committer name as the first argument.  The program is
 expected to return a single line of the form "Name &lt;email&gt;",
 which will be treated as if included in the authors file.</p>
+<div class="verseblock">
+<pre class="content">config key: svn.authorsProg</pre>
+</div>
 </dd>
 <dt class="hdlist1">-q</dt>
 <dt class="hdlist1">--quiet</dt>
@@ -1293,6 +1357,9 @@ creating the branch or tag.</p>
 <p>When retrieving svn commits into Git (as part of <em>fetch</em>, <em>rebase</em>, or
 <em>dcommit</em> operations), look for the first <code>From:</code> or <code>Signed-off-by:</code> line
 in the log message and use that as the author string.</p>
+<div class="verseblock">
+<pre class="content">config key: svn.useLogAuthor</pre>
+</div>
 </dd>
 <dt class="hdlist1">--add-author-from</dt>
 <dd>
@@ -1301,6 +1368,9 @@ operations), if the existing log message doesn&#8217;t already have a
 <code>From:</code> or <code>Signed-off-by:</code> line, append a <code>From:</code> line based on the
 Git commit&#8217;s author string.  If you use this, then <code>--use-log-author</code>
 will retrieve a valid author string for all commits.</p>
+<div class="verseblock">
+<pre class="content">config key: svn.addAuthorFrom</pre>
+</div>
 </dd>
 </dl>
 </div>
@@ -1419,7 +1489,7 @@ or useSvnsyncProps.</p>
 </dd>
 <dt class="hdlist1">svn-remote.&lt;name&gt;.pushurl</dt>
 <dd>
-<p>Similar to Git&#8217;s <em>remote.&lt;name&gt;.pushurl</em>, this key is designed
+<p>Similar to Git&#8217;s <code>remote.&lt;name&gt;.pushurl</code>, this key is designed
 to be used in cases where <em>url</em> points to an SVN repository
 via a read-only transport, to provide an alternate read/write
 transport. It is assumed that both keys point to the same
@@ -1604,7 +1674,7 @@ parent of the branch. However, it is possible that there is no suitable
 Git commit to serve as parent.  This will happen, among other reasons,
 if the SVN branch is a copy of a revision that was not fetched by <em>git
 svn</em> (e.g. because it is an old revision that was skipped with
-<em>--revision</em>), or if in SVN a directory was copied that is not tracked
+<code>--revision</code>), or if in SVN a directory was copied that is not tracked
 by <em>git svn</em> (such as a branch that is not tracked at all, or a
 subdirectory of a tracked branch). In these cases, <em>git svn</em> will still
 create a Git branch, but instead of using an existing Git commit as the
@@ -1697,12 +1767,12 @@ directories in the working copy.  While this is the easiest way to get a
 copy of a complete repository, for projects with many branches it will
 lead to a working copy many times larger than just the trunk. Thus for
 projects using the standard directory structure (trunk/branches/tags),
-it is recommended to clone with option <em>--stdlayout</em>. If the project
+it is recommended to clone with option <code>--stdlayout</code>. If the project
 uses a non-standard structure, and/or if branches and tags are not
 required, it is easiest to only clone one directory (typically trunk),
 without giving any repository layout options.  If the full history with
-branches and tags is required, the options <em>--trunk</em> / <em>--branches</em> /
-<em>--tags</em> must be used.</p>
+branches and tags is required, the options <code>--trunk</code> / <code>--branches</code> /
+<code>--tags</code> must be used.</p>
 </div>
 <div class="paragraph">
 <p>When using multiple --branches or --tags, <em>git svn</em> does not automatically
@@ -1879,7 +1949,7 @@ rewinds it.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-06-14 11:04:08 W. Europe Daylight Time
+Last updated 2017-10-12 21:18:06 Coordinated Universal Time
 </div>
 </div>
 </body>

@@ -4,8 +4,9 @@
 # All rights reserved.
 # Changes in Version 2.13_01 onwards Copyright (C) 2013-2014 Steve Hay.  All
 # rights reserved.
-# This program is free software; you can redistribute it and/or
-# modify it under the same terms as Perl itself.
+# This module is free software; you can redistribute it and/or modify it under
+# the same terms as Perl itself, i.e. under the terms of either the GNU General
+# Public License or the Artistic License, as specified in the F<LICENCE> file.
 
 package Net::Netrc;
 
@@ -17,7 +18,7 @@ use warnings;
 use Carp;
 use FileHandle;
 
-our $VERSION = "3.05";
+our $VERSION = "3.08_01";
 
 our $TESTING;
 
@@ -221,7 +222,7 @@ C<Net::Netrc> is a class implementing a simple interface to the .netrc file
 used as by the ftp program.
 
 C<Net::Netrc> also implements security checks just like the ftp program,
-these checks are, first that the .netrc file must be owned by the user and 
+these checks are, first that the .netrc file must be owned by the user and
 second the ownership permissions should be such that only the owner has
 read and write access. If these conditions are not met then a warning is
 output and the .netrc file is not read.
@@ -340,7 +341,8 @@ Versions up to 2.13 Copyright (c) 1995-1998 Graham Barr. All rights reserved.
 Changes in Version 2.13_01 onwards Copyright (C) 2013-2014 Steve Hay.  All
 rights reserved.
 
-This program is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+This module is free software; you can redistribute it and/or modify it under the
+same terms as Perl itself, i.e. under the terms of either the GNU General Public
+License or the Artistic License, as specified in the F<LICENCE> file.
 
 =cut

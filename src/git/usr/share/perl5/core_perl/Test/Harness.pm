@@ -31,11 +31,11 @@ Test::Harness - Run Perl standard test scripts with statistics
 
 =head1 VERSION
 
-Version 3.35
+Version 3.36
 
 =cut
 
-our $VERSION = '3.35';
+our $VERSION = '3.36_01';
 
 # Backwards compatibility for exportable variable names.
 *verbose  = *Verbose;
@@ -590,8 +590,8 @@ L<TAP::Harness>
 
 Please report any bugs or feature requests to
 C<bug-test-harness at rt.cpan.org>, or through the web interface at
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Test-Harness>.  I will be 
-notified, and then you'll automatically be notified of progress on your bug 
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Test-Harness>.  I will be
+notified, and then you'll automatically be notified of progress on your bug
 as I make changes.
 
 =head1 AUTHORS

@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 1.5.4">
+<meta name="generator" content="Asciidoctor 1.5.5">
 <title>git-cat-file(1)</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
@@ -17,7 +17,6 @@ audio:not([controls]){display:none;height:0}
 [hidden],template{display:none}
 script{display:none!important}
 html{font-family:sans-serif;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%}
-body{margin:0}
 a{background:transparent}
 a:focus{outline:thin dotted}
 a:active,a:hover{outline:0}
@@ -52,7 +51,7 @@ textarea{overflow:auto;vertical-align:top}
 table{border-collapse:collapse;border-spacing:0}
 *,*:before,*:after{-moz-box-sizing:border-box;-webkit-box-sizing:border-box;box-sizing:border-box}
 html,body{font-size:100%}
-body{background:#fff;color:rgba(0,0,0,.8);padding:0;margin:0;font-family:"Noto Serif","DejaVu Serif",serif;font-weight:400;font-style:normal;line-height:1;position:relative;cursor:auto}
+body{background:#fff;color:rgba(0,0,0,.8);padding:0;margin:0;font-family:"Noto Serif","DejaVu Serif",serif;font-weight:400;font-style:normal;line-height:1;position:relative;cursor:auto;tab-size:4;-moz-osx-font-smoothing:grayscale;-webkit-font-smoothing:antialiased}
 a:hover{cursor:pointer}
 img,object,embed{max-width:100%;height:auto}
 object,embed{height:100%}
@@ -64,7 +63,6 @@ img{-ms-interpolation-mode:bicubic}
 .text-center{text-align:center!important}
 .text-justify{text-align:justify!important}
 .hide{display:none}
-body{-webkit-font-smoothing:antialiased}
 img,object,svg{display:inline-block;vertical-align:middle}
 textarea{height:auto;min-height:50px}
 select{width:100%}
@@ -119,13 +117,16 @@ table thead tr th,table thead tr td,table tfoot tr th,table tfoot tr td{padding:
 table tr th,table tr td{padding:.5625em .625em;font-size:inherit;color:rgba(0,0,0,.8)}
 table tr.even,table tr.alt,table tr:nth-of-type(even){background:#f8f8f7}
 table thead tr th,table tfoot tr th,table tbody tr td,table tr td,table tfoot tr td{display:table-cell;line-height:1.6}
-body{tab-size:4}
 h1,h2,h3,#toctitle,.sidebarblock>.content>.title,h4,h5,h6{line-height:1.2;word-spacing:-.05em}
 h1 strong,h2 strong,h3 strong,#toctitle strong,.sidebarblock>.content>.title strong,h4 strong,h5 strong,h6 strong{font-weight:400}
 .clearfix:before,.clearfix:after,.float-group:before,.float-group:after{content:" ";display:table}
 .clearfix:after,.float-group:after{clear:both}
-*:not(pre)>code{font-size:.9375em;font-style:normal!important;letter-spacing:0;padding:.1em .5ex;word-spacing:-.15em;background-color:#f7f7f8;-webkit-border-radius:4px;border-radius:4px;line-height:1.45;text-rendering:optimizeSpeed}
+*:not(pre)>code{font-size:.9375em;font-style:normal!important;letter-spacing:0;padding:.1em .5ex;word-spacing:-.15em;background-color:#f7f7f8;-webkit-border-radius:4px;border-radius:4px;line-height:1.45;text-rendering:optimizeSpeed;word-wrap:break-word}
+*:not(pre)>code.nobreak{word-wrap:normal}
+*:not(pre)>code.nowrap{white-space:nowrap}
 pre,pre>code{line-height:1.45;color:rgba(0,0,0,.9);font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;font-weight:400;text-rendering:optimizeSpeed}
+em em{font-style:normal}
+strong strong{font-weight:400}
 .keyseq{color:rgba(51,51,51,.8)}
 kbd{font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;display:inline-block;color:rgba(0,0,0,.8);font-size:.65em;line-height:1.45;background-color:#f7f7f7;border:1px solid #ccc;-webkit-border-radius:3px;border-radius:3px;-webkit-box-shadow:0 1px 0 rgba(0,0,0,.2),0 0 0 .1em white inset;box-shadow:0 1px 0 rgba(0,0,0,.2),0 0 0 .1em #fff inset;margin:0 .15em;padding:.2em .5em;vertical-align:middle;position:relative;top:-.1em;white-space:nowrap}
 .keyseq kbd:first-child{margin-left:0}
@@ -430,8 +431,8 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <h2 id="_synopsis">SYNOPSIS</h2>
 <div class="sectionbody">
 <div class="verseblock">
-<pre class="content"><em>git cat-file</em> (-t [--allow-unknown-type]| -s [--allow-unknown-type]| -e | -p | &lt;type&gt; | --textconv ) &lt;object&gt;
-<em>git cat-file</em> (--batch | --batch-check) [--follow-symlinks]</pre>
+<pre class="content"><em>git cat-file</em> (-t [--allow-unknown-type]| -s [--allow-unknown-type]| -e | -p | &lt;type&gt; | --textconv | --filters ) [--path=&lt;path&gt;] &lt;object&gt;
+<em>git cat-file</em> (--batch | --batch-check) [ --textconv | --filters ] [--follow-symlinks]</pre>
 </div>
 </div>
 </div>
@@ -440,13 +441,17 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="sectionbody">
 <div class="paragraph">
 <p>In its first form, the command provides the content or the type of an object in
-the repository. The type is required unless <em>-t</em> or <em>-p</em> is used to find the
-object type, or <em>-s</em> is used to find the object size, or <em>--textconv</em> is used
-(which implies type "blob").</p>
+the repository. The type is required unless <code>-t</code> or <code>-p</code> is used to find the
+object type, or <code>-s</code> is used to find the object size, or <code>--textconv</code> or
+<code>--filters</code> is used (which imply type "blob").</p>
 </div>
 <div class="paragraph">
 <p>In the second form, a list of objects (separated by linefeeds) is provided on
-stdin, and the SHA-1, type, and size of each object is printed on stdout.</p>
+stdin, and the SHA-1, type, and size of each object is printed on stdout. The
+output format can be overridden using the optional <code>&lt;format&gt;</code> argument. If
+either <code>--textconv</code> or <code>--filters</code> was specified, the input is expected to
+list the object names followed by the path name, separated by a single white
+space, so that the appropriate drivers can be determined.</p>
 </div>
 </div>
 </div>
@@ -492,21 +497,39 @@ points at it.</p>
 <dt class="hdlist1">--textconv</dt>
 <dd>
 <p>Show the content as transformed by a textconv filter. In this case,
-&lt;object&gt; has be of the form &lt;tree-ish&gt;:&lt;path&gt;, or :&lt;path&gt; in order
-to apply the filter to the content recorded in the index at &lt;path&gt;.</p>
+&lt;object&gt; has to be of the form &lt;tree-ish&gt;:&lt;path&gt;, or :&lt;path&gt; in
+order to apply the filter to the content recorded in the index at
+&lt;path&gt;.</p>
+</dd>
+<dt class="hdlist1">--filters</dt>
+<dd>
+<p>Show the content as converted by the filters configured in
+the current working tree for the given &lt;path&gt; (i.e. smudge filters,
+end-of-line conversion, etc). In this case, &lt;object&gt; has to be of
+the form &lt;tree-ish&gt;:&lt;path&gt;, or :&lt;path&gt;.</p>
+</dd>
+<dt class="hdlist1">--path=&lt;path&gt;</dt>
+<dd>
+<p>For use with --textconv or --filters, to allow specifying an object
+name and a path separately, e.g. when it is difficult to figure out
+the revision from which the blob came.</p>
 </dd>
 <dt class="hdlist1">--batch</dt>
 <dt class="hdlist1">--batch=&lt;format&gt;</dt>
 <dd>
 <p>Print object information and contents for each object provided
-on stdin.  May not be combined with any other options or arguments.
-See the section <code>BATCH OUTPUT</code> below for details.</p>
+on stdin.  May not be combined with any other options or arguments
+except <code>--textconv</code> or <code>--filters</code>, in which case the input lines
+also need to specify the path, separated by white space.  See the
+section <code>BATCH OUTPUT</code> below for details.</p>
 </dd>
 <dt class="hdlist1">--batch-check</dt>
 <dt class="hdlist1">--batch-check=&lt;format&gt;</dt>
 <dd>
 <p>Print object information for each object provided on stdin.  May
-not be combined with any other options or arguments.  See the
+not be combined with any other options or arguments except
+<code>--textconv</code> or <code>--filters</code>, in which case the input lines also
+need to specify the path, separated by white space.  See the
 section <code>BATCH OUTPUT</code> below for details.</p>
 </dd>
 <dt class="hdlist1">--batch-all-objects</dt>
@@ -623,16 +646,16 @@ respectively print:</p>
 <h2 id="_output">OUTPUT</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>If <em>-t</em> is specified, one of the &lt;type&gt;.</p>
+<p>If <code>-t</code> is specified, one of the &lt;type&gt;.</p>
 </div>
 <div class="paragraph">
-<p>If <em>-s</em> is specified, the size of the &lt;object&gt; in bytes.</p>
+<p>If <code>-s</code> is specified, the size of the &lt;object&gt; in bytes.</p>
 </div>
 <div class="paragraph">
-<p>If <em>-e</em> is specified, no output.</p>
+<p>If <code>-e</code> is specified, no output.</p>
 </div>
 <div class="paragraph">
-<p>If <em>-p</em> is specified, the contents of &lt;object&gt; are pretty-printed.</p>
+<p>If <code>-p</code> is specified, the contents of &lt;object&gt; are pretty-printed.</p>
 </div>
 <div class="paragraph">
 <p>If &lt;type&gt; is specified, the raw (though uncompressed) contents of the &lt;object&gt;
@@ -815,7 +838,7 @@ will be reported.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-06-14 11:04:07 W. Europe Daylight Time
+Last updated 2017-10-12 21:18:05 Coordinated Universal Time
 </div>
 </div>
 </body>

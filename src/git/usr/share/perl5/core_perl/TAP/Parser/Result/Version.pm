@@ -11,11 +11,11 @@ TAP::Parser::Result::Version - TAP syntax version token.
 
 =head1 VERSION
 
-Version 3.35
+Version 3.36
 
 =cut
 
-our $VERSION = '3.35';
+our $VERSION = '3.36_01';
 
 =head1 DESCRIPTION
 
@@ -47,7 +47,7 @@ They keep me awake at night.
 
 =head2 Instance Methods
 
-=head3 C<version> 
+=head3 C<version>
 
   if ( $result->is_version ) {
      print $result->version;
