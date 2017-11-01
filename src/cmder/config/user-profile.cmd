@@ -9,10 +9,13 @@ if not defined WAGON_ROOT (
     for /f "delims=" %%i in ("%ConEmuDir%\..\..\..") do set "WAGON_ROOT=%%~fi"
 )
 
+:: Set PHP,MySQL version
+FOR /F "tokens=*" %%A IN ('type "%WAGON_ROOT%\uwamp\uwamp.ini" ^| tr -d " "') DO SET %%A
+
 :: Define environment variables
 set CMDER_START=%WAGON_ROOT%\uwamp\www
 set COMPOSER_HOME=%WAGON_ROOT%\composer
-set PHP_INSTSLL_ROOT=%WAGON_ROOT%\uwamp\bin\php\php-7.1.10
+set PHP_INSTSLL_ROOT=%WAGON_ROOT%\uwamp\bin\php\%PHP_CURRENT_VERSION%
 set SQLITE_ROOT=%CMDER_ROOT%\vendor\sqlite
 set GIT_INSTALL_ROOT=%WAGON_ROOT%\git
 
