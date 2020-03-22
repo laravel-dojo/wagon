@@ -14,6 +14,9 @@
 #   author
 #    - display (enum) [no|full|abbreviated|email|email-user]
 #					: Show author information?
+#    - width (int)			: Fixed width when nonzero
+#    - maxwidth (int)			: Autosize limit
+#
 #   commit-title
 #    - display (bool)			: Show the commit title?
 #    - graph (enum) [no|v2|v1]		: Show the commit graph? (main view only)
@@ -25,22 +28,36 @@
 #					: Show dates?
 #    - local (bool)			: Show local dates?
 #    - format (string)			: Custom strftime(3) format
+#					  Note: %Z is formatted as %z
+#    - width (int)			: Fixed width when nonzero
 #
 #   file-name
 #    - display (enum) [no|always|auto]	: Show file names?
+#    - width (int)			: Fixed width when nonzero
+#    - maxwidth (int)			: Autosize limit
 #
 #   file-size
-#    - display (enum) [no|default|units]	: Show file sizes?
+#    - display (enum) [no|default|units]
+#					: Show file sizes?
+#    - width (int)			: Fixed width when nonzero
 #
 #   id
 #    - display (bool)			: Show commit/tree ID?
+#    - width (int)			: Fixed width when nonzero
 #
 #   line-number
 #    - display (bool)			: Show line numbers?
 #    - interval (int)			: Interval between line numbers; defaults to 5
+#    - width (int)			: Fixed width when nonzero
 #
 #   mode
 #    - display (bool)			: Show file modes?
+#    - width (int)			: Fixed width when nonzero
+#
+#   ref
+#    - display (bool)			: Show ref names?
+#    - width (int)			: Fixed width when nonzero
+#    - maxwidth (int)			: Autosize limit
 #
 #   status
 #    - display (enum) [no|short|long]	: Show status label?
@@ -49,13 +66,11 @@
 #    - display (bool)			: Show text?
 #    - commit-title-overflow (boolint)	: Highlight overflow in log and diff view?
 #
-# All columns also support a width option to configure the max width of
-# the column. Use zero (the default value) to auto-size the column based
-# on the content.
 
-set blame-view	= date:default author:full file-name:auto id:yes,color line-number:no,interval=5 text
+set blame-view	= id:yes,color file-name:auto author:full date:default line-number:yes,interval=1 text
 set grep-view	= file-name:no line-number:yes,interval=1 text
 set main-view	= line-number:no,interval=5 id:no date:default author:full commit-title:yes,graph,refs,overflow=no
+set reflog-view	= line-number:no,interval=5 id:yes date:no author:no commit-title:yes,refs,overflow=no
 set refs-view	= line-number:no id:no date:default author:full ref commit-title
 set stash-view	= line-number:no,interval=5 id:no date:default author:full commit-title
 set status-view	= line-number:no,interval=5 status:short file-name
@@ -70,6 +85,7 @@ set diff-view	= line-number:no,interval=5 text:yes,commit-title-overflow=no
 
 # UI display settings
 set show-changes		= yes		# Show changes commits in the main view?
+set show-untracked		= yes		# Show also untracked changes?
 set wrap-lines			= no		# Wrap long lines in pager views?
 set tab-size			= 8		# Number of spaces to use when expanding tabs
 set line-graphics		= default	# Enum: ascii, default, utf-8
@@ -105,12 +121,14 @@ set show-notes			= yes		# When non-bool passed as `--show-notes=...` (diff)
 #set mailmap			= yes		# Use .mailmap to show canonical name and email address
 
 # Misc
+set start-on-head		= no		# Start with cursor on HEAD commit
 set refresh-mode		= auto		# Enum: manual, auto, after-command, periodic
 set refresh-interval		= 10		# Interval in seconds between refreshes
 set ignore-case			= no		# Enum: no, yes, smart-case
 						# Ignore case when searching? Smart-case option will
 set wrap-search			= yes		# Wrap around to top/bottom of view when searching
 set focus-child			= yes		# Move focus to child view when opened?
+set send-child-enter		= yes		# Propagate "enter" keypresses to child views?
 set horizontal-scroll		= 50%		# Number of columns to scroll as % of width
 set split-view-height		= 67%		# Height of the bottom view for horizontal splits
 set vertical-split		= auto		# Enum: horizontal, vertical, auto; Use auto to
@@ -135,7 +153,9 @@ set mouse-wheel-cursor		= no		# Prefer moving the cursor to scrolling the view?
 #   !	Run the command in the foreground with output shown.
 #   @	Run the command in the background with no output.
 #   ?	Prompt the user before executing the command.
+#   +   Run the command synchronously, and echo the first line of output to the status bar.
 #   <	Exit Tig after executing the command.
+#   >	Re-open Tig instantly in the last displayed view after executing the command.
 #
 # User-defined commands can optionally refer to Tig's internal state
 # using the following variable names, which are substituted before
@@ -165,6 +185,8 @@ bind stash	P	?git stash pop %(stash)
 bind stash	!	?git stash drop %(stash)
 bind refs	C	?git checkout %(branch)
 bind refs	!	?git branch -D %(branch)
+bind reflog	C	?git checkout %(branch)
+bind reflog	!	?git reset --hard %(commit)
 
 # Normal commands
 # ---------------
@@ -173,6 +195,7 @@ bind refs	!	?git branch -D %(branch)
 bind generic	m	view-main
 bind generic	d	view-diff
 bind generic	l	view-log
+bind generic	L	view-reflog
 bind generic	t	view-tree
 bind generic	f	view-blob
 bind generic	b	view-blame
@@ -218,6 +241,7 @@ bind stage	]	:toggle diff-context +1	# Increase the diff context
 bind diff	@	:/^@@			# Jump to next (c)hunk
 bind diff	[	:toggle diff-context -1
 bind diff	]	:toggle diff-context +1
+bind main	H	:goto HEAD
 bind main	G	:toggle commit-title-graph # Toggle revision graph visualization
 bind main	F	:toggle commit-title-refs  # Toggle reference display (tags/branches)
 
@@ -366,6 +390,7 @@ color line-number		cyan	default
 color title-blur		white	blue
 color title-focus		white	blue	bold
 color main-commit		default	default
+color main-annotated		default	default	bold
 color main-tag			magenta	default	bold
 color main-local-tag		magenta	default
 color main-remote		yellow	default

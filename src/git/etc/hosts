@@ -19,8 +19,23 @@
 # localhost name resolution is handled within DNS itself.
 #	127.0.0.1       localhost
 #	::1             localhost
-
-192.168.10.10   adminer.app
-192.168.10.10   laravel.app
-192.168.10.10   oauth-server.app
-192.168.10.10   oauth-client.app
+192.168.0.3 host.docker.internal
+192.168.0.3 gateway.docker.internal
+134.208.223.121 host.docker.internal
+134.208.223.121 gateway.docker.internal
+192.168.50.41 host.docker.internal
+192.168.50.41 gateway.docker.internal
+192.168.43.212 host.docker.internal
+192.168.43.212 gateway.docker.internal
+192.168.1.116 host.docker.internal
+192.168.1.116 gateway.docker.internal
+ host.docker.internal
+ gateway.docker.internal
+192.168.0.5 host.docker.internal
+192.168.0.5 gateway.docker.internal
+# Added by Docker Desktop
+192.168.0.12 host.docker.internal
+192.168.0.12 gateway.docker.internal
+# To allow the same kube context to work on the host and the container:
+127.0.0.1 kubernetes.docker.internal
+# End of section

@@ -275,6 +275,8 @@ ms-licensing     5720/tcp                           #Microsoft Licensing
 ms-licensing     5720/udp                           #Microsoft Licensing 
 directplay8      6073/tcp                           #DirectPlay8
 directplay8      6073/udp                           #DirectPlay8
+ms-do            7680/tcp                           #Microsoft Delivery Optimization
+ms-do            7680/udp                           #Microsoft Delivery Optimization
 man              9535/tcp                           #Remote Man Server
 rasadv           9753/tcp
 rasadv           9753/udp

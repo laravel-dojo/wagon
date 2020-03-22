@@ -5,6 +5,8 @@ use warnings;
 
 use URI::Escape qw();
 
+our $VERSION = '1.76';
+
 sub new
 {
     my $class = shift;
@@ -63,8 +65,8 @@ sub _file_is_localhost
     return 1 if $host eq "localhost";
     eval {
 	require Net::Domain;
-	lc(Net::Domain::hostfqdn()) eq $host ||
-	lc(Net::Domain::hostname()) eq $host;
+	lc(Net::Domain::hostfqdn() || '') eq $host ||
+	lc(Net::Domain::hostname() || '') eq $host;
     };
 }
 

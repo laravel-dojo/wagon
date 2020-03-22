@@ -3,6 +3,8 @@ package URI::ftp;
 use strict;
 use warnings;
 
+our $VERSION = '1.76';
+
 use parent qw(URI::_server URI::_userpass);
 
 sub default_port { 21 }

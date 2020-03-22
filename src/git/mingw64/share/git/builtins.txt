@@ -19,6 +19,7 @@ git-clone.exe
 git-column.exe
 git-commit-tree.exe
 git-commit.exe
+git-commit-graph.exe
 git-config.exe
 git-count-objects.exe
 git-credential.exe
@@ -28,6 +29,7 @@ git-diff-index.exe
 git-diff-tree.exe
 git-diff.exe
 git-difftool.exe
+git-env--helper.exe
 git-fast-export.exe
 git-fetch-pack.exe
 git-fetch.exe
@@ -57,6 +59,7 @@ git-merge-recursive.exe
 git-merge-tree.exe
 git-mktag.exe
 git-mktree.exe
+git-multi-pack-index.exe
 git-mv.exe
 git-name-rev.exe
 git-notes.exe
@@ -68,8 +71,9 @@ git-prune-packed.exe
 git-prune.exe
 git-pull.exe
 git-push.exe
+git-range-diff.exe
 git-read-tree.exe
-git-rebase--helper.exe
+git-rebase.exe
 git-receive-pack.exe
 git-reflog.exe
 git-remote.exe
@@ -86,7 +90,9 @@ git-rm.exe
 git-send-pack.exe
 git-shortlog.exe
 git-show-branch.exe
+git-show-index.exe
 git-show-ref.exe
+git-stash.exe
 git-stripspace.exe
 git-submodule--helper.exe
 git-symbolic-ref.exe
@@ -97,6 +103,7 @@ git-update-index.exe
 git-update-ref.exe
 git-update-server-info.exe
 git-upload-archive.exe
+git-upload-pack.exe
 git-var.exe
 git-verify-commit.exe
 git-verify-pack.exe
@@ -109,7 +116,9 @@ git-format-patch.exe
 git-fsck-objects.exe
 git-init.exe
 git-merge-subtree.exe
+git-restore.exe
 git-show.exe
 git-stage.exe
 git-status.exe
+git-switch.exe
 git-whatchanged.exe
