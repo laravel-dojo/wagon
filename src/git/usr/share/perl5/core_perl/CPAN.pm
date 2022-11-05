@@ -2,7 +2,7 @@
 # vim: ts=4 sts=4 sw=4:
 use strict;
 package CPAN;
-$CPAN::VERSION = '2.18';
+$CPAN::VERSION = '2.33';
 $CPAN::VERSION =~ s/_//;
 
 # we need to run chdir all over and we would get at wrong libraries
@@ -90,11 +90,13 @@ if ($ENV{PERL5_CPAN_IS_RUNNING} && $$ != $ENV{PERL5_CPAN_IS_RUNNING}) {
         warn $w;
     }
     local $| = 1;
+    my $have_been_sleeping = 0;
     while ($sleep > 0) {
         printf "\r#%5d", --$sleep;
         sleep 1;
+	++$have_been_sleeping;
     }
-    print "\n";
+    print "\n" if $have_been_sleeping;
 }
 $ENV{PERL5_CPAN_IS_RUNNING}=$$;
 $ENV{PERL5_CPANPLUS_IS_RUNNING}=$$; # https://rt.cpan.org/Ticket/Display.html?id=23735
@@ -285,6 +287,9 @@ sub shell {
         if (my $histfile = $CPAN::Config->{'histfile'}) {{
             unless ($term->can("AddHistory")) {
                 $CPAN::Frontend->mywarn("Terminal does not support AddHistory.\n");
+                unless ($CPAN::META->has_inst('Term::ReadLine::Perl')) {
+                    $CPAN::Frontend->mywarn("\nTo fix that, maybe try>  install Term::ReadLine::Perl\n\n");
+                }
                 last;
             }
             $META->readhist($term,$histfile);
@@ -488,7 +493,7 @@ Trying '$root' as temporary haven.
         push @$cwd, $root;
     }
     while () {
-        if (chdir $cwd->[0]) {
+        if (chdir "$cwd->[0]") {
             return;
         } else {
             if (@$cwd>1) {
@@ -544,8 +549,9 @@ sub _yaml_module () {
 
 # CPAN::_yaml_loadfile
 sub _yaml_loadfile {
-    my($self,$local_file) = @_;
+    my($self,$local_file,$opt) = @_;
     return +[] unless -s $local_file;
+    my $opt_loadblessed = $opt->{loadblessed} || $CPAN::Config->{yaml_load_code} || 0;
     my $yaml_module = _yaml_module;
     if ($CPAN::META->has_inst($yaml_module)) {
         # temporarily enable yaml code deserialisation
@@ -553,7 +559,9 @@ sub _yaml_loadfile {
         # 5.6.2 could not do the local() with the reference
         # so we do it manually instead
         my $old_loadcode = ${"$yaml_module\::LoadCode"};
+        my $old_loadblessed = ${"$yaml_module\::LoadBlessed"};
         ${ "$yaml_module\::LoadCode" } = $CPAN::Config->{yaml_load_code} || 0;
+        ${ "$yaml_module\::LoadBlessed" } = $opt_loadblessed ? 1 : 0;
 
         my ($code, @yaml);
         if ($code = UNIVERSAL::can($yaml_module, "LoadFile")) {
@@ -564,16 +572,20 @@ sub _yaml_loadfile {
             }
         } elsif ($code = UNIVERSAL::can($yaml_module, "Load")) {
             local *FH;
-            open FH, $local_file or die "Could not open '$local_file': $!";
-            local $/;
-            my $ystream = <FH>;
-            eval { @yaml = $code->($ystream); };
-            if ($@) {
-                # this shall not be done by the frontend
-                die CPAN::Exception::yaml_process_error->new($yaml_module,$local_file,"parse",$@);
+            if (open FH, $local_file) {
+                local $/;
+                my $ystream = <FH>;
+                eval { @yaml = $code->($ystream); };
+                if ($@) {
+                    # this shall not be done by the frontend
+                    die CPAN::Exception::yaml_process_error->new($yaml_module,$local_file,"parse",$@);
+                }
+            } else {
+                $CPAN::Frontend->mywarn("Could not open '$local_file': $!");
             }
         }
         ${"$yaml_module\::LoadCode"} = $old_loadcode;
+        ${"$yaml_module\::LoadBlessed"} = $old_loadblessed;
         return \@yaml;
     } else {
         # this shall not be done by the frontend
@@ -856,11 +868,12 @@ this variable in either a CPAN/MyConfig.pm or a CPAN/Config.pm in your
         }
         my $sleep = 1;
         while (!CPAN::_flock($fh, LOCK_EX|LOCK_NB)) {
-            if ($sleep>10) {
-                $CPAN::Frontend->mydie("Giving up\n");
+            my $err = $! || "unknown error";
+            if ($sleep>3) {
+                $CPAN::Frontend->mydie("Could not lock '$lockfile' with flock: $err; giving up\n");
             }
-            $CPAN::Frontend->mysleep($sleep++);
-            $CPAN::Frontend->mywarn("Could not lock lockfile with flock: $!; retrying\n");
+            $CPAN::Frontend->mysleep($sleep+=0.1);
+            $CPAN::Frontend->mywarn("Could not lock '$lockfile' with flock: $err; retrying\n");
         }
 
         seek $fh, 0, 0;
@@ -1022,7 +1035,10 @@ sub has_usable {
     $usable = {
 
                #
-               # these subroutines die if they believe the installed version is unusable;
+               # most of these subroutines warn on the frontend, then
+               # die if the installed version is unusable for some
+               # reason; has_usable() then returns false when it caught
+               # an exception, otherwise returns true and caches that;
                #
                'CPAN::Meta' => [
                             sub {
@@ -1038,9 +1054,31 @@ sub has_usable {
 
                'CPAN::Meta::Requirements' => [
                             sub {
+                                if (defined $CPAN::Meta::Requirements::VERSION
+                                    && CPAN::Version->vlt($CPAN::Meta::Requirements::VERSION, "2.120920")
+                                   ) {
+                                    delete $INC{"CPAN/Meta/Requirements.pm"};
+                                }
                                 require CPAN::Meta::Requirements;
                                 unless (CPAN::Version->vge(CPAN::Meta::Requirements->VERSION, 2.120920)) {
                                     for ("Will not use CPAN::Meta::Requirements, need version 2.120920\n") {
+                                        $CPAN::Frontend->mywarn($_);
+                                        die $_;
+                                    }
+                                }
+                            },
+                           ],
+
+               'CPAN::Reporter' => [
+                            sub {
+                                if (defined $CPAN::Reporter::VERSION
+                                    && CPAN::Version->vlt($CPAN::Reporter::VERSION, "1.2011")
+                                   ) {
+                                    delete $INC{"CPAN/Reporter.pm"};
+                                }
+                                require CPAN::Reporter;
+                                unless (CPAN::Version->vge(CPAN::Reporter->VERSION, "1.2011")) {
+                                    for ("Will not use CPAN::Reporter, need version 1.2011\n") {
                                         $CPAN::Frontend->mywarn($_);
                                         die $_;
                                     }
@@ -1077,6 +1115,28 @@ sub has_usable {
                             sub {require Net::FTP},
                             sub {require Net::Config},
                            ],
+               'IO::Socket::SSL' => [
+                                 sub {
+                                     require IO::Socket::SSL;
+                                     unless (CPAN::Version->vge(IO::Socket::SSL::->VERSION,1.56)) {
+                                         for ("Will not use IO::Socket::SSL, need 1.56\n") {
+                                             $CPAN::Frontend->mywarn($_);
+                                             die $_;
+                                         }
+                                     }
+                                 }
+                                ],
+               'Net::SSLeay' => [
+                                 sub {
+                                     require Net::SSLeay;
+                                     unless (CPAN::Version->vge(Net::SSLeay::->VERSION,1.49)) {
+                                         for ("Will not use Net::SSLeay, need 1.49\n") {
+                                             $CPAN::Frontend->mywarn($_);
+                                             die $_;
+                                         }
+                                     }
+                                 }
+                                ],
                'HTTP::Tiny' => [
                             sub {
                                 require HTTP::Tiny;
@@ -1434,11 +1494,12 @@ sub set_perl5lib {
         $ENV{PERL5LIB} = join $Config::Config{path_sep}, @dirs, @env;
     } else {
         my $cnt = keys %{$self->{is_tested}};
-        $CPAN::Frontend->optprint('perl5lib', "Prepending blib/arch and blib/lib of ".
-                                 "$cnt build dirs to PERL5LIB; ".
-                                 "for '$for'\n"
+        my $newenv = join $Config::Config{path_sep}, @dirs, @env;
+        $CPAN::Frontend->optprint('perl5lib', sprintf ("Prepending blib/arch and blib/lib of ".
+                                 "%d build dirs to PERL5LIB, reaching size %d; ".
+                                 "for '%s'\n", $cnt, length($newenv), $for)
                                 );
-        $ENV{PERL5LIB} = join $Config::Config{path_sep}, @dirs, @env;
+        $ENV{PERL5LIB} = $newenv;
     }
 }}
 
@@ -2110,6 +2171,12 @@ where WORD is any valid config variable or a regular expression.
 The following keys in the hash reference $CPAN::Config are
 currently defined:
 
+  allow_installing_module_downgrades
+                     allow or disallow installing module downgrades
+  allow_installing_outdated_dists
+                     allow or disallow installing modules that are
+                     indexed in the cpan index pointing to a distro
+                     with a higher distro-version number
   applypatch         path to external prg
   auto_commit        commit all changes to config variables to disk
   build_cache        size of cache for directories to build modules
@@ -2123,7 +2190,8 @@ currently defined:
   check_sigs         if signatures should be verified
   cleanup_after_install
                      remove build directory immediately after a
-                     successful install
+                     successful install and remember that for the
+                     duration of the session
   colorize_debug     Term::ANSIColor attributes for debugging output
   colorize_output    boolean if Term::ANSIColor should colorize output
   colorize_print     Term::ANSIColor attributes for normal output
@@ -2207,6 +2275,8 @@ currently defined:
   prefs_dir          local directory to store per-distro build options
   proxy_user         username for accessing an authenticating proxy
   proxy_pass         password for accessing an authenticating proxy
+  pushy_https        use https to cpan.org when possible, otherwise use http
+                     to cpan.org and issue a warning
   randomize_urllist  add some randomness to the sequence of the urllist
   recommends_policy  whether recommended prerequisites should be included
   scan_cache         controls scanning of cache ('atstart', 'atexit' or 'never')
@@ -2227,6 +2297,10 @@ currently defined:
                      CPAN::Reporter history)
   unzip              location of external program unzip
   urllist            arrayref to nearby CPAN sites (or equivalent locations)
+  urllist_ping_external
+                     use external ping command when autoselecting mirrors
+  urllist_ping_verbose
+                     increase verbosity when autoselecting mirrors
   use_prompt_default set PERL_MM_USE_DEFAULT for configure/make/test/install
   use_sqlite         use CPAN::SQLite for metadata storage (fast and lean)
   username           your username if you CPAN server wants one
@@ -2367,10 +2441,47 @@ installed. It is only built and tested, and then kept in the list of
 tested but uninstalled modules. As such, it is available during the
 build of the dependent module by integrating the path to the
 C<blib/arch> and C<blib/lib> directories in the environment variable
-PERL5LIB. If C<build_requires_install_policy> is set ti C<yes>, then
+PERL5LIB. If C<build_requires_install_policy> is set to C<yes>, then
 both modules declared as C<requires> and those declared as
 C<build_requires> are treated alike. By setting to C<ask/yes> or
 C<ask/no>, CPAN.pm asks the user and sets the default accordingly.
+
+=head2 Configuration of the allow_installing_* parameters
+
+The C<allow_installing_*> parameters are evaluated during
+the C<make> phase. If set to C<yes>, they allow the testing and the installation of
+the current distro and otherwise have no effect. If set to C<no>, they
+may abort the build (preventing testing and installing), depending on the contents of the
+C<blib/> directory. The C<blib/> directory is the directory that holds
+all the files that would usually be installed in the C<install> phase.
+
+C<allow_installing_outdated_dists> compares the C<blib/> directory with the CPAN index.
+If it finds something there that belongs, according to the index, to a different
+dist, it aborts the current build.
+
+C<allow_installing_module_downgrades> compares the C<blib/> directory
+with already installed modules, actually their version numbers, as
+determined by ExtUtils::MakeMaker or equivalent. If a to-be-installed
+module would downgrade an already installed module, the current build
+is aborted.
+
+An interesting twist occurs when a distroprefs document demands the
+installation of an outdated dist via goto while
+C<allow_installing_outdated_dists> forbids it. Without additional
+provisions, this would let the C<allow_installing_outdated_dists>
+win and the distroprefs lose. So the proper arrangement in such a case
+is to write a second distroprefs document for the distro that C<goto>
+points to and overrule the C<cpanconfig> there. E.g.:
+
+  ---
+  match:
+    distribution: "^MAUKE/Keyword-Simple-0.04.tar.gz"
+  goto: "MAUKE/Keyword-Simple-0.03.tar.gz"
+  ---
+  match:
+    distribution: "^MAUKE/Keyword-Simple-0.03.tar.gz"
+  cpanconfig:
+    allow_installing_outdated_dists: yes
 
 =head2 Configuration for individual distributions (I<Distroprefs>)
 
@@ -3910,6 +4021,25 @@ start (or more precisely, after the first extraction into the build
 directory) or exit the CPAN shell, respectively. If you never start up
 the CPAN shell, you probably also have to clean up the build directory
 yourself.
+
+=item 19)
+
+How can I switch to sudo instead of local::lib?
+
+The following 5 environment veriables need to be reset to the previous
+values: PATH, PERL5LIB, PERL_LOCAL_LIB_ROOT, PERL_MB_OPT, PERL_MM_OPT;
+and these two CPAN.pm config variables must be reconfigured:
+make_install_make_command and mbuild_install_build_command. The five
+env variables have probably been overwritten in your $HOME/.bashrc or
+some equivalent. You either find them there and delete their traces
+and logout/login or you override them temporarily, depending on your
+exact desire. The two cpanpm config variables can be set with:
+
+  o conf init /install_.*_command/
+
+probably followed by
+
+  o conf commit
 
 =back
 

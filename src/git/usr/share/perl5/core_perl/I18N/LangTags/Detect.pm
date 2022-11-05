@@ -5,14 +5,14 @@ require 5;
 package I18N::LangTags::Detect;
 use strict;
 
-use vars qw( @ISA $VERSION $MATCH_SUPERS $USING_LANGUAGE_TAGS
-             $USE_LITERALS $MATCH_SUPERS_TIGHTLY);
+our ( $MATCH_SUPERS, $USING_LANGUAGE_TAGS,
+             $USE_LITERALS, $MATCH_SUPERS_TIGHTLY);
 
 BEGIN { unless(defined &DEBUG) { *DEBUG = sub () {0} } }
  # define the constant 'DEBUG' at compile-time
 
-$VERSION = "1.06";
-@ISA = ();
+our $VERSION = "1.08";
+our @ISA = ();
 use I18N::LangTags qw(alternate_language_tags locale2language_tag);
 
 sub _uniq { my %seen; return grep(!($seen{$_}++), @_); }
@@ -34,7 +34,7 @@ sub detect () { return __PACKAGE__->ambient_langprefs; }
 
 sub ambient_langprefs { # always returns things untainted
   my $base_class = $_[0];
-
+  
   return $base_class->http_accept_langs
    if length( $ENV{'REQUEST_METHOD'} || '' ); # I'm a CGI
        # it's off in its own routine because it's complicated
@@ -56,7 +56,7 @@ sub ambient_langprefs { # always returns things untainted
     ;
     last; # first one wins
   }
-
+  
   if($ENV{'IGNORE_WIN32_LOCALE'}) {
     # no-op
   } elsif(&_try_use('Win32::Locale')) {
@@ -81,7 +81,7 @@ sub http_accept_langs {
   return() unless defined $in and length $in;
 
   $in =~ s/\([^\)]*\)//g; # nix just about any comment
-
+  
   if( $in =~ m/^\s*([a-zA-Z][-a-zA-Z]+)\s*$/s ) {
     # Very common case: just one language tag
     return _normalize $1;
@@ -95,7 +95,7 @@ sub http_accept_langs {
   $in =~ s/\s+//g;  # Yes, we can just do without the WS!
   my @in = $in =~ m/([^,]+)/g;
   my %pref;
-
+  
   my $q;
   foreach my $tag (@in) {
     next unless $tag =~
@@ -203,11 +203,13 @@ C<I18N::LangTags::implicate_supers(...)>, like so:
 
 =head1 ENVIRONMENT
 
-This module looks for several environment variables, including
+This module looks at several environment variables:
 REQUEST_METHOD, HTTP_ACCEPT_LANGUAGE,
 LANGUAGE, LC_ALL, LC_MESSAGES, and LANG.
 
-It will also use the L<Win32::Locale> module, if it's installed.
+It will also use the L<Win32::Locale> module, if it's installed
+and IGNORE_WIN32_LOCALE is not set to a true value in the
+environment.
 
 
 =head1 SEE ALSO

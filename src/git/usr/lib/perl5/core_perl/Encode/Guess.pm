@@ -2,15 +2,16 @@ package Encode::Guess;
 use strict;
 use warnings;
 use Encode qw(:fallbacks find_encoding);
-our $VERSION = do { my @r = ( q$Revision: 2.6 $ =~ /\d+/g ); sprintf "%d." . "%02d" x $#r, @r };
+our $VERSION = do { my @r = ( q$Revision: 2.8 $ =~ /\d+/g ); sprintf "%d." . "%02d" x $#r, @r };
 
 my $Canon = 'Guess';
 use constant DEBUG => !!$ENV{PERL_ENCODE_DEBUG};
 our %DEF_SUSPECTS = map { $_ => find_encoding($_) } qw(ascii utf8);
-$Encode::Encoding{$Canon} = bless {
+my $obj = bless {
     Name     => $Canon,
     Suspects => {%DEF_SUSPECTS},
 } => __PACKAGE__;
+Encode::define_encoding($obj, $Canon);
 
 use parent qw(Encode::Encoding);
 sub needs_lines { 1 }
@@ -157,7 +158,7 @@ sub guess {
         $nline++;
     }
     $try{ascii}
-      or return "Encodings too ambiguous: ", join( " or ", keys %try );
+      or return "Encodings too ambiguous: " . join( " or ", keys %try );
     return $try{ascii};
 }
 
@@ -188,7 +189,7 @@ Encode::Guess -- Guesses encoding from data
 =head1 ABSTRACT
 
 Encode::Guess enables you to guess in what encoding a given data is
-encoded, or at least tries to.
+encoded, or at least tries to.  
 
 =head1 DESCRIPTION
 
@@ -214,7 +215,7 @@ will be limited to the suspects and C<ascii>.
 =item Encode::Guess->set_suspects
 
 You can also change the internal suspects list via C<set_suspects>
-method.
+method. 
 
   use Encode::Guess;
   Encode::Guess->set_suspects(qw/euc-jp shiftjis 7bit-jis/);
@@ -324,7 +325,7 @@ On the other hand, mixing various national standard encodings
 automagically works unless $data is too short to allow for guessing.
 
  # This is ok if $data is long enough
- my $decoder =
+ my $decoder =  
   guess_encoding($data, qw/euc-cn
                            euc-jp shiftjis 7bit-jis
                            euc-kr
@@ -334,14 +335,14 @@ automagically works unless $data is too short to allow for guessing.
 
 DO NOT PUT TOO MANY SUSPECTS!  Don't you try something like this!
 
-  my $decoder = guess_encoding($data,
+  my $decoder = guess_encoding($data, 
                                Encode->encodings(":all"));
 
 =back
 
 It is, after all, just a guess.  You should alway be explicit when it
 comes to encodings.  But there are some, especially Japanese,
-environment that guess-coding is a must.  Use this module with care.
+environment that guess-coding is a must.  Use this module with care. 
 
 =head1 TO DO
 

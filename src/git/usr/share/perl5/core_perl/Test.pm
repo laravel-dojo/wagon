@@ -5,10 +5,9 @@ package Test;
 use strict;
 
 use Carp;
-use vars (qw($VERSION @ISA @EXPORT @EXPORT_OK $ntest $TestLevel), #public-ish
-          qw($TESTOUT $TESTERR %Program_Lines $told_about_diff
-             $ONFAIL %todo %history $planned @FAILDETAIL) #private-ish
-         );
+our ($VERSION, @ISA, @EXPORT, @EXPORT_OK, $ntest, $TestLevel); #public-is
+our ($TESTOUT, $TESTERR, %Program_Lines, $told_about_diff,
+             $ONFAIL, %todo, %history, $planned, @FAILDETAIL); #private-ish
 
 # In case a test is run in a persistent environment.
 sub _reset_globals {
@@ -20,7 +19,7 @@ sub _reset_globals {
     $planned    = 0;
 }
 
-$VERSION = '1.30';
+$VERSION = '1.31';
 require Exporter;
 @ISA=('Exporter');
 
@@ -356,7 +355,7 @@ as the value for comparing.  For example:
       4
     ;
 
-The above test passes two values to C<ok(arg1, arg2)> -- the first
+The above test passes two values to C<ok(arg1, arg2)> -- the first 
 a coderef, and the second is the number 4.  Before C<ok> compares them,
 it calls the coderef, and uses its return value as the real value of
 this parameter. Assuming that C<$bytecount> returns 4, C<ok> ends up
@@ -968,7 +967,7 @@ L<Test::Inline> lets you embed tests in code.
 
 =head1 AUTHOR
 
-Copyright (c) 1998-2000 Joshua Nathaniel Pritikin.
+Copyright (c) 1998-2000 Joshua Nathaniel Pritikin. 
 
 Copyright (c) 2001-2002 Michael G. Schwern.
 

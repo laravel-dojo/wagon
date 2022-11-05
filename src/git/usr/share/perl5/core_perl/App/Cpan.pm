@@ -6,7 +6,7 @@ use vars qw($VERSION);
 
 use if $] < 5.008 => 'IO::Scalar';
 
-$VERSION = '1.66';
+$VERSION = '1.678';
 
 =head1 NAME
 
@@ -119,6 +119,8 @@ C<-l> was already taken.
 Load the file that has the CPAN configuration data. This should have the
 same format as the standard F<CPAN/Config.pm> file, which defines
 C<$CPAN::Config> as an anonymous hash.
+
+If the file does not exist, C<cpan> dies.
 
 =item -J
 
@@ -242,9 +244,9 @@ The build tools, L<ExtUtils::MakeMaker> and L<Module::Build> use some,
 while others matter to the levels above them. Some of these are specified
 by the Perl Toolchain Gang:
 
-Lancaster Concensus: L<https://github.com/Perl-Toolchain-Gang/toolchain-site/blob/master/lancaster-consensus.md>
+Lancaster Consensus: L<https://github.com/Perl-Toolchain-Gang/toolchain-site/blob/master/lancaster-consensus.md>
 
-Oslo Concensus: L<https://github.com/Perl-Toolchain-Gang/toolchain-site/blob/master/oslo-consensus.md>
+Oslo Consensus: L<https://github.com/Perl-Toolchain-Gang/toolchain-site/blob/master/oslo-consensus.md>
 
 =over 4
 
@@ -261,7 +263,7 @@ to C<1> unless it already has a value (even if that value is false).
 
 =item CPAN_OPTS
 
-As with C<PERL5OPTS>, a string of additional C<cpan(1)> options to
+As with C<PERL5OPT>, a string of additional C<cpan(1)> options to
 add to those you specify on the command line.
 
 =item CPANSCRIPT_LOGLEVEL
@@ -289,7 +291,7 @@ use CPAN 1.80 (); # needs no test
 use Config;
 use autouse Cwd => qw(cwd);
 use autouse 'Data::Dumper' => qw(Dumper);
-use File::Spec::Functions;
+use File::Spec::Functions qw(catfile file_name_is_absolute rel2abs);
 use File::Basename;
 use Getopt::Std;
 
@@ -345,10 +347,10 @@ sub GOOD_EXIT () { 0 }
 # key => [ sub ref, takes args?, exit value, description ]
 
 	# options that do their thing first, then exit
-	h =>  [ \&_print_help,        NO_ARGS, GOOD_EXIT, 'Printing help'                ],
-	v =>  [ \&_print_version,     NO_ARGS, GOOD_EXIT, 'Printing version'             ],
-	V =>  [ \&_print_details,     NO_ARGS, GOOD_EXIT, 'Printing detailed version'    ],
-	X =>  [ \&_list_all_namespaces, NO_ARGS, GOOD_EXIT, 'Listing all namespaces'      ],
+	h =>  [ \&_print_help,          NO_ARGS, GOOD_EXIT, 'Printing help'                ],
+	v =>  [ \&_print_version,       NO_ARGS, GOOD_EXIT, 'Printing version'             ],
+	V =>  [ \&_print_details,       NO_ARGS, GOOD_EXIT, 'Printing detailed version'    ],
+	X =>  [ \&_list_all_namespaces, NO_ARGS, GOOD_EXIT, 'Listing all namespaces'       ],
 
 	# options that affect other options
 	j =>  [ \&_load_config,          ARGS, GOOD_EXIT, 'Use specified config file'    ],
@@ -357,7 +359,7 @@ sub GOOD_EXIT () { 0 }
 	I =>  [ \&_load_local_lib,    NO_ARGS, GOOD_EXIT, 'Loading local::lib'           ],
 	M =>  [ \&_use_these_mirrors,    ARGS, GOOD_EXIT, 'Setting per session mirrors'  ],
 	P =>  [ \&_find_good_mirrors, NO_ARGS, GOOD_EXIT, 'Finding good mirrors'         ],
-    w =>  [ \&_turn_on_warnings,  NO_ARGS, GOOD_EXIT, 'Turning on warnings'          ],
+	w =>  [ \&_turn_on_warnings,  NO_ARGS, GOOD_EXIT, 'Turning on warnings'          ],
 
 	# options that do their one thing
 	g =>  [ \&_download,             ARGS, GOOD_EXIT, 'Download the latest distro'        ],
@@ -375,13 +377,13 @@ sub GOOD_EXIT () { 0 }
 
 	r =>  [ \&_recompile,         NO_ARGS, GOOD_EXIT, 'Recompiling'                  ],
 	u =>  [ \&_upgrade,           NO_ARGS, GOOD_EXIT, 'Running `make test`'          ],
-   's' => [ \&_shell,            NO_ARGS, GOOD_EXIT, 'Running `make test`'          ],
+	's' => [ \&_shell,            NO_ARGS, GOOD_EXIT, 'Drop into the CPAN.pm shell'  ],
 
-   'x' => [ \&_guess_namespace,      ARGS, GOOD_EXIT, 'Guessing namespaces'          ],
+	'x' => [ \&_guess_namespace,     ARGS, GOOD_EXIT, 'Guessing namespaces'          ],
 	c =>  [ \&_default,              ARGS, GOOD_EXIT, 'Running `make clean`'         ],
 	f =>  [ \&_default,              ARGS, GOOD_EXIT, 'Installing with force'        ],
 	i =>  [ \&_default,              ARGS, GOOD_EXIT, 'Running `make install`'       ],
-   'm' => [ \&_default,              ARGS, GOOD_EXIT, 'Running `make`'               ],
+	'm' => [ \&_default,             ARGS, GOOD_EXIT, 'Running `make`'               ],
 	t =>  [ \&_default,              ARGS, GOOD_EXIT, 'Running `make test`'          ],
 	T =>  [ \&_default,              ARGS, GOOD_EXIT, 'Installing with notest'       ],
 	);
@@ -412,13 +414,13 @@ sub _process_options
 
 	# if no arguments, just drop into the shell
 	if( 0 == @ARGV ) { CPAN::shell(); exit 0 }
-	else
+	elsif (Getopt::Std::getopts(
+		  join( '', @option_order ), \%options ))
 		{
-		Getopt::Std::getopts(
-		  join( '', @option_order ), \%options );
 		 \%options;
 		}
-	}
+	else { exit 1 }
+}
 
 sub _process_setup_options
 	{
@@ -429,8 +431,7 @@ sub _process_setup_options
 		$Method_table{j}[ $Method_table_index{code} ]->( $options->{j} );
 		delete $options->{j};
 		}
-	else
-		{
+	elsif ( ! $options->{h} ) { # h "ignores all of the other options and arguments"
 		# this is what CPAN.pm would do otherwise
 		local $CPAN::Be_Silent = 1;
 		CPAN::HandleConfig->load(
@@ -482,7 +483,7 @@ sub _setup_environment {
 	$ENV{PERL_MM_USE_DEFAULT}    = 1 unless defined $ENV{PERL_MM_USE_DEFAULT};
 	}
 
-=item run()
+=item run( ARGS )
 
 Just do it.
 
@@ -495,8 +496,8 @@ my $logger;
 
 sub run
 	{
-	my $class = shift;
-
+	my( $class, @args ) = @_;
+	local @ARGV = @args;
 	my $return_value = HEY_IT_WORKED; # assume that things will work
 
 	$logger = $class->_init_logger;
@@ -540,38 +541,50 @@ sub run
 	return $return_value;
 	}
 
+my $LEVEL;
 {
 package
   Local::Null::Logger; # hide from PAUSE
 
+my @LOGLEVELS = qw(TRACE DEBUG INFO WARN ERROR FATAL);
+$LEVEL        = uc($ENV{CPANSCRIPT_LOGLEVEL} || 'INFO');
+my %LL        = map { $LOGLEVELS[$_] => $_ } 0..$#LOGLEVELS;
+unless (defined $LL{$LEVEL}){
+	warn "Unsupported loglevel '$LEVEL', setting to INFO";
+	$LEVEL = 'INFO';
+}
 sub new { bless \ my $x, $_[0] }
-sub AUTOLOAD { 1 }
+sub AUTOLOAD {
+	my $autoload = our $AUTOLOAD;
+	$autoload =~ s/.*://;
+	return if $LL{uc $autoload} < $LL{$LEVEL};
+	$CPAN::Frontend->mywarn(">($autoload): $_\n")
+		for split /[\r\n]+/, $_[1];
+}
 sub DESTROY { 1 }
 }
 
 # load a module without searching the default entry for the current
 # directory
 sub _safe_load_module {
-    my $name = shift;
+	my $name = shift;
 
-    local @INC = @INC;
-    pop @INC if $INC[-1] eq '.';
+	local @INC = @INC;
+	pop @INC if $INC[-1] eq '.';
 
-    eval "require $name; 1";
+	eval "require $name; 1";
 }
 
 sub _init_logger
 	{
 	my $log4perl_loaded = _safe_load_module("Log::Log4perl");
 
-    unless( $log4perl_loaded )
-        {
-        print STDERR "Loading internal null logger. Install Log::Log4perl for logging messages\n";
-        $logger = Local::Null::Logger->new;
-        return $logger;
-        }
-
-	my $LEVEL = $ENV{CPANSCRIPT_LOGLEVEL} || 'INFO';
+	unless( $log4perl_loaded )
+		{
+		print STDOUT "Loading internal logger. Log::Log4perl recommended for better logging\n";
+		$logger = Local::Null::Logger->new;
+		return $logger;
+		}
 
 	Log::Log4perl::init( \ <<"HERE" );
 log4perl.rootLogger=$LEVEL, A1
@@ -625,6 +638,8 @@ sub _default
 	# How do I handle exit codes for multiple arguments?
 	my @errors = ();
 
+	$options->{x} or _disable_guessers();
+
 	foreach my $arg ( @$args )
 		{
 		# check the argument and perhaps capture typos
@@ -666,7 +681,7 @@ sub _hook_into_CPANpm_report
 
 	*CPAN::Shell::myprint = sub {
 		my($self,$what) = @_;
-		$scalar .= $what;
+		$scalar .= $what if defined $what;
 		$self->print_ornamented($what,
 			$CPAN::Config->{colorize_print}||'bold blue on_white',
 			);
@@ -674,7 +689,7 @@ sub _hook_into_CPANpm_report
 
 	*CPAN::Shell::mywarn = sub {
 		my($self,$what) = @_;
-		$scalar .= $what;
+		$scalar .= $what if defined $what;
 		$self->print_ornamented($what,
 			$CPAN::Config->{colorize_warn}||'bold red on_white'
 			);
@@ -715,21 +730,21 @@ sub _get_cpanpm_last_line
 
 	my @lines = <$fh>;
 
-    # This is a bit ugly. Once we examine a line, we have to
-    # examine the line before it and go through all of the same
-    # regexes. I could do something fancy, but this works.
-    REGEXES: {
+	# This is a bit ugly. Once we examine a line, we have to
+	# examine the line before it and go through all of the same
+	# regexes. I could do something fancy, but this works.
+	REGEXES: {
 	foreach my $regex ( @skip_lines )
 		{
 		if( $lines[-1] =~ m/$regex/ )
-            {
-            pop @lines;
-            redo REGEXES; # we have to go through all of them for every line!
-            }
+			{
+			pop @lines;
+			redo REGEXES; # we have to go through all of them for every line!
+			}
 		}
 	}
 
-    $logger->debug( "Last interesting line of CPAN.pm output is:\n\t$lines[-1]" );
+	$logger->debug( "Last interesting line of CPAN.pm output is:\n\t$lines[-1]" );
 
 	$lines[-1];
 	}
@@ -784,7 +799,14 @@ sub _turn_off_testing {
 sub _print_help
 	{
 	$logger->info( "Use perldoc to read the documentation" );
-	exec "perldoc $0";
+	my $HAVE_PERLDOC = eval { require Pod::Perldoc; 1; };
+	if ($HAVE_PERLDOC) {
+		system qq{"$^X" -e "require Pod::Perldoc; Pod::Perldoc->run()" $0};
+		exit;
+	} else {
+		warn "Please install Pod::Perldoc, maybe try 'cpan -i Pod::Perldoc'\n";
+		return HEY_IT_WORKED;
+	}
 	}
 
 sub _print_version # -v
@@ -811,15 +833,15 @@ sub _print_details # -V
 	{
 	require CPAN::Mirrors;
 
-      if ( $CPAN::Config->{connect_to_internet_ok} ) {
-        $CPAN::Frontend->myprint(qq{Trying to fetch a mirror list from the Internet\n});
-        eval { CPAN::FTP->localize('MIRRORED.BY',File::Spec->catfile($CPAN::Config->{keep_source_where},'MIRRORED.BY'),3,1) }
-          or $CPAN::Frontend->mywarn(<<'HERE');
+	if ( $CPAN::Config->{connect_to_internet_ok} ) {
+		$CPAN::Frontend->myprint(qq{Trying to fetch a mirror list from the Internet\n});
+		eval { CPAN::FTP->localize('MIRRORED.BY',File::Spec->catfile($CPAN::Config->{keep_source_where},'MIRRORED.BY'),3,1) }
+			or $CPAN::Frontend->mywarn(<<'HERE');
 We failed to get a copy of the mirror list from the Internet.
 You will need to provide CPAN mirror URLs yourself.
 HERE
-        $CPAN::Frontend->myprint("\n");
-      }
+		$CPAN::Frontend->myprint("\n");
+		}
 
 	my $mirrors   = CPAN::Mirrors->new( _mirror_file() );
 	my @continents = $mirrors->find_best_continents;
@@ -890,21 +912,21 @@ Stolen from File::Path::Expand
 
 sub _expand_filename
 	{
-    my( $path ) = @_;
-    no warnings 'uninitialized';
-    $logger->debug( "Expanding path $path\n" );
-    $path =~ s{\A~([^/]+)?}{
+	my( $path ) = @_;
+	no warnings 'uninitialized';
+	$logger->debug( "Expanding path $path\n" );
+	$path =~ s{\A~([^/]+)?}{
 		_home_of( $1 || $> ) || "~$1"
-    	}e;
-    return $path;
+		}e;
+	return $path;
 	}
 
 sub _home_of
 	{
 	require User::pwent;
-    my( $user ) = @_;
-    my $ent = User::pwent::getpw($user) or return;
-    return $ent->dir;
+	my( $user ) = @_;
+	my $ent = User::pwent::getpw($user) or return;
+	return $ent->dir;
 	}
 
 sub _get_default_inc
@@ -1011,19 +1033,19 @@ sub _get_ping_report
 		return -e $url->file;
 		}
 
-    my( $port ) = $url->port;
+	my( $port ) = $url->port;
 
-    return unless $port;
+	return unless $port;
 
-    if ( $ping->can('port_number') ) {
-        $ping->port_number($port);
-    	}
-    else {
-        $ping->{'port_num'} = $port;
-    	}
+	if ( $ping->can('port_number') ) {
+		$ping->port_number($port);
+		}
+	else {
+		$ping->{'port_num'} = $port;
+		}
 
-    $ping->hires(1) if $ping->can( 'hires' );
-    my( $alive, $rtt ) = eval{ $ping->ping( $url->host ) };
+	$ping->hires(1) if $ping->can( 'hires' );
+	my( $alive, $rtt ) = eval{ $ping->ping( $url->host ) };
 	$alive ? $rtt : undef;
 	}
 
@@ -1093,12 +1115,14 @@ sub _shell
 
 sub _load_config # -j
 	{
-	my $file = shift || '';
+	my $argument = shift;
+
+	my $file = file_name_is_absolute( $argument ) ? $argument : rel2abs( $argument );
+	croak( "cpan config file [$file] for -j does not exist!\n" ) unless -e $file;
 
 	# should I clear out any existing config here?
 	$CPAN::Config = {};
 	delete $INC{'CPAN/Config.pm'};
-	croak( "Config file [$file] does not exist!\n" ) unless -e $file;
 
 	my $rc = eval "require '$file'";
 
@@ -1157,9 +1181,9 @@ sub _download
 
 		$logger->debug( "Inst file would be $path\n" );
 
-		$paths{$arg} = _get_file( _make_path( $path ) );
+		$paths{$module} = _get_file( _make_path( $path ) );
 
-		$logger->info( "Downloaded [$arg] to [$paths{$module}]" );
+		$logger->info( "Downloaded [$arg] to [$paths{$arg}]" );
 		}
 
 	return \%paths;
@@ -1183,7 +1207,9 @@ sub _get_file
 		{
 		my $fetch_path = join "/", $site, $path;
 		$logger->debug( "Trying $fetch_path" );
-	    last if LWP::Simple::getstore( $fetch_path, $store_path );
+		my $status_code = LWP::Simple::getstore( $fetch_path, $store_path );
+		last if( 200 <= $status_code and $status_code <= 300 );
+		$logger->warn( "Could not get [$fetch_path]: Status code $status_code" );
 		}
 
 	return $store_path;
@@ -1258,16 +1284,16 @@ sub _get_changes_file
 	croak "Reading Changes files requires LWP::Simple and URI\n"
 		unless _safe_load_module("LWP::Simple") && _safe_load_module("URI");
 
-    my $url = shift;
+	my $url = shift;
 
-    my $content = LWP::Simple::get( $url );
-    $logger->info( "Got $url ..." ) if defined $content;
+	my $content = LWP::Simple::get( $url );
+	$logger->info( "Got $url ..." ) if defined $content;
 	#print $content;
 
 	my( $change_link ) = $content =~ m|<a href="(.*?)">Changes</a>|gi;
 
 	my $changes_url = URI->new_abs( $change_link, $url );
- 	$logger->debug( "Change link is: $changes_url" );
+	$logger->debug( "Change link is: $changes_url" );
 
 	my $changes =  LWP::Simple::get( $changes_url );
 
@@ -1347,8 +1373,8 @@ sub _show_out_of_date
 
 	foreach my $module ( @$modules )
 		{
-                next unless $module = _expand_module($module);
-                next unless $module->inst_file;
+		next unless $module = _expand_module($module);
+		next unless $module->inst_file;
 		next if $module->uptodate;
 		printf "%-40s  %.4f  %.4f\n",
 			$module->id,
@@ -1453,7 +1479,7 @@ sub _eval_version
         # split package line to hide from PAUSE
 	my $eval = qq{
 		package
-                  ExtUtils::MakeMaker::_version;
+		  ExtUtils::MakeMaker::_version;
 
 		local $sigil$var;
 		\$$var=undef; do {
@@ -1493,8 +1519,8 @@ sub _expand_module
 	my( $module ) = @_;
 
 	my $expanded = CPAN::Shell->expandany( $module );
-        return $expanded if $expanded;
-        $expanded = CPAN::Shell->expand( "Module", $module );
+	return $expanded if $expanded;
+	$expanded = CPAN::Shell->expand( "Module", $module );
 	unless( defined $expanded ) {
 		$logger->error( "Could not expand [$module]. Check the module name." );
 		my $threshold = (
@@ -1517,13 +1543,18 @@ sub _expand_module
 	}
 
 my $guessers = [
-	[ qw( Text::Levenshtein::XS distance 7 ) ],
-	[ qw( Text::Levenshtein::Damerau::XS     xs_edistance 7 ) ],
+	[ qw( Text::Levenshtein::XS distance 7 1 ) ],
+	[ qw( Text::Levenshtein::Damerau::XS     xs_edistance 7 1 ) ],
 
-	[ qw( Text::Levenshtein     distance 7 ) ],
-	[ qw( Text::Levenshtein::Damerau::PP     pp_edistance 7 ) ],
+	[ qw( Text::Levenshtein     distance 7 1 ) ],
+	[ qw( Text::Levenshtein::Damerau::PP     pp_edistance 7 1 ) ],
 
 	];
+
+sub _disable_guessers
+	{
+	$_->[-1] = 0 for @$guessers;
+	}
 
 # for -x
 sub _guess_namespace
@@ -1553,25 +1584,40 @@ sub _list_all_namespaces {
 
 BEGIN {
 my $distance;
+my $_threshold;
+my $can_guess;
+my $shown_help = 0;
 sub _guess_at_module_name
 	{
 	my( $target, $threshold ) = @_;
 
 	unless( defined $distance ) {
 		foreach my $try ( @$guessers ) {
-			my $can_guess = eval "require $try->[0]; 1" or next;
+			$can_guess = eval "require $try->[0]; 1" or next;
 
+			$try->[-1] or next; # disabled
 			no strict 'refs';
 			$distance = \&{ join "::", @$try[0,1] };
 			$threshold ||= $try->[2];
 			}
 		}
+	$_threshold ||= $threshold;
 
 	unless( $distance ) {
-		my $modules = join ", ", map { $_->[0] } @$guessers;
-		substr $modules, rindex( $modules, ',' ), 1, ', and';
+		unless( $shown_help ) {
+			my $modules = join ", ", map { $_->[0] } @$guessers;
+			substr $modules, rindex( $modules, ',' ), 1, ', and';
 
-		$logger->info( "I can suggest names if you install one of $modules" );
+			# Should this be colorized?
+			if( $can_guess ) {
+				$logger->info( "I can suggest names if you provide the -x option on invocation." );
+				}
+			else {
+				$logger->info( "I can suggest names if you install one of $modules" );
+				$logger->info( "and you provide the -x option on invocation." );
+				}
+			$shown_help++;
+			}
 		return;
 		}
 
@@ -1581,7 +1627,7 @@ sub _guess_at_module_name
 	my %guesses;
 	foreach my $guess ( @$modules ) {
 		my $distance = $distance->( $target, $guess );
-		next if $distance > $threshold;
+		next if $distance > $_threshold;
 		$guesses{$guess} = $distance;
 		}
 
@@ -1643,7 +1689,7 @@ but the canonical source is now in the above repo.
 
 Japheth Cleaver added the bits to allow a forced install (C<-f>).
 
-Jim Brandt suggest and provided the initial implementation for the
+Jim Brandt suggested and provided the initial implementation for the
 up-to-date and Changes features.
 
 Adam Kennedy pointed out that C<exit()> causes problems on Windows
@@ -1651,14 +1697,23 @@ where this script ends up with a .bat extension
 
 David Golden helps integrate this into the C<CPAN.pm> repos.
 
+Jim Keenan fixed up various issues with _download
+
 =head1 AUTHOR
 
 brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2001-2015, brian d foy, All Rights Reserved.
+Copyright (c) 2001-2021, brian d foy, All Rights Reserved.
 
 You may redistribute this under the same terms as Perl itself.
 
 =cut
+
+# Local Variables:
+# mode: cperl
+# indent-tabs-mode: t
+# cperl-indent-level: 8
+# cperl-continued-statement-offset: 8
+# End:

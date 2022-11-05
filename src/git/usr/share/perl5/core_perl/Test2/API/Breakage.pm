@@ -2,7 +2,7 @@ package Test2::API::Breakage;
 use strict;
 use warnings;
 
-our $VERSION = '1.302073';
+our $VERSION = '1.302190';
 
 
 use Test2::Util qw/pkg_to_file/;
@@ -31,7 +31,12 @@ sub upgrade_required {
         'Test::SharedFork'        => '0.34',
         'Test::Alien'             => '0.04',
         'Test::UseAllModules'     => '0.14',
+        'Test::More::Prefix'      => '0.005',
 
+        'Test2::Tools::EventDumper' => 0.000007,
+        'Test2::Harness'            => 0.000013,
+
+        'Test::DBIx::Class::Schema'    => '1.0.9',
         'Test::Clustericious::Cluster' => '0.30',
     );
 }
@@ -43,12 +48,10 @@ sub known_broken {
         'Test::Aggregate'       => '0.373',
         'Test::Flatten'         => '0.11',
         'Test::Group'           => '0.20',
-        'Test::More::Prefix'    => '0.005',
         'Test::ParallelSubtest' => '0.05',
         'Test::Pretty'          => '0.32',
         'Test::Wrapper'         => '0.3.0',
 
-        'Test::DBIx::Class::Schema'      => '1.0.9',
         'Log::Dispatch::Config::TestLog' => '0.02',
     );
 }
@@ -70,7 +73,9 @@ sub report {
         next unless $INC{$file} || ($require && eval { require $file; 1 });
         my $want = $suggest{$mod};
         next if eval { $mod->VERSION($want); 1 };
-        push @warn => " * Module '$mod' is outdated, we recommed updating above $want.";
+        my $error = $@;
+        chomp $error;
+        push @warn => " * Module '$mod' is outdated, we recommed updating above $want. error was: '$error'; INC is $INC{$file}";
     }
 
     for my $mod (keys %required) {
@@ -165,7 +170,7 @@ F<http://github.com/Test-More/test-more/>.
 
 =head1 COPYRIGHT
 
-Copyright 2016 Chad Granum E<lt>exodist@cpan.orgE<gt>.
+Copyright 2020 Chad Granum E<lt>exodist@cpan.orgE<gt>.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

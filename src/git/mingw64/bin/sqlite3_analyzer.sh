@@ -21,7 +21,7 @@ proc is_without_rowid {tname} {
   db eval "PRAGMA index_list = '$t'" o {
     if {$o(origin) == "pk"} {
       set n $o(name)
-      if {0==[db one { SELECT count(*) FROM sqlite_master WHERE name=$n }]} {
+      if {0==[db one { SELECT count(*) FROM sqlite_schema WHERE name=$n }]} {
         return 1
       }
     }
@@ -165,7 +165,7 @@ if {![db exists {SELECT 1 FROM pragma_compile_options
   exit 1
 }
 
-db eval {SELECT count(*) FROM sqlite_master}
+db eval {SELECT count(*) FROM sqlite_schema}
 set pageSize [expr {wide([db one {PRAGMA page_size}])}]
 
 if {$flags(-pageinfo)} {
@@ -250,8 +250,8 @@ db eval {DROP TABLE temp.stat}
 set isCompressed 0
 set compressOverhead 0
 set depth 0
-set sql { SELECT name, tbl_name FROM sqlite_master WHERE rootpage>0 }
-foreach {name tblname} [concat sqlite_master sqlite_master [db eval $sql]] {
+set sql { SELECT name, tbl_name FROM sqlite_schema WHERE rootpage>0 }
+foreach {name tblname} [concat sqlite_schema sqlite_schema [db eval $sql]] {
 
   set is_index [expr {$name!=$tblname}]
   set is_without_rowid [is_without_rowid $name]
@@ -350,7 +350,7 @@ proc titleline {title} {
     puts [string repeat * 79]
   } else {
     set len [string length $title]
-    set stars [string repeat * [expr 79-$len-5]]
+    set stars [string repeat * [expr {79-$len-5}]]
     puts "*** $title $stars"
   }
 }
@@ -360,7 +360,7 @@ proc titleline {title} {
 #
 proc statline {title value {extra {}}} {
   set len [string length $title]
-  set dots [string repeat . [expr 50-$len]]
+  set dots [string repeat . [expr {50-$len}]]
   set len [string length $value]
   set sp2 [string range {          } $len end]
   if {$extra ne ""} {
@@ -386,7 +386,7 @@ proc percent {num denom {of {}}} {
 
 proc divide {num denom} {
   if {$denom==0} {return 0.0}
-  return [format %.2f [expr double($num)/double($denom)]]
+  return [format %.2f [expr {double($num)/double($denom)}]]
 }
 
 # Generate a subreport that covers some subset of the database.
@@ -538,10 +538,10 @@ proc autovacuum_overhead {filePages pageSize} {
   # database file is one pointer-map page, followed by $ptrsPerPage other
   # pages, followed by a pointer-map page etc. The first pointer-map page
   # is the second page of the file overall.
-  set ptrsPerPage [expr double($pageSize/5)]
+  set ptrsPerPage [expr {double($pageSize/5)}]
 
   # Return the number of pointer map pages in the database.
-  return [expr wide(ceil( ($filePages-1.0)/($ptrsPerPage+1.0) ))]
+  return [expr {wide(ceil(($filePages-1.0)/($ptrsPerPage+1.0)))}]
 }
 
 
@@ -565,7 +565,7 @@ proc autovacuum_overhead {filePages pageSize} {
 # nautoindex:    Number of indices created automatically.
 # nmanindex:     Number of indices created manually.
 # user_payload:  Number of bytes of payload in table btrees 
-#                (not including sqlite_master)
+#                (not including sqlite_schema)
 # user_percent:  $user_payload as a percentage of total file size.
 
 ### The following, setting $file_bytes based on the actual size of the file
@@ -582,7 +582,7 @@ set av_pgcnt    [autovacuum_overhead $file_pgcnt $pageSize]
 set av_percent  [percent $av_pgcnt $file_pgcnt]
 
 set sql {SELECT sum(leaf_pages+int_pages+ovfl_pages) FROM space_used}
-set inuse_pgcnt   [expr wide([mem eval $sql])]
+set inuse_pgcnt   [expr {wide([mem eval $sql])}]
 set inuse_percent [percent $inuse_pgcnt $file_pgcnt]
 
 set free_pgcnt    [expr {$file_pgcnt-$inuse_pgcnt-$av_pgcnt}]
@@ -592,15 +592,18 @@ set free_percent2 [percent $free_pgcnt2 $file_pgcnt]
 
 set file_pgcnt2 [expr {$inuse_pgcnt+$free_pgcnt2+$av_pgcnt}]
 
-set ntable [db eval {SELECT count(*)+1 FROM sqlite_master WHERE type='table'}]
-set nindex [db eval {SELECT count(*) FROM sqlite_master WHERE type='index'}]
-set sql {SELECT count(*) FROM sqlite_master WHERE name LIKE 'sqlite_autoindex%'}
+# Account for the lockbyte page
+if {$file_pgcnt2*$pageSize>1073742335} {incr file_pgcnt2}
+
+set ntable [db eval {SELECT count(*)+1 FROM sqlite_schema WHERE type='table'}]
+set nindex [db eval {SELECT count(*) FROM sqlite_schema WHERE type='index'}]
+set sql {SELECT count(*) FROM sqlite_schema WHERE name LIKE 'sqlite_autoindex%'}
 set nautoindex [db eval $sql]
 set nmanindex [expr {$nindex-$nautoindex}]
 
 # set total_payload [mem eval "SELECT sum(payload) FROM space_used"]
 set user_payload [mem one {SELECT int(sum(payload)) FROM space_used
-     WHERE NOT is_index AND name NOT LIKE 'sqlite_master'}]
+     WHERE NOT is_index AND name NOT LIKE 'sqlite_schema'}]
 set user_percent [percent $user_payload $file_bytes]
 
 # Output the summary statistics calculated above.

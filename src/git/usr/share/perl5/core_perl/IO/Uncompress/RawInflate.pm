@@ -5,16 +5,16 @@ use strict ;
 use warnings;
 use bytes;
 
-use Compress::Raw::Zlib  2.074 ;
-use IO::Compress::Base::Common  2.074 qw(:Status );
+use Compress::Raw::Zlib  2.103 ;
+use IO::Compress::Base::Common  2.106 qw(:Status );
 
-use IO::Uncompress::Base  2.074 ;
-use IO::Uncompress::Adapter::Inflate  2.074 ;
+use IO::Uncompress::Base  2.106 ;
+use IO::Uncompress::Adapter::Inflate  2.106 ;
 
 require Exporter ;
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, %DEFLATE_CONSTANTS, $RawInflateError);
 
-$VERSION = '2.074';
+$VERSION = '2.106';
 $RawInflateError = '';
 
 @ISA    = qw(IO::Uncompress::Base Exporter);
@@ -356,7 +356,7 @@ IO::Uncompress::RawInflate - Read RFC 1951 files/buffers
     my $status = rawinflate $input => $output [,OPTS]
         or die "rawinflate failed: $RawInflateError\n";
 
-    my $z = new IO::Uncompress::RawInflate $input [OPTS]
+    my $z = IO::Uncompress::RawInflate->new( $input [OPTS] )
         or die "rawinflate failed: $RawInflateError\n";
 
     $status = $z->read($buffer)
@@ -418,7 +418,8 @@ The functional interface needs Perl5.005 or better.
 =head2 rawinflate $input_filename_or_reference => $output_filename_or_reference [, OPTS]
 
 C<rawinflate> expects at least two parameters,
-C<$input_filename_or_reference> and C<$output_filename_or_reference>.
+C<$input_filename_or_reference> and C<$output_filename_or_reference>
+and zero or more optional parameters (see L</Optional Parameters>)
 
 =head3 The C<$input_filename_or_reference> parameter
 
@@ -431,7 +432,7 @@ It can take one of the following forms:
 
 =item A filename
 
-If the <$input_filename_or_reference> parameter is a simple scalar, it is
+If the C<$input_filename_or_reference> parameter is a simple scalar, it is
 assumed to be a filename. This file will be opened for reading and the
 input data will be read from it.
 
@@ -528,9 +529,9 @@ files/buffers.
 
 =head2 Optional Parameters
 
-Unless specified below, the optional parameters for C<rawinflate>,
-C<OPTS>, are the same as those used with the OO interface defined in the
-L</"Constructor Options"> section below.
+The optional parameters for the one-shot function C<rawinflate>
+are (for the most part) identical to those used with the OO interface defined in the
+L</"Constructor Options"> section. The exceptions are listed below
 
 =over 5
 
@@ -547,10 +548,7 @@ This parameter defaults to 0.
 
 =item C<< BinModeOut => 0|1 >>
 
-When writing to a file or filehandle, set C<binmode> before writing to the
-file.
-
-Defaults to 0.
+This option is now a no-op. All files will be written  in binmode.
 
 =item C<< Append => 0|1 >>
 
@@ -648,7 +646,7 @@ uncompressed data to a buffer, C<$buffer>.
     use IO::Uncompress::RawInflate qw(rawinflate $RawInflateError) ;
     use IO::File ;
 
-    my $input = new IO::File "<file1.txt.1951"
+    my $input = IO::File->new( "<file1.txt.1951" )
         or die "Cannot open 'file1.txt.1951': $!\n" ;
     my $buffer ;
     rawinflate $input => \$buffer
@@ -683,7 +681,7 @@ and if you want to compress each file one at a time, this will do the trick
 
 The format of the constructor for IO::Uncompress::RawInflate is shown below
 
-    my $z = new IO::Uncompress::RawInflate $input [OPTS]
+    my $z = IO::Uncompress::RawInflate->new( $input [OPTS] )
         or die "IO::Uncompress::RawInflate failed: $RawInflateError\n";
 
 Returns an C<IO::Uncompress::RawInflate> object on success and undef on failure.
@@ -1066,7 +1064,7 @@ C<InputLength> option in the constructor.
 
 =head1 Importing
 
-No symbolic constants are required by this IO::Uncompress::RawInflate at present.
+No symbolic constants are required by IO::Uncompress::RawInflate at present.
 
 =over 5
 
@@ -1085,9 +1083,15 @@ Same as doing this
 
 See L<IO::Compress::FAQ|IO::Compress::FAQ/"Compressed files and Net::FTP">
 
+=head1 SUPPORT
+
+General feedback/questions/bug reports should be sent to
+L<https://github.com/pmqs/IO-Compress/issues> (preferred) or
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=IO-Compress>.
+
 =head1 SEE ALSO
 
-L<Compress::Zlib>, L<IO::Compress::Gzip>, L<IO::Uncompress::Gunzip>, L<IO::Compress::Deflate>, L<IO::Uncompress::Inflate>, L<IO::Compress::RawDeflate>, L<IO::Compress::Bzip2>, L<IO::Uncompress::Bunzip2>, L<IO::Compress::Lzma>, L<IO::Uncompress::UnLzma>, L<IO::Compress::Xz>, L<IO::Uncompress::UnXz>, L<IO::Compress::Lzop>, L<IO::Uncompress::UnLzop>, L<IO::Compress::Lzf>, L<IO::Uncompress::UnLzf>, L<IO::Uncompress::AnyInflate>, L<IO::Uncompress::AnyUncompress>
+L<Compress::Zlib>, L<IO::Compress::Gzip>, L<IO::Uncompress::Gunzip>, L<IO::Compress::Deflate>, L<IO::Uncompress::Inflate>, L<IO::Compress::RawDeflate>, L<IO::Compress::Bzip2>, L<IO::Uncompress::Bunzip2>, L<IO::Compress::Lzma>, L<IO::Uncompress::UnLzma>, L<IO::Compress::Xz>, L<IO::Uncompress::UnXz>, L<IO::Compress::Lzip>, L<IO::Uncompress::UnLzip>, L<IO::Compress::Lzop>, L<IO::Uncompress::UnLzop>, L<IO::Compress::Lzf>, L<IO::Uncompress::UnLzf>, L<IO::Compress::Zstd>, L<IO::Uncompress::UnZstd>, L<IO::Uncompress::AnyInflate>, L<IO::Uncompress::AnyUncompress>
 
 L<IO::Compress::FAQ|IO::Compress::FAQ>
 
@@ -1096,9 +1100,9 @@ L<Archive::Tar|Archive::Tar>,
 L<IO::Zlib|IO::Zlib>
 
 For RFC 1950, 1951 and 1952 see
-L<http://www.faqs.org/rfcs/rfc1950.html>,
-L<http://www.faqs.org/rfcs/rfc1951.html> and
-L<http://www.faqs.org/rfcs/rfc1952.html>
+L<https://datatracker.ietf.org/doc/html/rfc1950>,
+L<https://datatracker.ietf.org/doc/html/rfc1951> and
+L<https://datatracker.ietf.org/doc/html/rfc1952>
 
 The I<zlib> compression library was written by Jean-loup Gailly
 C<gzip@prep.ai.mit.edu> and Mark Adler C<madler@alumni.caltech.edu>.
@@ -1118,8 +1122,7 @@ See the Changes file.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2005-2017 Paul Marquess. All rights reserved.
+Copyright (c) 2005-2022 Paul Marquess. All rights reserved.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
-

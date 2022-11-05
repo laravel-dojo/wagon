@@ -1,16 +1,13 @@
 package Exporter;
 
-require 5.006;
-
-# Be lean.
-#use strict;
-#no strict 'refs';
+use strict;
+no strict 'refs';
 
 our $Debug = 0;
 our $ExportLevel = 0;
 our $Verbose ||= 0;
-our $VERSION = '5.72';
-our (%Cache);
+our $VERSION = '5.77';
+our %Cache;
 
 sub as_heavy {
   require Exporter::Heavy;
@@ -60,7 +57,7 @@ sub import {
       foreach (@_);
   }
   return export $pkg, $callpkg, ($args ? @_ : ()) if $heavy;
-  local $SIG{__WARN__} =
+  local $SIG{__WARN__} = 
 	sub {require Carp; &Carp::carp} if not $SIG{__WARN__};
   # shortcut for the common case of no type character
   *{"$callpkg\::$_"} = \&{"$pkg\::$_"} foreach @_;
@@ -105,15 +102,21 @@ Exporter - Implements default import method for modules
 In module F<YourModule.pm>:
 
   package YourModule;
-  require Exporter;
-  @ISA = qw(Exporter);
-  @EXPORT_OK = qw(munge frobnicate);  # symbols to export on request
+  use Exporter 'import';
+  our @EXPORT_OK = qw(munge frobnicate);  # symbols to export on request
 
 or
 
   package YourModule;
-  use Exporter 'import'; # gives you Exporter's import() method directly
-  @EXPORT_OK = qw(munge frobnicate);  # symbols to export on request
+  require Exporter;
+  our @ISA = qw(Exporter);  # inherit all of Exporter's methods
+  our @EXPORT_OK = qw(munge frobnicate);  # symbols to export on request
+
+or
+
+  package YourModule;
+  use parent 'Exporter';  # inherit all of Exporter's methods
+  our @EXPORT_OK = qw(munge frobnicate);  # symbols to export on request
 
 In other files which wish to use C<YourModule>:
 
@@ -146,8 +149,8 @@ symbols can represent functions, scalars, arrays, hashes, or typeglobs.
 The symbols must be given by full name with the exception that the
 ampersand in front of a function is optional, e.g.
 
-    @EXPORT    = qw(afunc $scalar @array);   # afunc is a function
-    @EXPORT_OK = qw(&bfunc %hash *typeglob); # explicit prefix on &bfunc
+  our @EXPORT    = qw(afunc $scalar @array);   # afunc is a function
+  our @EXPORT_OK = qw(&bfunc %hash *typeglob); # explicit prefix on &bfunc
 
 If you are only exporting function names it is recommended to omit the
 ampersand, as the implementation is faster this way.
@@ -234,9 +237,9 @@ include :DEFAULT explicitly.
 
 e.g., F<Module.pm> defines:
 
-    @EXPORT      = qw(A1 A2 A3 A4 A5);
-    @EXPORT_OK   = qw(B1 B2 B3 B4 B5);
-    %EXPORT_TAGS = (T1 => [qw(A1 A2 B1 B2)], T2 => [qw(A1 A2 B3 B4)]);
+    our @EXPORT      = qw(A1 A2 A3 A4 A5);
+    our @EXPORT_OK   = qw(B1 B2 B3 B4 B5);
+    our %EXPORT_TAGS = (T1 => [qw(A1 A2 B1 B2)], T2 => [qw(A1 A2 B3 B4)]);
 
 Note that you cannot use tags in @EXPORT or @EXPORT_OK.
 
@@ -279,22 +282,22 @@ import function:
 
     package A;
 
-    @ISA = qw(Exporter);
-    @EXPORT_OK = qw($b);
+    our @ISA = qw(Exporter);
+    our @EXPORT_OK = qw($b);
 
     sub import
     {
 	$A::b = 1;     # not a very useful import method
     }
 
-and you want to Export symbol C<$A::b> back to the module that called
-package A.  Since Exporter relies on the import method to work, via
-inheritance, as it stands Exporter::import() will never get called.
+and you want to Export symbol C<$A::b> back to the module that called 
+package A.  Since Exporter relies on the import method to work, via 
+inheritance, as it stands Exporter::import() will never get called. 
 Instead, say the following:
 
     package A;
-    @ISA = qw(Exporter);
-    @EXPORT_OK = qw($b);
+    our @ISA = qw(Exporter);
+    our @EXPORT_OK = qw($b);
 
     sub import
     {
@@ -302,8 +305,8 @@ Instead, say the following:
 	A->export_to_level(1, @_);
     }
 
-This will export the symbols one level 'above' the current package - ie: to
-the program or module that used package A.
+This will export the symbols one level 'above' the current package - ie: to 
+the program or module that used package A. 
 
 Note: Be careful not to modify C<@_> at all before you call export_to_level
 - or people using your package will get very unexplained results!
@@ -312,7 +315,7 @@ Note: Be careful not to modify C<@_> at all before you call export_to_level
 
 By including Exporter in your C<@ISA> you inherit an Exporter's import() method
 but you also inherit several other helper methods which you probably don't
-want.  To avoid this you can do:
+want and complicate the inheritance tree.  To avoid this you can do:
 
   package YourModule;
   use Exporter qw(import);
@@ -374,7 +377,7 @@ Since the symbols listed within C<%EXPORT_TAGS> must also appear in either
 C<@EXPORT> or C<@EXPORT_OK>, two utility functions are provided which allow
 you to easily add tagged sets of symbols to C<@EXPORT> or C<@EXPORT_OK>:
 
-  %EXPORT_TAGS = (foo => [qw(aa bb cc)], bar => [qw(aa cc dd)]);
+  our %EXPORT_TAGS = (foo => [qw(aa bb cc)], bar => [qw(aa cc dd)]);
 
   Exporter::export_tags('foo');     # add aa, bb and cc to @EXPORT
   Exporter::export_ok_tags('bar');  # add aa, cc and dd to @EXPORT_OK
@@ -391,7 +394,7 @@ useful to create the utility ":all" to simplify "use" statements.
 
 The simplest way to do this is:
 
-  %EXPORT_TAGS = (foo => [qw(aa bb cc)], bar => [qw(aa cc dd)]);
+ our  %EXPORT_TAGS = (foo => [qw(aa bb cc)], bar => [qw(aa cc dd)]);
 
   # add all the other ":class" tags to the ":all" class,
   # deleting duplicates
@@ -460,7 +463,7 @@ variables C<@EXPORT_OK>, C<@EXPORT>, C<@ISA>, etc.
   our @ISA = qw(Exporter);
   our @EXPORT_OK = qw(munge frobnicate);
 
-If backward compatibility for Perls under 5.6 is important,
+If backward compatibility for Perls B<under> 5.6 is important,
 one must write instead a C<use vars> statement.
 
   use vars qw(@ISA @EXPORT_OK);
@@ -476,8 +479,8 @@ This may happen for instance with mutually recursive
 modules, which are affected by the time the relevant
 constructions are executed.
 
-The ideal (but a bit ugly) way to never have to think
-about that is to use C<BEGIN> blocks.  So the first part
+The ideal way to never have to think about that is to use
+C<BEGIN> blocks and the simple import method.  So the first part
 of the L</SYNOPSIS> code could be rewritten as:
 
   package YourModule;
@@ -485,16 +488,27 @@ of the L</SYNOPSIS> code could be rewritten as:
   use strict;
   use warnings;
 
-  our (@ISA, @EXPORT_OK);
+  use Exporter 'import';
   BEGIN {
-     require Exporter;
-     @ISA = qw(Exporter);
-     @EXPORT_OK = qw(munge frobnicate);  # symbols to export on request
+    our @EXPORT_OK = qw(munge frobnicate);  # symbols to export on request
+  }
+
+Or if you need to inherit from Exporter:
+
+  package YourModule;
+
+  use strict;
+  use warnings;
+
+  BEGIN {
+    require Exporter;
+    our @ISA = qw(Exporter);  # inherit all of Exporter's methods
+    our @EXPORT_OK = qw(munge frobnicate);  # symbols to export on request
   }
 
 The C<BEGIN> will assure that the loading of F<Exporter.pm>
 and the assignments to C<@ISA> and C<@EXPORT_OK> happen
-immediately, leaving no room for something to get awry
+immediately like C<use>, leaving no room for something to get awry
 or just plain wrong.
 
 With respect to loading C<Exporter> and inheriting, there
@@ -505,7 +519,7 @@ are alternatives with the use of modules like C<base> and C<parent>.
   use parent qw(Exporter);
 
 Any of these statements are nice replacements for
-C<BEGIN { require Exporter; @ISA = qw(Exporter); }>
+C<BEGIN { require Exporter; our @ISA = qw(Exporter); }>
 with the same compile-time effect.  The basic difference
 is that C<base> code interacts with declared C<fields>
 while C<parent> is a streamlined version of the older

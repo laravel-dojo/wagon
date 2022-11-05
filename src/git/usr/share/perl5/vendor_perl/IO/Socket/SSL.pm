@@ -13,7 +13,7 @@
 
 package IO::Socket::SSL;
 
-our $VERSION = '2.066';
+our $VERSION = '2.075';
 
 use IO::Socket;
 use Net::SSLeay 1.46;
@@ -39,6 +39,7 @@ BEGIN {
 my $Net_SSLeay_ERROR_WANT_READ   = Net::SSLeay::ERROR_WANT_READ();
 my $Net_SSLeay_ERROR_WANT_WRITE  = Net::SSLeay::ERROR_WANT_WRITE();
 my $Net_SSLeay_ERROR_SYSCALL     = Net::SSLeay::ERROR_SYSCALL();
+my $Net_SSLeay_ERROR_SSL         = Net::SSLeay::ERROR_SSL();
 my $Net_SSLeay_VERIFY_NONE       = Net::SSLeay::VERIFY_NONE();
 my $Net_SSLeay_VERIFY_PEER       = Net::SSLeay::VERIFY_PEER();
 
@@ -73,6 +74,9 @@ my $can_pha;         # do we support PHA
 my $session_upref;   # SSL_SESSION_up_ref is implemented
 my %sess_cb;         # SSL_CTX_sess_set_(new|remove)_cb
 my $check_partial_chain; # use X509_V_FLAG_PARTIAL_CHAIN if available
+my $auto_retry;      # (clear|set)_mode SSL_MODE_AUTO_RETRY with OpenSSL 1.1.1+ with non-blocking
+my $ssl_mode_release_buffers = 0; # SSL_MODE_RELEASE_BUFFERS if available
+my $can_ciphersuites; # support for SSL_CTX_set_ciphersuites (TLS 1.3)
 
 my $openssl_version;
 my $netssleay_version;
@@ -108,8 +112,9 @@ BEGIN {
     $can_ocsp_staple = $can_ocsp
 	&& defined &Net::SSLeay::set_tlsext_status_type;
     $can_tckt_keycb  = defined &Net::SSLeay::CTX_set_tlsext_ticket_getkey_cb
-	&& $netssleay_version >= 1.80;  
+	&& $netssleay_version >= 1.80;
     $can_pha = defined &Net::SSLeay::CTX_set_post_handshake_auth;
+    $can_ciphersuites = defined &Net::SSLeay::CTX_set_ciphersuites;
 
     if (defined &Net::SSLeay::SESSION_up_ref) {
 	$session_upref = 1;
@@ -131,6 +136,34 @@ BEGIN {
 	    my $param = Net::SSLeay::CTX_get0_param($ctx);
 	    Net::SSLeay::X509_VERIFY_PARAM_set_flags($param, $c);
 	};
+    }
+
+    if (!defined &Net::SSLeay::clear_mode) {
+	# assume SSL_CTRL_CLEAR_MODE being 78 since it was always this way
+	*Net::SSLeay::clear_mode = sub {
+	    my ($ctx,$opt) = @_;
+	    Net::SSLeay::ctrl($ctx,78,$opt,0);
+	};
+    }
+
+    if ($openssl_version >= 0x10101000) {
+	# openssl 1.1.1 enabled SSL_MODE_AUTO_RETRY by default, which is bad for
+	# non-blocking sockets
+	my $mode_auto_retry =
+	    # was always 0x00000004
+	    eval { Net::SSLeay::MODE_AUTO_RETRY() } || 0x00000004;
+	$auto_retry = sub {
+	    my ($ssl,$on) = @_;
+	    if ($on) {
+		Net::SSLeay::set_mode($ssl, $mode_auto_retry);
+	    } else {
+		Net::SSLeay::clear_mode($ssl, $mode_auto_retry);
+	    }
+	}
+    }
+    if ($openssl_version >= 0x10000000) {
+	# ssl/ssl.h:#define SSL_MODE_RELEASE_BUFFERS 0x00000010L
+	$ssl_mode_release_buffers = 0x00000010;
     }
 }
 
@@ -172,11 +205,8 @@ my %DEFAULT_SSL_ARGS = (
     SSL_npn_protocols => undef,    # meaning depends whether on server or client side
     SSL_alpn_protocols => undef,   # list of protocols we'll accept/send, for example ['http/1.1','spdy/3.1']
 
-    # https://wiki.mozilla.org/Security/Server_Side_TLS, 2019/03/05
-    # "Old backward compatibility" for best compatibility
-    # .. "Most ciphers that are not clearly broken and dangerous to use are supported"
-    # slightly reordered to prefer AES since it is cheaper when hardware accelerated
-    SSL_cipher_list => 'ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-DSS-AES128-GCM-SHA256:kEDH+AESGCM:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA:ECDHE-ECDSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-DSS-AES128-SHA256:DHE-RSA-AES256-SHA256:DHE-DSS-AES256-SHA:DHE-RSA-AES256-SHA:ECDHE-RSA-DES-CBC3-SHA:ECDHE-ECDSA-DES-CBC3-SHA:EDH-RSA-DES-CBC3-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:AES128-SHA:AES256-SHA:AES:DES-CBC3-SHA:HIGH:SEED:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!PSK:!RSAPSK:!aDH:!aECDH:!EDH-DSS-DES-CBC3-SHA:!KRB5-DES-CBC3-SHA:!SRP',
+    # rely on system default but be sure to disable some definitely bad ones
+    SSL_cipher_list => 'DEFAULT !EXP !MEDIUM !LOW !eNULL !aNULL !RC4 !DES !MD5 !PSK !SRP',
 );
 
 my %DEFAULT_SSL_CLIENT_ARGS = (
@@ -185,64 +215,6 @@ my %DEFAULT_SSL_CLIENT_ARGS = (
 
     SSL_ca_file => undef,
     SSL_ca_path => undef,
-
-    # older versions of F5 BIG-IP hang when getting SSL client hello >255 bytes
-    # http://support.f5.com/kb/en-us/solutions/public/13000/000/sol13037.html
-    # http://guest:guest@rt.openssl.org/Ticket/Display.html?id=2771
-    # Ubuntu worked around this by disabling TLSv1_2 on the client side for
-    # a while. Later a padding extension was added to OpenSSL to work around
-    # broken F5 but then IronPort croaked because it did not understand this
-    # extension so it was disabled again :(
-    # Firefox, Chrome and IE11 use TLSv1_2 but use only a few ciphers, so
-    # that packet stays small enough. We try the same here.
-
-    SSL_cipher_list => join(" ",
-
-	# SSLabs report for Chrome 48/OSX. 
-	# This also includes the fewer ciphers Firefox uses.
-	'ECDHE-ECDSA-AES128-GCM-SHA256',
-	'ECDHE-RSA-AES128-GCM-SHA256',
-	'DHE-RSA-AES128-GCM-SHA256',
-	'ECDHE-ECDSA-CHACHA20-POLY1305',
-	'ECDHE-RSA-CHACHA20-POLY1305',
-	'ECDHE-ECDSA-AES256-SHA',
-	'ECDHE-RSA-AES256-SHA',
-	'DHE-RSA-AES256-SHA',
-	'ECDHE-ECDSA-AES128-SHA',
-	'ECDHE-RSA-AES128-SHA',
-	'DHE-RSA-AES128-SHA',
-	'AES128-GCM-SHA256',
-	'AES256-SHA',
-	'AES128-SHA',
-	'DES-CBC3-SHA',
-
-	# IE11/Edge has some more ciphers, notably SHA384 and DSS
-	# we don't offer the *-AES128-SHA256 and *-AES256-SHA384 non-GCM
-	# ciphers IE/Edge offers because they look like a large mismatch
-	# between a very strong HMAC and a comparably weak (but sufficient)
-	# encryption. Similar all browsers which do SHA384 can do ECDHE
-	# so skip the DHE*SHA384 ciphers.
-	'ECDHE-RSA-AES256-GCM-SHA384',
-	'ECDHE-ECDSA-AES256-GCM-SHA384',
-	# 'ECDHE-RSA-AES256-SHA384',
-	# 'ECDHE-ECDSA-AES256-SHA384',
-	# 'ECDHE-RSA-AES128-SHA256',
-	# 'ECDHE-ECDSA-AES128-SHA256',
-	# 'DHE-RSA-AES256-GCM-SHA384',
-	# 'AES256-GCM-SHA384',
-	'AES256-SHA256',
-	# 'AES128-SHA256',
-	'DHE-DSS-AES256-SHA256',
-	# 'DHE-DSS-AES128-SHA256',
-	'DHE-DSS-AES256-SHA',
-	'DHE-DSS-AES128-SHA',
-	'EDH-DSS-DES-CBC3-SHA',
-
-	# Just to make sure, that we don't accidentally add bad ciphers above.
-	# This includes dropping RC4 which is no longer supported by modern
-	# browsers and also excluded in the SSL libraries of Python and Ruby.
-	"!EXP !MEDIUM !LOW !eNULL !aNULL !RC4 !DES !MD5 !PSK !SRP"
-    )
 );
 
 # set values inside _init to work with perlcc, RT#95452
@@ -256,7 +228,7 @@ my %DEFAULT_SSL_SERVER_ARGS;
 	# library_init returns false if the library was already initialized.
 	# This way we can find out if the library needs to be re-initialized
 	# inside code compiled with perlcc
-	Net::SSLeay::library_init() or return; 
+	Net::SSLeay::library_init() or return;
 
 	Net::SSLeay::load_error_strings();
 	Net::SSLeay::OpenSSL_add_all_digests();
@@ -323,7 +295,7 @@ BEGIN{
 # every time we setup a connection
 my %SSL_OP_NO;
 for(qw( SSLv2 SSLv3 TLSv1 TLSv1_1 TLSv11:TLSv1_1 TLSv1_2 TLSv12:TLSv1_2
-        TLSv1_3 TLSv13:TLSv1_3 )) {
+	TLSv1_3 TLSv13:TLSv1_3 )) {
     my ($k,$op) = m{:} ? split(m{:},$_,2) : ($_,$_);
     my $sub = "Net::SSLeay::OP_NO_$op";
     local $SIG{__DIE__};
@@ -385,8 +357,8 @@ BEGIN {
 	Socket::inet_pton( AF_INET6(),'::1') && AF_INET6() or die;
 	Socket->import( qw/inet_pton NI_NUMERICHOST NI_NUMERICSERV/ );
 	# behavior different to Socket6::getnameinfo - wrap
-	*_getnameinfo = sub { 
-	    my ($err,$host,$port) = Socket::getnameinfo(@_) or return; 
+	*_getnameinfo = sub {
+	    my ($err,$host,$port) = Socket::getnameinfo(@_) or return;
 	    return if $err;
 	    return ($host,$port);
 	};
@@ -405,8 +377,8 @@ BEGIN {
     if ($ip6) {
 	# if we have IO::Socket::IP >= 0.31 we will use this in preference
 	# because it can handle both IPv4 and IPv6
-	if ( eval { 
-	    require IO::Socket::IP; 
+	if ( eval {
+	    require IO::Socket::IP;
 	    IO::Socket::IP->VERSION(0.31)
 	}) {
 	    @ISA = qw(IO::Socket::IP);
@@ -854,6 +826,7 @@ sub connect_SSL {
     } else {
 	# timeout does not apply because invalid or socket non-blocking
 	$timeout = undef;
+	$auto_retry && $auto_retry->($ssl,$self->blocking);
     }
 
     my $start = defined($timeout) && time();
@@ -1066,6 +1039,7 @@ sub accept_SSL {
     } else {
 	# timeout does not apply because invalid or socket non-blocking
 	$timeout = undef;
+	$auto_retry && $auto_retry->($ssl,$socket->blocking);
     }
 
     my $start = defined($timeout) && time();
@@ -1139,6 +1113,14 @@ sub accept_SSL {
 
 ####### I/O subroutines ########################
 
+if ($auto_retry) {
+    *blocking = sub {
+	my $self = shift;
+	{ @_ && $auto_retry->(${*$self}{_SSL_object} || last, @_); }
+	return $self->SUPER::blocking(@_);
+    };
+}
+
 sub _generic_read {
     my ($self, $read_func, undef, $length, $offset) = @_;
     my $ssl =  ${*$self}{_SSL_object} || return;
@@ -1148,13 +1130,12 @@ sub _generic_read {
     my ($data,$rwerr) = $read_func->($ssl, $length);
     while ( ! defined($data)) {
 	if ( my $err = $self->_skip_rw_error( $ssl, defined($rwerr) ? $rwerr:-1 )) {
-	    if ($err == $Net_SSLeay_ERROR_SYSCALL) {
-		# OpenSSL 1.1.0c+ : EOF can now result in SSL_read returning -1
-		if (not $!) {
-		    # SSL_ERROR_SYSCALL but not errno -> treat as EOF
-		    $data = '';
-		    last;
-		}
+	    # OpenSSL 1.1.0c+ : EOF can now result in SSL_read returning -1 and SSL_ERROR_SYSCALL
+	    # OpenSSL 3.0 : EOF can now result in SSL_read returning -1 and SSL_ERROR_SSL
+	    if (not $! and $err == $Net_SSLeay_ERROR_SSL || $err == $Net_SSLeay_ERROR_SYSCALL) {
+		# treat as EOF
+		$data = '';
+		last;
 	    }
 	    $self->error("SSL read error");
 	}
@@ -1230,7 +1211,7 @@ sub _generic_write {
     } else {
 	$written = Net::SSLeay::write_partial( $ssl,$offset,$length,$$buffer );
 	# write_partial does SSL_write which returns -1 on error
-	$written = undef if $written < 0;
+	$written = undef if $written <= 0;
     }
     if ( !defined($written) ) {
 	if ( my $err = $self->_skip_rw_error( $ssl,-1 )) {
@@ -1421,7 +1402,9 @@ sub stop_SSL {
     $stop_args->{SSL_no_shutdown} = 1 if ! ${*$self}{_SSL_opened};
 
     if (my $ssl = ${*$self}{'_SSL_object'}) {
-	if ( ! $stop_args->{SSL_no_shutdown} ) {
+	if (delete ${*$self}{'_SSL_opening'}) {
+	    # just destroy the object further below
+	} elsif ( ! $stop_args->{SSL_no_shutdown} ) {
 	    my $status = Net::SSLeay::get_shutdown($ssl);
 
 	    my $timeout =
@@ -1449,11 +1432,16 @@ sub stop_SSL {
 
 		# initiate or complete shutdown
 		local $SIG{PIPE} = 'IGNORE';
+		$SSL_ERROR = $! = undef;
 		my $rv = Net::SSLeay::shutdown($ssl);
 		if ( $rv < 0 ) {
 		    # non-blocking socket?
 		    if ( ! $timeout ) {
-			$self->_skip_rw_error( $ssl,$rv );
+			if ( my $err = $self->_skip_rw_error( $ssl, $rv )) {
+				# if $! is not set with ERROR_SYSCALL then report as EPIPE
+				$! ||= EPIPE if $err == $Net_SSLeay_ERROR_SYSCALL;
+				$self->error("SSL shutdown error ($err)");
+			}
 			# need to try again
 			return;
 		    }
@@ -1821,7 +1809,7 @@ if ( defined &Net::SSLeay::get_peer_cert_chain
 	    $ipn = inet_pton(AF_INET6,$identity) or return; # invalid name
 	} elsif ( my @ip = $identity =~m{^(\d+)(?:\.(\d+)\.(\d+)\.(\d+)|[\d\.]*)$} ) {
 	    # check for invalid IP/hostname
-	    return if 4 != @ip or 4 != grep { defined($_) && $_<256 } @ip; 
+	    return if 4 != @ip or 4 != grep { defined($_) && $_<256 } @ip;
 	    $ipn = pack("CCCC",@ip);
 	} else {
 	    # assume hostname, check for umlauts etc
@@ -1896,7 +1884,7 @@ if ( defined &Net::SSLeay::get_peer_cert_chain
 		if ( $identity eq $commonName ) {
 		    return 1 if
 			$scheme->{ip_in_cn} == 4 ? length($ipn) == 4 :
-			$scheme->{ip_in_cn} == 6 ? length($ipn) == 8 :
+			$scheme->{ip_in_cn} == 6 ? length($ipn) == 16 :
 			1;
 		}
 	    }
@@ -1925,7 +1913,7 @@ sub get_servername {
 sub get_fingerprint_bin {
     my ($self,$algo,$cert,$key_only) = @_;
     $cert ||= $self->peer_certificate;
-    return $key_only 
+    return $key_only
 	? Net::SSLeay::X509_pubkey_digest($cert, $algo2digest->($algo || 'sha256'))
 	: Net::SSLeay::X509_digest($cert, $algo2digest->($algo || 'sha256'));
 }
@@ -1993,6 +1981,7 @@ sub fatal_ssl_error {
     my $self = shift;
     my $error_trap = ${*$self}{'_SSL_arguments'}->{'SSL_error_trap'};
     $@ = $self->errstr;
+    my $saved_error = $SSL_ERROR;
     if (defined $error_trap and ref($error_trap) eq 'CODE') {
 	$error_trap->($self, $self->errstr()."\n".$self->get_ssleay_error());
     } elsif ( ${*$self}{'_SSL_ioclass_upgraded'}
@@ -2004,6 +1993,7 @@ sub fatal_ssl_error {
 	# kill socket
 	$self->close
     }
+    $SSL_ERROR = $saved_error if $saved_error;
     return;
 }
 
@@ -2059,6 +2049,14 @@ sub error {
     return;
 }
 
+sub _errstack {
+    my @err;
+    while (my $err = Net::SSLeay::ERR_get_error()) {
+	push @err, Net::SSLeay::ERR_error_string($err);
+    }
+    return @err;
+}
+
 sub can_client_sni { return $can_client_sni }
 sub can_server_sni { return $can_server_sni }
 sub can_multi_cert { return $can_multi_cert }
@@ -2076,8 +2074,7 @@ sub DESTROY {
     if (my $ssl = ${*$self}{_SSL_object}) {
 	delete $SSL_OBJECT{$ssl};
 	if (!$use_threads or delete $CREATED_IN_THIS_THREAD{$ssl}) {
-	    $self->close(_SSL_in_DESTROY => 1, SSL_no_shutdown => 1)
-		if ${*$self}{'_SSL_opened'};
+	    $self->close(_SSL_in_DESTROY => 1, SSL_no_shutdown => 1);
 	}
     }
     delete @{*$self}{@all_my_keys};
@@ -2244,6 +2241,7 @@ use strict;
 
 my %CTX_CREATED_IN_THIS_THREAD;
 *DEBUG = *IO::Socket::SSL::DEBUG;
+*_errstack = \&IO::Socket::SSL::_errstack;
 
 use constant SSL_MODE_ENABLE_PARTIAL_WRITE => 1;
 use constant SSL_MODE_ACCEPT_MOVING_WRITE_BUFFER => 2;
@@ -2253,7 +2251,7 @@ use constant FILETYPE_ASN1 => Net::SSLeay::FILETYPE_ASN1();
 
 my $DEFAULT_SSL_OP = &Net::SSLeay::OP_ALL
     | &Net::SSLeay::OP_SINGLE_DH_USE
-    | ($can_ecdh && &Net::SSLeay::OP_SINGLE_ECDH_USE);
+    | ($can_ecdh ? &Net::SSLeay::OP_SINGLE_ECDH_USE : 0);
 
 # Note that the final object will actually be a reference to the scalar
 # (C-style pointer) returned by Net::SSLeay::CTX_*_new() so that
@@ -2265,7 +2263,7 @@ sub new {
 
     my $is_server = $arg_hash->{SSL_server};
     my %defaults = $is_server
-	? (%DEFAULT_SSL_SERVER_ARGS, %$GLOBAL_SSL_ARGS, %$GLOBAL_SSL_SERVER_ARGS) 
+	? (%DEFAULT_SSL_SERVER_ARGS, %$GLOBAL_SSL_ARGS, %$GLOBAL_SSL_SERVER_ARGS)
 	: (%DEFAULT_SSL_CLIENT_ARGS, %$GLOBAL_SSL_ARGS, %$GLOBAL_SSL_CLIENT_ARGS);
     if ( $defaults{SSL_reuse_ctx} ) {
 	# ignore default context if there are args to override it
@@ -2481,8 +2479,8 @@ sub new {
 	# client session caching will fail
 	# if user does not provide explicit id just use the stringification
 	# of the context
-	if($arg_hash->{SSL_server} and my $id = 
-	    $arg_hash->{SSL_session_id_context} || 
+	if($arg_hash->{SSL_server} and my $id =
+	    $arg_hash->{SSL_session_id_context} ||
 	    ( $arg_hash->{SSL_verify_mode} & 0x01 ) && "$ctx" ) {
 	    Net::SSLeay::CTX_set_session_id_context($ctx,$id,length($id));
 	}
@@ -2492,7 +2490,10 @@ sub new {
 	# SSL_MODE_ENABLE_PARTIAL_WRITE can be necessary for non-blocking because we
 	# cannot guarantee, that the location of the buffer stays constant
 	Net::SSLeay::CTX_set_mode( $ctx,
-	    SSL_MODE_ACCEPT_MOVING_WRITE_BUFFER|SSL_MODE_ENABLE_PARTIAL_WRITE);
+	    SSL_MODE_ACCEPT_MOVING_WRITE_BUFFER |
+	    SSL_MODE_ENABLE_PARTIAL_WRITE |
+	    ($arg_hash->{SSL_mode_release_buffers} ? $ssl_mode_release_buffers : 0)
+	);
 
 	if ( my $proto_list = $arg_hash->{SSL_npn_protocols} ) {
 	    return IO::Socket::SSL->_internal_error("NPN not supported in Net::SSLeay",9)
@@ -2618,11 +2619,16 @@ sub new {
 	    $havecert = 'OBJ';
 	} elsif ( my $f = $arg_hash->{SSL_cert_file} ) {
 	    # try to load chain from PEM or certificate from ASN1
+	    my @err;
 	    if (Net::SSLeay::CTX_use_certificate_chain_file($ctx,$f)) {
 		$havecert = 'PEM';
-	    } elsif (Net::SSLeay::CTX_use_certificate_file($ctx,$f,FILETYPE_ASN1)) {
+	    } elsif (do {
+		push @err, [ PEM => _errstack() ];
+		Net::SSLeay::CTX_use_certificate_file($ctx,$f,FILETYPE_ASN1)
+	    }) {
 		$havecert = 'DER';
 	    } else {
+		push @err, [ DER => _errstack() ];
 		# try to load certificate, key and chain from PKCS12 file
 		my ($key,$cert,@chain) = Net::SSLeay::P_PKCS12_load_file($f,1);
 		if (!$cert and $arg_hash->{SSL_passwd_cb}
@@ -2651,8 +2657,15 @@ sub new {
 		# don't free @chain, because CTX_add_extra_chain_cert
 		# did not duplicate the certificates
 	    }
-	    $havecert or return IO::Socket::SSL->error(
-		"Failed to load certificate from file (no PEM, DER or PKCS12)");
+	    if (!$havecert) {
+		push @err, [ PKCS12 => _errstack() ];
+		my $err = "Failed to load certificate from file $f:";
+		for(@err) {
+		    my ($type,@e) = @$_;
+		    $err .= " [format:$type] @e **" if @e;
+		}
+		return IO::Socket::SSL->error($err);
+	    }
 	}
 
 	if (!$havecert || $havekey) {
@@ -2674,8 +2687,8 @@ sub new {
 		"Failed to load key from file (no PEM or DER)");
 	}
 
-        Net::SSLeay::CTX_set_post_handshake_auth($ctx,1)
-            if (!$is_server && $can_pha && $havecert && $havekey);
+	Net::SSLeay::CTX_set_post_handshake_auth($ctx,1)
+	    if (!$is_server && $can_pha && $havecert && $havekey);
     }
 
     if ($arg_hash->{SSL_server}) {
@@ -2696,7 +2709,7 @@ sub new {
 	    # binary, e.g. DH*
 
 	    for( values %ctx ) {
-		Net::SSLeay::CTX_set_tmp_dh( $_,$dh ) || return 
+		Net::SSLeay::CTX_set_tmp_dh( $_,$dh ) || return
 		    IO::Socket::SSL->error( "Failed to set DH from SSL_dh" );
 	    }
 	}
@@ -2761,7 +2774,7 @@ sub new {
 		length($digest) == 40 ? 'sha1' :
 		length($digest) == 64 ? 'sha256' :
 		return IO::Socket::SSL->_internal_error(
-		    "cannot detect hash algorithem from fingerprint '$_'",9);
+		    "cannot detect hash algorithm from fingerprint '$_'",9);
 	    $algo = lc($algo);
 	    push @accept_fp,[ $algo, $pubkey || '', pack('H*',$digest) ]
 	}
@@ -2904,8 +2917,18 @@ sub new {
 
     if ( my $cl = $arg_hash->{SSL_cipher_list} ) {
 	for (keys %ctx) {
-	    Net::SSLeay::CTX_set_cipher_list($ctx{$_}, ref($cl) 
-		? $cl->{$_} || $cl->{''} || $DEFAULT_SSL_ARGS{SSL_cipher_list} || next 
+	    Net::SSLeay::CTX_set_cipher_list($ctx{$_}, ref($cl)
+		? $cl->{$_} || $cl->{''} || $DEFAULT_SSL_ARGS{SSL_cipher_list} || next
+		: $cl
+	    ) || return IO::Socket::SSL->error("Failed to set SSL cipher list");
+	}
+    }
+    if ( my $cl = $arg_hash->{SSL_ciphersuites} ) {
+	return IO::Socket::SSL->error("no support for SSL_ciphersuites in Net::SSLeay")
+	    if ! $can_ciphersuites;
+	for (keys %ctx) {
+	    Net::SSLeay::CTX_set_ciphersuites($ctx{$_}, ref($cl)
+		? $cl->{$_} || $cl->{''} || $DEFAULT_SSL_ARGS{SSL_cipher_list} || next
 		: $cl
 	    ) || return IO::Socket::SSL->error("Failed to set SSL cipher list");
 	}
@@ -2924,11 +2947,11 @@ sub new {
 	    my $snictx = $ctx{lc($host)} || $ctx{''} or do {
 		$DEBUG>1 and DEBUG(
 		    "cannot get context from servername '$host'");
-		return 0;
+		return 2; # SSL_TLSEXT_ERR_ALERT_FATAL
 	    };
 	    $DEBUG>1 and DEBUG("set context from servername $host");
 	    Net::SSLeay::set_SSL_CTX($ssl,$snictx) if $snictx != $ctx;
-	    return 1;
+	    return 0; # SSL_TLSEXT_ERR_OK
 	});
     }
 

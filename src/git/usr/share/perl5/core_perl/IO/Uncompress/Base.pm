@@ -9,12 +9,12 @@ our (@ISA, $VERSION, @EXPORT_OK, %EXPORT_TAGS);
 @ISA    = qw(IO::File Exporter);
 
 
-$VERSION = '2.074';
+$VERSION = '2.106';
 
 use constant G_EOF => 0 ;
 use constant G_ERR => -1 ;
 
-use IO::Compress::Base::Common 2.074 ;
+use IO::Compress::Base::Common 2.106 ;
 
 use IO::File ;
 use Symbol;
@@ -143,11 +143,12 @@ sub smartSeek
     my $position = shift || SEEK_SET;
 
     # TODO -- need to take prime into account
+    *$self->{Prime} = '';
     if (defined *$self->{FH})
       { *$self->{FH}->seek($offset, $position) }
     else {
         if ($position == SEEK_END) {
-            *$self->{BufferOffset} = length ${ *$self->{Buffer} } + $offset ;
+            *$self->{BufferOffset} = length(${ *$self->{Buffer} }) + $offset ;
         }
         elsif ($position == SEEK_CUR) {
             *$self->{BufferOffset} += $offset ;
@@ -429,7 +430,7 @@ sub _create
             my $mode = '<';
             $mode = '+<' if $got->getValue('scan');
             *$obj->{StdIO} = ($inValue eq '-');
-            *$obj->{FH} = new IO::File "$mode $inValue"
+            *$obj->{FH} = IO::File->new( "$mode $inValue" )
                 or return $obj->saveErrorString(undef, "cannot open file '$inValue': $!", $!) ;
         }
 
@@ -472,8 +473,8 @@ sub _create
     *$obj->{Plain}             = 0;
     *$obj->{PlainBytesRead}    = 0;
     *$obj->{InflatedBytesRead} = 0;
-    *$obj->{UnCompSize}        = new U64;
-    *$obj->{CompSize}          = new U64;
+    *$obj->{UnCompSize}        = U64->new;
+    *$obj->{CompSize}          = U64->new;
     *$obj->{TotalInflatedBytesRead} = 0;
     *$obj->{NewStream}         = 0 ;
     *$obj->{EventEof}          = 0 ;
@@ -493,6 +494,9 @@ sub _create
 
     *$obj->{InNew} = 0;
     *$obj->{Closed} = 0;
+
+    return $obj
+        if *$obj->{Pause} ;
 
     if ($status) {
         # Need to try uncompressing to catch the case
@@ -569,7 +573,7 @@ sub _inf
     my $output = shift ;
 
 
-    my $x = new IO::Compress::Base::Validator($class, *$obj->{Error}, $name, $input, $output)
+    my $x = IO::Compress::Base::Validator->new($class, *$obj->{Error}, $name, $input, $output)
         or return undef ;
 
     push @_, $output if $haveOut && $x->{Hash};
@@ -689,15 +693,15 @@ sub _singleTarget
         my $mode = '>' ;
         $mode = '>>'
             if $x->{Got}->getValue('append') ;
-        $x->{fh} = new IO::File "$mode $output"
+        $x->{fh} = IO::File->new( "$mode $output" )
             or return retErr($x, "cannot open file '$output': $!") ;
-        binmode $x->{fh} if $x->{Got}->valueOrDefault('binmodeout');
+        binmode $x->{fh} ;
 
     }
 
     elsif ($x->{outType} eq 'handle') {
         $x->{fh} = $output;
-        binmode $x->{fh} if $x->{Got}->valueOrDefault('binmodeout');
+        binmode $x->{fh} ;
         if ($x->{Got}->getValue('append')) {
                 seek($x->{fh}, 0, SEEK_END)
                     or return retErr($x, "Cannot seek to end of output filehandle: $!") ;
@@ -1002,9 +1006,17 @@ sub nextStream
 {
     my $self = shift ;
 
+    # An uncompressed file cannot have a next stream, so
+    # return immediately.
+    return 0
+        if *$self->{Plain} ;
+
     my $status = $self->gotoNextStream();
     $status == 1
         or return $status ;
+
+    *$self->{Pending} = ''
+        if $self !~ /IO::Uncompress::RawInflate/ && ! *$self->{MultiStream};
 
     *$self->{TotalInflatedBytesRead} = 0 ;
     *$self->{LineNo} = $. = 0;
@@ -1046,6 +1058,10 @@ sub gotoNextStream
             return 0;
         }
 
+        # Not EOF, so Transparent mode kicks in now for trailing data
+        # Reset member name in case anyone calls getHeaderInfo()->{Name}
+        *$self->{Info} = { Name => undef, Type  => 'plain' };
+
         $self->clearError();
         *$self->{Type} = 'plain';
         *$self->{Plain} = 1;
@@ -1072,13 +1088,6 @@ sub streamCount
     return 1 if ! defined *$self->{InfoList};
     return scalar @{ *$self->{InfoList} }  ;
 }
-
-#sub read
-#{
-#    my $status = myRead(@_);
-#    return undef if $status < 0;
-#    return $status;
-#}
 
 sub read
 {
@@ -1120,6 +1129,7 @@ sub read
 
     if (! *$self->{AppendOutput}) {
         if (! $offset) {
+
             $$buffer = '' ;
         }
         else {
@@ -1480,33 +1490,35 @@ sub input_line_number
     return $last;
 }
 
-
-*BINMODE  = \&binmode;
-*SEEK     = \&seek;
-*READ     = \&read;
-*sysread  = \&read;
-*TELL     = \&tell;
-*EOF      = \&eof;
-
-*FILENO   = \&fileno;
-*CLOSE    = \&close;
-
 sub _notAvailable
 {
     my $name = shift ;
     return sub { croak "$name Not Available: File opened only for intput" ; } ;
 }
 
+{
+    no warnings 'once';
 
-*print    = _notAvailable('print');
-*PRINT    = _notAvailable('print');
-*printf   = _notAvailable('printf');
-*PRINTF   = _notAvailable('printf');
-*write    = _notAvailable('write');
-*WRITE    = _notAvailable('write');
+    *BINMODE  = \&binmode;
+    *SEEK     = \&seek;
+    *READ     = \&read;
+    *sysread  = \&read;
+    *TELL     = \&tell;
+    *EOF      = \&eof;
 
-#*sysread  = \&read;
-#*syswrite = \&_notAvailable;
+    *FILENO   = \&fileno;
+    *CLOSE    = \&close;
+
+    *print    = _notAvailable('print');
+    *PRINT    = _notAvailable('print');
+    *printf   = _notAvailable('printf');
+    *PRINTF   = _notAvailable('printf');
+    *write    = _notAvailable('write');
+    *WRITE    = _notAvailable('write');
+
+    #*sysread  = \&read;
+    #*syswrite = \&_notAvailable;
+}
 
 
 
@@ -1529,9 +1541,15 @@ IO::Uncompress::Base - Base Class for IO::Uncompress modules
 This module is not intended for direct use in application code. Its sole
 purpose is to be sub-classed by IO::Uncompress modules.
 
+=head1 SUPPORT
+
+General feedback/questions/bug reports should be sent to
+L<https://github.com/pmqs/IO-Compress/issues> (preferred) or
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=IO-Compress>.
+
 =head1 SEE ALSO
 
-L<Compress::Zlib>, L<IO::Compress::Gzip>, L<IO::Uncompress::Gunzip>, L<IO::Compress::Deflate>, L<IO::Uncompress::Inflate>, L<IO::Compress::RawDeflate>, L<IO::Uncompress::RawInflate>, L<IO::Compress::Bzip2>, L<IO::Uncompress::Bunzip2>, L<IO::Compress::Lzma>, L<IO::Uncompress::UnLzma>, L<IO::Compress::Xz>, L<IO::Uncompress::UnXz>, L<IO::Compress::Lzop>, L<IO::Uncompress::UnLzop>, L<IO::Compress::Lzf>, L<IO::Uncompress::UnLzf>, L<IO::Uncompress::AnyInflate>, L<IO::Uncompress::AnyUncompress>
+L<Compress::Zlib>, L<IO::Compress::Gzip>, L<IO::Uncompress::Gunzip>, L<IO::Compress::Deflate>, L<IO::Uncompress::Inflate>, L<IO::Compress::RawDeflate>, L<IO::Uncompress::RawInflate>, L<IO::Compress::Bzip2>, L<IO::Uncompress::Bunzip2>, L<IO::Compress::Lzma>, L<IO::Uncompress::UnLzma>, L<IO::Compress::Xz>, L<IO::Uncompress::UnXz>, L<IO::Compress::Lzip>, L<IO::Uncompress::UnLzip>, L<IO::Compress::Lzop>, L<IO::Uncompress::UnLzop>, L<IO::Compress::Lzf>, L<IO::Uncompress::UnLzf>, L<IO::Compress::Zstd>, L<IO::Uncompress::UnZstd>, L<IO::Uncompress::AnyInflate>, L<IO::Uncompress::AnyUncompress>
 
 L<IO::Compress::FAQ|IO::Compress::FAQ>
 
@@ -1549,8 +1567,7 @@ See the Changes file.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2005-2017 Paul Marquess. All rights reserved.
+Copyright (c) 2005-2022 Paul Marquess. All rights reserved.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
-

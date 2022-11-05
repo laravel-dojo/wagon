@@ -12,10 +12,9 @@ package B::Concise;
 use strict; # use #2
 use warnings; # uses #3 and #4, since warnings uses Carp
 
-use Exporter (); # use #5
+use Exporter 'import'; # use #5
 
-our $VERSION   = "0.999";
-our @ISA       = qw(Exporter);
+our $VERSION   = "1.006";
 our @EXPORT_OK = qw( set_style set_style_standard add_callback
 		     concise_subref concise_cv concise_main
 		     add_style walk_output compile reset_sequence );
@@ -30,7 +29,8 @@ use B qw(class ppname main_start main_root main_cv cstring svref_2object
 	 SVf_IOK SVf_NOK SVf_POK SVf_IVisUV SVf_FAKE OPf_KIDS OPf_SPECIAL
          OPf_STACKED
          OPpSPLIT_ASSIGN OPpSPLIT_LEX
-	 CVf_ANON PAD_FAKELEX_ANON PAD_FAKELEX_MULTI SVf_ROK);
+	 CVf_ANON CVf_LEXICAL CVf_NAMED
+	 PAD_FAKELEX_ANON PAD_FAKELEX_MULTI SVf_ROK);
 
 my %style =
   ("terse" =>
@@ -145,13 +145,14 @@ sub concise_subref {
 
 sub concise_stashref {
     my($order, $h) = @_;
-    local *s;
+    my $name = svref_2object($h)->NAME;
     foreach my $k (sort keys %$h) {
 	next unless defined $h->{$k};
-	*s = $h->{$k};
-	my $coderef = *s{CODE} or next;
+	my $coderef = ref $h->{$k} eq 'CODE' ? $h->{$k}
+		    : ref\$h->{$k} eq 'GLOB' ? *{$h->{$k}}{CODE} || next
+		    : next;
 	reset_sequence();
-	print "FUNC: ", *s, "\n";
+	print "FUNC: *", $name, "::", $k, "\n";
 	my $codeobj = svref_2object($coderef);
 	next unless ref $codeobj eq 'B::CV';
 	eval { concise_cv_obj($order, $codeobj, $k) };
@@ -715,35 +716,52 @@ sub concise_sv {
 	$hr->{svval} = "*$stash" . $gv->SAFENAME;
 	return "*$stash" . $gv->SAFENAME;
     } else {
-	if ($] >= 5.011) {
-	    while (class($sv) eq "IV" && $sv->FLAGS & SVf_ROK) {
-		$hr->{svval} .= "\\";
-		$sv = $sv->RV;
-	    }
-	} else {
-	    while (class($sv) eq "RV") {
-		$hr->{svval} .= "\\";
-		$sv = $sv->RV;
-	    }
+	while (class($sv) eq "IV" && $sv->FLAGS & SVf_ROK) {
+	    $hr->{svval} .= "\\";
+	    $sv = $sv->RV;
 	}
 	if (class($sv) eq "SPECIAL") {
-	    $hr->{svval} .= ["Null", "sv_undef", "sv_yes", "sv_no"]->[$$sv];
+	    $hr->{svval} .= ["Null", "sv_undef", "sv_yes", "sv_no",
+                             '', '', '', "sv_zero"]->[$$sv];
 	} elsif ($preferpv
-	      && ($sv->FLAGS & SVf_POK || class($sv) eq "REGEXP")) {
+	      && ($sv->FLAGS & SVf_POK)) {
 	    $hr->{svval} .= cstring($sv->PV);
 	} elsif ($sv->FLAGS & SVf_NOK) {
 	    $hr->{svval} .= $sv->NV;
 	} elsif ($sv->FLAGS & SVf_IOK) {
 	    $hr->{svval} .= $sv->int_value;
-	} elsif ($sv->FLAGS & SVf_POK || class($sv) eq "REGEXP") {
+	} elsif ($sv->FLAGS & SVf_POK) {
 	    $hr->{svval} .= cstring($sv->PV);
 	} elsif (class($sv) eq "HV") {
 	    $hr->{svval} .= 'HASH';
+	} elsif (class($sv) eq "AV") {
+	    $hr->{svval} .= 'ARRAY';
+	} elsif (class($sv) eq "CV") {
+	    if ($sv->CvFLAGS & CVf_ANON) {
+		$hr->{svval} .= 'CODE';
+	    } elsif ($sv->CvFLAGS & CVf_NAMED) {
+		$hr->{svval} .= "&";
+		unless ($sv->CvFLAGS & CVf_LEXICAL) {
+		    my $stash = $sv->STASH;
+		    unless (class($stash) eq "SPECIAL") {
+			$hr->{svval} .= $stash->NAME . "::";
+		    }
+		}
+		$hr->{svval} .= $sv->NAME_HEK;
+	    } else {
+		$hr->{svval} .= "&";
+		$sv = $sv->GV;
+		my $stash = $sv->STASH;
+		unless (class($stash) eq "SPECIAL") {
+		    $hr->{svval} .= $stash->NAME . "::";
+		}
+		$hr->{svval} .= $sv->SAFENAME;
+	    }
 	}
 
 	$hr->{svval} = 'undef' unless defined $hr->{svval};
 	my $out = $hr->{svclass};
-	return $out .= " $hr->{svval}" ;
+	return $out .= " $hr->{svval}" ; 
     }
 }
 
@@ -834,9 +852,14 @@ sub concise_op {
 	# targ holds a reference count
         my $refs = "ref" . ($h{targ} != 1 ? "s" : "");
         $h{targarglife} = $h{targarg} = "$h{targ} $refs";
-    } elsif ($h{targ}) {
+    } elsif ($h{targ} && $h{name} ne 'iter') {
+        # for my ($q, $r, $s) () {} syntax hijacks the targ of the iter op,
+        # (which is the ->next of the enteriter) hence the special cases above
+        # and just below:
 	my $count = $h{name} eq 'padrange'
             ? ($op->private & $B::Op_private::defines{'OPpPADRANGE_COUNTMASK'})
+            : $h{name} eq 'enteriter'
+            ? $op->next->targ + 1
             : 1;
 	my (@targarg, @targarglife);
 	for my $i (0..$count-1) {
@@ -912,10 +935,7 @@ sub concise_op {
 	$h{arg} = "($label$stash $cseq $loc)";
 	if ($show_src) {
 	    fill_srclines($pathnm) unless exists $srclines{$pathnm};
-	    # Would love to retain Jim's use of // but this code needs to be
-	    # portable to 5.8.x
-	    my $line = $srclines{$pathnm}[$ln];
-	    $line = "-src unavailable under -e" unless defined $line;
+	    my $line = $srclines{$pathnm}[$ln] // "-src unavailable under -e";
 	    $h{src} = "$ln: $line";
 	}
     } elsif ($h{class} eq "LOOP") {
@@ -1029,7 +1049,7 @@ sub b_terse {
 	    fmt_line($h, $op, $style{"terse"}[1], $level+1);
     }
     $lastnext = $op->next;
-    print # $walkHandle
+    print # $walkHandle 
 	concise_op($op, $level, $style{"terse"}[0]);
 }
 
@@ -1085,10 +1105,6 @@ sub tree {
 # number for the user's program as being a small offset later, so all we
 # have to worry about are changes in the offset.
 
-# [For 5.8.x and earlier perl is generating sequence numbers for all ops,
-#  and using them to reference labels]
-
-
 # When you say "perl -MO=Concise -e '$a'", the output should look like:
 
 # 4  <@> leave[t1] vKP/REFC ->(end)
@@ -1103,7 +1119,7 @@ sub tree {
 # to update the corresponding magic number in the next line.
 # Remember, this needs to stay the last things in the module.
 
-my $cop_seq_mnum = 16;
+my $cop_seq_mnum = 12;
 $cop_seq_base = svref_2object(eval 'sub{0;}')->START->cop_seq + $cop_seq_mnum;
 
 1;
@@ -1272,7 +1288,7 @@ This is mainly a joke.
 
 =item B<-debug>
 
-Use formatting conventions reminiscent of B<B::Debug>; these aren't
+Use formatting conventions reminiscent of CPAN module B<B::Debug>; these aren't
 very concise at all.
 
 =item B<-env>
@@ -1691,20 +1707,9 @@ The numeric value of the OP's private flags.
 The sequence number of the OP. Note that this is a sequence number
 generated by B::Concise.
 
-=item B<#seqnum>
-
-5.8.x and earlier only. 5.9 and later do not provide this.
-
-The real sequence number of the OP, as a regular number and not adjusted
-to be relative to the start of the real program. (This will generally be
-a fairly large number because all of B<B::Concise> is compiled before
-your program is).
-
 =item B<#opt>
 
 Whether or not the op has been optimized by the peephole optimizer.
-
-Only available in 5.9 and later.
 
 =item B<#sibaddr>
 
@@ -1796,7 +1801,7 @@ B::Concise::compile() itself.
 Once you're doing this, you may alter Concise output by adding new
 rendering styles, and by optionally adding callback routines which
 populate new variables, if such were referenced from those (just
-added) styles.
+added) styles.  
 
 =head2 Example: Altering Concise Renderings
 

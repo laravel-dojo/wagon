@@ -4,7 +4,7 @@ use strict;
 no strict 'refs';
 
 # On one line so MakeMaker will see it.
-require Exporter;  our $VERSION = $Exporter::VERSION;
+our $VERSION = '5.77';
 
 =head1 NAME
 
@@ -109,7 +109,7 @@ sub heavy_export {
 		    if $Exporter::Verbose;
 
 		if ($remove) {
-		   foreach $sym (@names) { delete $imports{$sym} }
+		   foreach $sym (@names) { delete $imports{$sym} } 
 		}
 		else {
 		    @imports{@names} = (1) x @names;
@@ -148,7 +148,7 @@ sub heavy_export {
 		    if (!$export_cache->{$sym}) {
 			# accumulate the non-exports
 			push @carp,
-			  qq["$sym" is not exported by the $pkg module\n];
+			  qq["$sym" is not exported by the $pkg module];
 			$oops++;
 		    }
 		}
@@ -156,7 +156,7 @@ sub heavy_export {
 	}
 	if ($oops) {
 	    require Carp;
-	    Carp::croak("@{carp}Can't continue after import errors");
+	    Carp::croak(join("\n", @carp, "Can't continue after import errors"));
 	}
     }
     else {
@@ -226,7 +226,7 @@ sub _push_tags {
     my @nontag = ();
     my $export_tags = \%{"${pkg}::EXPORT_TAGS"};
     push(@{"${pkg}::$var"},
-	map { $export_tags->{$_} ? @{$export_tags->{$_}}
+	map { $export_tags->{$_} ? @{$export_tags->{$_}} 
                                  : scalar(push(@nontag,$_),$_) }
 		(@$syms) ? @$syms : keys %$export_tags);
     if (@nontag and $^W) {

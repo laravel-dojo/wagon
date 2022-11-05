@@ -7,22 +7,23 @@
 
 package File::Copy;
 
-use 5.006;
+use 5.035007;
 use strict;
 use warnings; no warnings 'newline';
+no warnings 'experimental::builtin';
+use builtin 'blessed';
+use overload;
 use File::Spec;
 use Config;
-# During perl build, we need File::Copy but Scalar::Util might not be built yet
-# And then we need these games to avoid loading overload, as that will
-# confuse miniperl during the bootstrap of perl.
-my $Scalar_Util_loaded = eval q{ require Scalar::Util; require overload; 1 };
+# We want HiRes stat and utime if available
+BEGIN { eval q{ use Time::HiRes qw( stat utime ) } };
 our(@ISA, @EXPORT, @EXPORT_OK, $VERSION, $Too_Big, $Syscopy_is_copy);
 sub copy;
 sub syscopy;
 sub cp;
 sub mv;
 
-$VERSION = '2.32';
+$VERSION = '2.39';
 
 require Exporter;
 @ISA = qw(Exporter);
@@ -44,8 +45,8 @@ sub carp {
 sub _catname {
     my($from, $to) = @_;
     if (not defined &basename) {
-	require File::Basename;
-	import  File::Basename 'basename';
+        require File::Basename;
+        File::Basename->import( 'basename' );
     }
 
     return File::Spec->catfile($to, basename($from));
@@ -54,8 +55,7 @@ sub _catname {
 # _eq($from, $to) tells whether $from and $to are identical
 sub _eq {
     my ($from, $to) = map {
-        $Scalar_Util_loaded && Scalar::Util::blessed($_)
-	    && overload::Method($_, q{""})
+        blessed($_) && overload::Method($_, q{""})
             ? "$_"
             : $_
     } (@_);
@@ -98,11 +98,11 @@ sub copy {
     }
 
     if ((($Config{d_symlink} && $Config{d_readlink}) || $Config{d_link}) &&
-	!($^O eq 'MSWin32' || $^O eq 'os2')) {
+	!($^O eq 'os2')) {
 	my @fs = stat($from);
 	if (@fs) {
 	    my @ts = stat($to);
-	    if (@ts && $fs[0] == $ts[0] && $fs[1] == $ts[1] && !-p $from) {
+	    if (@ts && $fs[0] == $ts[0] && $fs[1] eq $ts[1] && !-p $from) {
 		carp("'$from' and '$to' are identical (not copied)");
                 return 0;
 	    }
@@ -117,7 +117,6 @@ sub copy {
 	&& !$to_a_handle
 	&& !($from_a_handle && $^O eq 'os2' )	# OS/2 cannot handle handles
 	&& !($from_a_handle && $^O eq 'MSWin32')
-	&& !($from_a_handle && $^O eq 'NetWare')
        )
     {
         if ($^O eq 'VMS' && -e $from
@@ -499,7 +498,7 @@ $! will be set if an error was encountered.
 Before calling copy() or move() on a filehandle, the caller should
 close or flush() the file to avoid writes being lost. Note that this
 is the case even for move(), because it may actually copy the file,
-depending on the OS-specific inplementation, and the underlying
+depending on the OS-specific implementation, and the underlying
 filesystem(s).
 
 =head1 AUTHOR

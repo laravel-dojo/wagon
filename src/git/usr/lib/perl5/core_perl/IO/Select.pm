@@ -8,12 +8,11 @@ package IO::Select;
 
 use     strict;
 use warnings::register;
-use     vars qw($VERSION @ISA);
 require Exporter;
 
-$VERSION = "1.22";
+our $VERSION = "1.49";
 
-@ISA = qw(Exporter); # This is only so we can do version checking
+our @ISA = qw(Exporter); # This is only so we can do version checking
 
 sub VEC_BITS () {0}
 sub FD_COUNT () {1}
@@ -58,7 +57,21 @@ sub _fileno
  my($self, $f) = @_;
  return unless defined $f;
  $f = $f->[0] if ref($f) eq 'ARRAY';
- ($f =~ /^\d+$/) ? $f : fileno($f);
+ if($f =~ /^[0-9]+$/) { # plain file number
+  return $f;
+ }
+ elsif(defined(my $fd = fileno($f))) {
+  return $fd;
+ }
+ else {
+  # Neither a plain file number nor an opened filehandle; but maybe it was
+  # previously registered and has since been closed. ->remove still wants to
+  # know what fileno it had
+  foreach my $i ( FIRST_FD .. $#$self ) {
+   return $i - FIRST_FD if defined $self->[$i] && $self->[$i] == $f;
+  }
+  return undef;
+ }
 }
 
 sub _update
@@ -243,7 +256,7 @@ sub handles
    push(@h, $vec->[$i])
       if !defined($bits) || vec($bits, $i - FIRST_FD, 1);
   }
-
+ 
  @h;
 }
 
@@ -315,10 +328,13 @@ Return an array of all registered handles.
 
 =item can_read ( [ TIMEOUT ] )
 
-Return an array of handles that are ready for reading. C<TIMEOUT> is
-the maximum amount of time to wait before returning an empty list, in
-seconds, possibly fractional. If C<TIMEOUT> is not given and any
-handles are registered then the call will block.
+Return an array of handles that are ready for reading.  C<TIMEOUT> is the
+maximum amount of time to wait before returning an empty list (with C<$!>
+unchanged), in seconds, possibly fractional.  If C<TIMEOUT> is not given
+and any handles are registered then the call will block indefinitely.
+Upon error, an empty list is returned, with C<$!> set to indicate the
+error.  To distinguish between timeout and error, set C<$!> to zero
+before calling this method, and check it after an empty list is returned.
 
 =item can_write ( [ TIMEOUT ] )
 
@@ -346,9 +362,14 @@ like C<new>. C<READ>, C<WRITE> and C<EXCEPTION> are either C<undef> or
 C<IO::Select> objects. C<TIMEOUT> is optional and has the same effect as
 for the core select call.
 
-The result will be an array of 3 elements, each a reference to an array
-which will hold the handles that are ready for reading, writing and have
-exceptions respectively. Upon error an empty list is returned.
+If at least one handle is ready for the specified kind of operation,
+the result will be an array of 3 elements, each a reference to an array
+which will hold the handles that are ready for reading, writing and
+have exceptions respectively.  Upon timeout, an empty list is returned,
+with C<$!> unchanged.  Upon error, an empty list is returned, with C<$!>
+set to indicate the error.  To distinguish between timeout and error,
+set C<$!> to zero before calling this method, and check it after an
+empty list is returned.
 
 =back
 
@@ -384,7 +405,7 @@ listening for more connections on a listen socket
 =head1 AUTHOR
 
 Graham Barr. Currently maintained by the Perl Porters.  Please report all
-bugs to <perlbug@perl.org>.
+bugs at L<https://github.com/Perl/perl5/issues>.
 
 =head1 COPYRIGHT
 

@@ -4,11 +4,13 @@ package re;
 use strict;
 use warnings;
 
-our $VERSION     = "0.34";
+our $VERSION     = "0.43";
 our @ISA         = qw(Exporter);
-our @EXPORT_OK   = ('regmust',
-                    qw(is_regexp regexp_pattern
-                       regname regnames regnames_count));
+our @EXPORT_OK   = qw{
+	is_regexp regexp_pattern
+	regname regnames regnames_count
+	regmust optimization
+};
 our %EXPORT_OK = map { $_ => 1 } @EXPORT_OK;
 
 my %bitmask = (
@@ -54,33 +56,37 @@ sub setcolor {
 }
 
 my %flags = (
-    COMPILE         => 0x0000FF,
-    PARSE           => 0x000001,
-    OPTIMISE        => 0x000002,
-    TRIEC           => 0x000004,
-    DUMP            => 0x000008,
-    FLAGS           => 0x000010,
-    TEST            => 0x000020,
+    COMPILE           => 0x0000FF,
+    PARSE             => 0x000001,
+    OPTIMISE          => 0x000002,
+    TRIEC             => 0x000004,
+    DUMP              => 0x000008,
+    FLAGS             => 0x000010,
+    TEST              => 0x000020,
 
-    EXECUTE         => 0x00FF00,
-    INTUIT          => 0x000100,
-    MATCH           => 0x000200,
-    TRIEE           => 0x000400,
+    EXECUTE           => 0x00FF00,
+    INTUIT            => 0x000100,
+    MATCH             => 0x000200,
+    TRIEE             => 0x000400,
 
-    EXTRA           => 0xFF0000,
-    TRIEM           => 0x010000,
-    OFFSETS         => 0x020000,
-    OFFSETSDBG      => 0x040000,
-    STATE           => 0x080000,
-    OPTIMISEM       => 0x100000,
-    STACK           => 0x280000,
-    BUFFERS         => 0x400000,
-    GPOS            => 0x800000,
+    EXTRA             => 0x3FF0000,
+    TRIEM             => 0x0010000,
+    STATE             => 0x0080000,
+    OPTIMISEM         => 0x0100000,
+    STACK             => 0x0280000,
+    BUFFERS           => 0x0400000,
+    GPOS              => 0x0800000,
+    DUMP_PRE_OPTIMIZE => 0x1000000,
+    WILDCARD          => 0x2000000,
 );
-$flags{ALL} = -1 & ~($flags{OFFSETS}|$flags{OFFSETSDBG}|$flags{BUFFERS});
+$flags{ALL} = -1 & ~($flags{BUFFERS}
+                    |$flags{DUMP_PRE_OPTIMIZE}
+                    |$flags{WILDCARD}
+                    );
 $flags{All} = $flags{all} = $flags{DUMP} | $flags{EXECUTE};
 $flags{Extra} = $flags{EXECUTE} | $flags{COMPILE} | $flags{GPOS};
-$flags{More} = $flags{MORE} = $flags{All} | $flags{TRIEC} | $flags{TRIEM} | $flags{STATE};
+$flags{More} = $flags{MORE} =
+                    $flags{All} | $flags{TRIEC} | $flags{TRIEM} | $flags{STATE};
 $flags{State} = $flags{DUMP} | $flags{EXECUTE} | $flags{STATE};
 $flags{TRIE} = $flags{DUMP} | $flags{EXECUTE} | $flags{TRIEC};
 
@@ -113,6 +119,8 @@ sub bits {
     my $on = shift;
     my $bits = 0;
     my $turning_all_off = ! @_ && ! $on;
+    my $seen_Debug = 0;
+    my $seen_debug = 0;
     if ($turning_all_off) {
 
         # Pretend were called with certain parameters, which are best dealt
@@ -126,8 +134,15 @@ sub bits {
     foreach my $idx (0..$#_){
         my $s=$_[$idx];
         if ($s eq 'Debug' or $s eq 'Debugcolor') {
+            if (! $seen_Debug) {
+                $seen_Debug = 1;
+
+                # Reset to nothing, and then add what follows.  $seen_Debug
+                # allows, though unlikely someone would do it, more than one
+                # Debug and flags in the arguments
+                ${^RE_DEBUG_FLAGS} = 0;
+            }
             setcolor() if $s =~/color/i;
-            ${^RE_DEBUG_FLAGS} = 0 unless defined ${^RE_DEBUG_FLAGS};
             for my $idx ($idx+1..$#_) {
                 if ($flags{$_[$idx]}) {
                     if ($on) {
@@ -144,9 +159,13 @@ sub bits {
             _load_unload($on ? 1 : ${^RE_DEBUG_FLAGS});
             last;
         } elsif ($s eq 'debug' or $s eq 'debugcolor') {
+
+            # These default flags should be kept in sync with the same values
+            # in regcomp.h
+            ${^RE_DEBUG_FLAGS} = $flags{'EXECUTE'} | $flags{'DUMP'};
 	    setcolor() if $s =~/color/i;
 	    _load_unload($on);
-	    last;
+            $seen_debug = 1;
         } elsif (exists $bitmask{$s}) {
 	    $bits |= $bitmask{$s};
 	} elsif ($EXPORT_OK{$s}) {
@@ -255,9 +274,15 @@ sub bits {
 	                    : ($^H &= ~$flags_hint);
 	} else {
 	    require Carp;
-	    Carp::carp("Unknown \"re\" subpragma '$s' (known ones are: ",
+            if ($seen_debug && defined $flags{$s}) {
+                Carp::carp("Use \"Debug\" not \"debug\", to list debug types"
+                         . " in \"re\".  \"$s\" ignored");
+            }
+            else {
+                Carp::carp("Unknown \"re\" subpragma '$s' (known ones are: ",
                        join(', ', map {qq('$_')} 'debug', 'debugcolor', sort keys %bitmask),
                        ")");
+            }
 	}
     }
 
@@ -359,7 +384,7 @@ appearing literally within the regexp.  That is normally disallowed, since
 it is a
 potential security risk.  Note that this pragma is ignored when the regular
 expression is obtained from tainted data, i.e.  evaluation is always
-disallowed with tainted regular expressions.  See L<perlre/(?{ code })>
+disallowed with tainted regular expressions.  See L<perlre/(?{ code })> 
 and L<perlre/(??{ code })>.
 
 For the purpose of this pragma, interpolation of precompiled regular
@@ -396,7 +421,7 @@ equivalent to
  qr/\x{AB}C/
 
 that is, the character whose code point value is C<0xAB>, followed by the
-letter C<C>.  But since C<C> is a a hex digit, there is a reasonable chance
+letter C<C>.  But since C<C> is a hex digit, there is a reasonable chance
 that the intent was
 
  qr/\x{ABC}/
@@ -488,6 +513,12 @@ comma-separated list of C<termcap> properties to use for highlighting
 strings on/off, pre-point part on/off.
 See L<perldebug/"Debugging Regular Expressions"> for additional info.
 
+B<NOTE> that the exact format of the C<debug> mode is B<NOT> considered
+to be an officially supported API of Perl. It is intended for debugging
+only and may change as the core development team deems appropriate
+without notice or deprecation in any release of Perl, major or minor.
+Any documentation of the output is purely advisory.
+
 As of 5.9.5 the directive C<use re 'debug'> and its equivalents are
 lexically scoped, as the other directives are.  However they have both
 compile-time and run-time effects.
@@ -500,7 +531,17 @@ Similarly C<use re 'Debug'> produces debugging output, the difference
 being that it allows the fine tuning of what debugging output will be
 emitted. Options are divided into three groups, those related to
 compilation, those related to execution and those related to special
-purposes. The options are as follows:
+purposes.
+
+B<NOTE> that the options provided under the C<Debug> mode and the exact
+format of the output they create is B<NOT> considered to be an
+officially supported API of Perl. It is intended for debugging only and
+may change as the core development team deems appropriate without notice
+or deprecation in any release of Perl, major or minor. Any documentation
+of the format or options available is advisory only and is subject to
+change without notice.
+
+The options are as follows:
 
 =over 4
 
@@ -510,7 +551,7 @@ purposes. The options are as follows:
 
 =item COMPILE
 
-Turns on all compile related debug options.
+Turns on all non-extra compile related debug options.
 
 =item PARSE
 
@@ -544,7 +585,7 @@ Print output intended for testing the internals of the compile process
 
 =item EXECUTE
 
-Turns on all execute related debug options.
+Turns on all non-extra execute related debug options.
 
 =item MATCH
 
@@ -597,26 +638,36 @@ Enable debugging of the \G modifier.
 Enable enhanced optimisation debugging and start-point optimisations.
 Probably not useful except when debugging the regexp engine itself.
 
-=item OFFSETS
+=item DUMP_PRE_OPTIMIZE
 
-Dump offset information. This can be used to see how regops correlate
-to the pattern. Output format is
+Enable the dumping of the compiled pattern before the optimization phase.
 
-   NODENUM:POSITION[LENGTH]
+=item WILDCARD
 
-Where 1 is the position of the first char in the string. Note that position
-can be 0, or larger than the actual length of the pattern, likewise length
-can be zero.
+When Perl encounters a wildcard subpattern, (see L<perlunicode/Wildcards in
+Property Values>), it suspends compilation of the main pattern, compiles the
+subpattern, and then matches that against all legal possibilities to determine
+the actual code points the subpattern matches.  After that it adds these to
+the main pattern, and continues its compilation.
 
-=item OFFSETSDBG
+You may very well want to see how your subpattern gets compiled, but it is
+likely of less use to you to see how Perl matches that against all the legal
+possibilities, as that is under control of Perl, not you.   Therefore, the
+debugging information of the compilation portion is as specified by the other
+options, but the debugging output of the matching portion is normally
+suppressed.
 
-Enable debugging of offsets information. This emits copious
-amounts of trace information and doesn't mesh well with other
-debug options.
+You can use the WILDCARD option to enable the debugging output of this
+subpattern matching.  Careful!  This can lead to voluminous outputs, and it
+may not make much sense to you what and why Perl is doing what it is.
+But it may be helpful to you to see why things aren't going the way you
+expect.
 
-Almost definitely only useful to people hacking
-on the offsets part of the debug engine.
-
+Note that this option alone doesn't cause any debugging information to be
+output.  What it does is stop the normal suppression of execution-related
+debugging information during the matching portion of the compilation of
+wildcards.  You also have to specify which execution debugging information you
+want, such as by also including the EXECUTE option.
 
 =back
 
@@ -628,12 +679,14 @@ These are useful shortcuts to save on the typing.
 
 =item ALL
 
-Enable all options at once except OFFSETS, OFFSETSDBG and BUFFERS.
-(To get every single option without exception, use both ALL and EXTRA.)
+Enable all options at once except BUFFERS, WILDCARD, and DUMP_PRE_OPTIMIZE.
+(To get every single option without exception, use both ALL and EXTRA, or
+starting in 5.30 on a C<-DDEBUGGING>-enabled perl interpreter, use
+the B<-Drv> command-line switches.)
 
 =item All
 
-Enable DUMP and all execute options. Equivalent to:
+Enable DUMP and all non-extra execute options. Equivalent to:
 
   use re 'debug';
 
@@ -691,6 +744,28 @@ will be warning free regardless of what $ref actually is.
 Like C<is_regexp> this function will not be confused by overloading
 or blessing of the object.
 
+=item regname($name,$all)
+
+Returns the contents of a named buffer of the last successful match. If
+$all is true, then returns an array ref containing one entry per buffer,
+otherwise returns the first defined buffer.
+
+=item regnames($all)
+
+Returns a list of all of the named buffers defined in the last successful
+match. If $all is true, then it returns all names defined, if not it returns
+only names which were involved in the match.
+
+=item regnames_count()
+
+Returns the number of distinct names defined in the pattern used
+for the last successful match.
+
+B<Note:> this result is always the actual number of distinct
+named buffers defined, it may not actually match that which is
+returned by C<regnames()> and related routines when those routines
+have not been called with the $all parameter set.
+
 =item regmust($ref)
 
 If the argument is a compiled regular expression as returned by C<qr//>,
@@ -723,27 +798,115 @@ floating string. This will be what the optimiser of the Perl that you
 are using thinks is the longest. If you believe that the result is wrong
 please report it via the L<perlbug> utility.
 
-=item regname($name,$all)
+=item optimization($ref)
 
-Returns the contents of a named buffer of the last successful match. If
-$all is true, then returns an array ref containing one entry per buffer,
-otherwise returns the first defined buffer.
+If the argument is a compiled regular expression as returned by C<qr//>,
+then this function returns a hashref of the optimization information
+discovered at compile time, so we can write tests around it. If any
+other argument is given, returns C<undef>.
 
-=item regnames($all)
+The hash contents are expected to change from time to time as we develop
+new ways to optimize - no assumption of stability should be made, not
+even between minor versions of perl.
 
-Returns a list of all of the named buffers defined in the last successful
-match. If $all is true, then it returns all names defined, if not it returns
-only names which were involved in the match.
+For the current version, the hash will have the following contents:
 
-=item regnames_count()
+=over 4
 
-Returns the number of distinct names defined in the pattern used
-for the last successful match.
+=item minlen
 
-B<Note:> this result is always the actual number of distinct
-named buffers defined, it may not actually match that which is
-returned by C<regnames()> and related routines when those routines
-have not been called with the $all parameter set.
+An integer, the least number of characters in any string that can match.
+
+=item minlenret
+
+An integer, the least number of characters that can be in C<$&> after a
+match. (Consider eg C< /ns(?=\d)/ >.)
+
+=item gofs
+
+An integer, the number of characters before C<pos()> to start match at.
+
+=item noscan
+
+A boolean, C<TRUE> to indicate that any anchored/floating substrings
+found should not be used. (CHECKME: apparently this is set for an
+anchored pattern with no floating substring, but never used.)
+
+=item isall
+
+A boolean, C<TRUE> to indicate that the optimizer information is all
+that the regular expression contains, and thus one does not need to
+enter the regexp runtime engine at all.
+
+=item anchor SBOL
+
+A boolean, C<TRUE> if the pattern is anchored to start of string.
+
+=item anchor MBOL
+
+A boolean, C<TRUE> if the pattern is anchored to any start of line
+within the string.
+
+=item anchor GPOS
+
+A boolean, C<TRUE> if the pattern is anchored to the end of the previous
+match.
+
+=item skip
+
+A boolean, C<TRUE> if the start class can match only the first of a run.
+
+=item implicit
+
+A boolean, C<TRUE> if a C</.*/> has been turned implicitly into a C</^.*/>.
+
+=item anchored/floating
+
+A byte string representing an anchored or floating substring respectively
+that any match must contain, or undef if no such substring was found, or
+if the substring would require utf8 to represent.
+
+=item anchored utf8/floating utf8
+
+A utf8 string representing an anchored or floating substring respectively
+that any match must contain, or undef if no such substring was found, or
+if the substring contains only 7-bit ASCII characters.
+
+=item anchored min offset/floating min offset
+
+An integer, the first offset in characters from a match location at which
+we should look for the corresponding substring.
+
+=item anchored max offset/floating max offset
+
+An integer, the last offset in characters from a match location at which
+we should look for the corresponding substring.
+
+Ignored for anchored, so may be 0 or same as min.
+
+=item anchored end shift/floating end shift
+
+FIXME: not sure what this is, something to do with lookbehind. regcomp.c
+says:
+    When the final pattern is compiled and the data is moved from the
+    scan_data_t structure into the regexp structure the information
+    about lookbehind is factored in, with the information that would
+    have been lost precalculated in the end_shift field for the
+    associated string.
+
+=item checking
+
+A constant string, one of "anchored", "floating" or "none" to indicate
+which substring (if any) should be checked for first.
+
+=item stclass
+
+A string representation of a character class ("start class") that must
+be the first character of any match.
+
+TODO: explain the representations.
+
+=back
 
 =back
 

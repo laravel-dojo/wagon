@@ -9,9 +9,9 @@ use Net::SSLeay;
 require Exporter;
 *import = \&Exporter::import;
 
-our $VERSION = '2.014';
+our $VERSION = '2.015';
 our @EXPORT = qw(
-    PEM_file2cert PEM_string2cert PEM_cert2file PEM_cert2string
+    PEM_file2cert PEM_file2certs PEM_string2cert PEM_cert2file PEM_certs2file PEM_cert2string
     PEM_file2key PEM_string2key PEM_key2file PEM_key2string
     KEY_free CERT_free
     KEY_create_rsa CERT_asHash CERT_create
@@ -35,6 +35,37 @@ sub PEM_cert2file {
     open( my $fh,'>',$file ) or croak("cannot write $file: $!");
     print $fh $string;
 }
+
+use constant PEM_R_NO_START_LINE => 108;
+sub PEM_file2certs {
+    my $file = shift;
+    my $bio = Net::SSLeay::BIO_new_file($file,'r') or
+	croak "cannot read $file: $!";
+    my @certs;
+    while (1) {
+	if (my $cert = Net::SSLeay::PEM_read_bio_X509($bio)) {
+	    push @certs, $cert;
+	} else {
+	    Net::SSLeay::BIO_free($bio);
+	    my $error = Net::SSLeay::ERR_get_error();
+	    last if ($error & 0xfff) == PEM_R_NO_START_LINE && @certs;
+	    croak "cannot parse $file as PEM X509 cert: " .
+		Net::SSLeay::ERR_error_string($error);
+	}
+    }
+    return @certs;
+}
+
+sub PEM_certs2file {
+    my $file = shift;
+    open( my $fh,'>',$file ) or croak("cannot write $file: $!");
+    for my $cert (@_) {
+	my $string = Net::SSLeay::PEM_get_string_X509($cert)
+	    or croak("cannot get string from cert");
+	print $fh $string;
+    }
+}
+
 
 sub PEM_string2cert {
     my $string = shift;
@@ -90,13 +121,11 @@ sub PEM_key2string {
 }
 
 sub CERT_free {
-    my $cert = shift or return;
-    Net::SSLeay::X509_free($cert);
+    Net::SSLeay::X509_free($_) for @_;
 }
 
 sub KEY_free {
-    my $key = shift or return;
-    Net::SSLeay::EVP_PKEY_free($key);
+    Net::SSLeay::EVP_PKEY_free($_) for @_;
 }
 
 sub KEY_create_rsa {
@@ -149,16 +178,27 @@ sub CERT_asHash {
 	    $cert,$digest_name),
     );
 
-    my $subj = Net::SSLeay::X509_get_subject_name($cert);
-    my %subj;
-    for ( 0..Net::SSLeay::X509_NAME_entry_count($subj)-1 ) {
-	my $e = Net::SSLeay::X509_NAME_get_entry($subj,$_);
-	my $o = Net::SSLeay::X509_NAME_ENTRY_get_object($e);
-	$subj{ Net::SSLeay::OBJ_obj2txt($o) } =
-	    Net::SSLeay::P_ASN1_STRING_get(
-		Net::SSLeay::X509_NAME_ENTRY_get_data($e));
+    for([ subject => Net::SSLeay::X509_get_subject_name($cert) ],
+	[ issuer => Net::SSLeay::X509_get_issuer_name($cert) ]) {
+	my ($what,$subj) = @$_;
+	my %subj;
+	for ( 0..Net::SSLeay::X509_NAME_entry_count($subj)-1 ) {
+	    my $e = Net::SSLeay::X509_NAME_get_entry($subj,$_);
+	    my $k = Net::SSLeay::OBJ_obj2txt(
+		Net::SSLeay::X509_NAME_ENTRY_get_object($e));
+	    my $v = Net::SSLeay::P_ASN1_STRING_get(
+		    Net::SSLeay::X509_NAME_ENTRY_get_data($e));
+	    if (!exists $subj{$k}) {
+		$subj{$k} = $v;
+	    } elsif (!ref $subj{$k}) {
+		$subj{$k} = [ $subj{$k}, $v ];
+	    } else {
+		push @{$subj{$k}}, $v;
+	    }
+	}
+	$hash{$what} = \%subj;
     }
-    $hash{subject} = \%subj;
+
 
     if ( my @names = Net::SSLeay::X509_get_subjectAltNames($cert) ) {
 	my $alt = $hash{subjectAltNames} = [];
@@ -197,17 +237,6 @@ sub CERT_asHash {
 	    push @$alt,[$t,$v]
 	}
     }
-
-    my $issuer = Net::SSLeay::X509_get_issuer_name($cert);
-    my %issuer;
-    for ( 0..Net::SSLeay::X509_NAME_entry_count($issuer)-1 ) {
-	my $e = Net::SSLeay::X509_NAME_get_entry($issuer,$_);
-	my $o = Net::SSLeay::X509_NAME_ENTRY_get_object($e);
-	$issuer{ Net::SSLeay::OBJ_obj2txt($o) } =
-	    Net::SSLeay::P_ASN1_STRING_get(
-		Net::SSLeay::X509_NAME_ENTRY_get_data($e));
-    }
-    $hash{issuer} = \%issuer;
 
     my @ext;
     for( 0..Net::SSLeay::X509_get_ext_count($cert)-1 ) {
@@ -271,14 +300,17 @@ sub CERT_create {
 	organizationName => 'IO::Socket::SSL',
 	commonName => 'IO::Socket::SSL Test'
     };
+
     while ( my ($k,$v) = each %$subj ) {
 	# Not everything we get is nice - try with MBSTRING_UTF8 first and if it
 	# fails try V_ASN1_T61STRING and finally V_ASN1_OCTET_STRING
-	Net::SSLeay::X509_NAME_add_entry_by_txt($subj_e,$k,0x1000,$v,-1,0)
-	    or Net::SSLeay::X509_NAME_add_entry_by_txt($subj_e,$k,20,$v,-1,0)
-	    or Net::SSLeay::X509_NAME_add_entry_by_txt($subj_e,$k,4,$v,-1,0)
-	    or croak("failed to add entry for $k - ".
-	    Net::SSLeay::ERR_error_string(Net::SSLeay::ERR_get_error()));
+	for (ref($v) ? @$v : ($v)) {
+	    Net::SSLeay::X509_NAME_add_entry_by_txt($subj_e,$k,0x1000,$_,-1,0)
+		or Net::SSLeay::X509_NAME_add_entry_by_txt($subj_e,$k,20,$_,-1,0)
+		or Net::SSLeay::X509_NAME_add_entry_by_txt($subj_e,$k,4,$_,-1,0)
+		or croak("failed to add entry for $k - ".
+		Net::SSLeay::ERR_error_string(Net::SSLeay::ERR_get_error()));
+	}
     }
 
     my @ext = (
@@ -468,11 +500,20 @@ IO::Socket::SSL::Utils -- loading, storing, creating certificates and keys
 =head1 SYNOPSIS
 
     use IO::Socket::SSL::Utils;
-    my $cert = PEM_file2cert('cert.pem');  # load certificate from file
-    my $string = PEM_cert2string($cert);   # convert certificate to PEM string
+
+    $cert = PEM_file2cert('cert.pem');     # load certificate from file
+    my $hash = CERT_asHash($cert);         # get details from certificate
+    PEM_cert2file('cert.pem',$cert);       # write certificate to file
     CERT_free($cert);                      # free memory within OpenSSL
 
-    my $key = KEY_create_rsa(2048);        # create new 2048-bit RSA key
+    @certs = PEM_file2certs('chain.pem');  # load multiple certificates from file
+    PEM_certs2file('chain.pem', @certs);   # write multiple certificates to file
+    CERT_free(@certs);                     # free memory for all within OpenSSL
+
+    my $cert = PEM_string2cert($pem);      # load certificate from PEM string
+    $pem = PEM_cert2string($cert);         # convert certificate to PEM string
+
+    $key = KEY_create_rsa(2048);           # create new 2048-bit RSA key
     PEM_string2file($key,"key.pem");       # and write it to file
     KEY_free($key);                        # free memory within OpenSSL
 
@@ -498,6 +539,10 @@ They croak if the operation cannot be completed.
 
 =item PEM_cert2file(cert,file)
 
+=item PEM_file2certs(file) -> @certs
+
+=item PEM_certs2file(file,@certs)
+
 =item PEM_string2cert(string) -> cert
 
 =item PEM_cert2string(cert) -> string
@@ -519,9 +564,9 @@ Each loaded or created cert and key must be freed to not leak memory.
 
 =over 8
 
-=item CERT_free(cert)
+=item CERT_free(@certs)
 
-=item KEY_free(key)
+=item KEY_free(@keys)
 
 =back
 
@@ -544,7 +589,9 @@ The resulting hash contains:
 =item subject
 
 Hash with the parts of the subject, e.g. commonName, countryName,
-organizationName, stateOrProvinceName, localityName.
+organizationName, stateOrProvinceName, localityName. If there are multiple
+values for any of these parts the hash value will be an array ref with the
+values in order instead of just a scalar.
 
 =item subjectAltNames
 
@@ -555,7 +602,9 @@ EDIPARTY, URI, IP or RID.
 =item issuer
 
 Hash with the parts of the issuer, e.g. commonName, countryName,
-organizationName, stateOrProvinceName, localityName.
+organizationName, stateOrProvinceName, localityName. If there are multiple
+values for any of these parts the hash value will be an array ref with the
+values in order instead of just a scalar.
 
 =item not_before, not_after
 

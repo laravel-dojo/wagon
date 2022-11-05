@@ -1,11 +1,10 @@
-package Tie::StdHandle;
+package Tie::StdHandle; 
 
 use strict;
 
 use Tie::Handle;
-use vars qw(@ISA $VERSION);
-@ISA = 'Tie::Handle';
-$VERSION = '4.4';
+our @ISA = 'Tie::Handle';
+our $VERSION = '4.6';
 
 =head1 NAME
 
@@ -35,7 +34,7 @@ selective overwriting of methods.
 
 =cut
 
-sub TIEHANDLE
+sub TIEHANDLE 
 {
  my $class = shift;
  my $fh    = \do { local *HANDLE};
@@ -49,7 +48,7 @@ sub TELL    { tell($_[0]) }
 sub FILENO  { fileno($_[0]) }
 sub SEEK    { seek($_[0],$_[1],$_[2]) }
 sub CLOSE   { close($_[0]) }
-sub BINMODE { binmode($_[0]) }
+sub BINMODE { &CORE::binmode(shift, @_) }
 
 sub OPEN
 {

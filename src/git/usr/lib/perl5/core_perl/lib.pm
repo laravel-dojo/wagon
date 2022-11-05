@@ -13,7 +13,7 @@ my @inc_version_list = reverse split / /, $Config{inc_version_list};
 
 
 our @ORIG_INC = @INC;	# take a handy copy of 'original' value
-our $VERSION = '0.64';
+our $VERSION = '0.65';
 
 sub import {
     shift;
@@ -147,7 +147,9 @@ from @INC.
 For each directory in LIST (called $dir here) the lib module also
 checks to see if a directory called $dir/$archname/auto exists.
 If so the $dir/$archname directory is assumed to be a corresponding
-architecture specific directory and is also deleted from @INC.
+architecture specific directory and is also deleted from @INC. lib.pm also
+checks if directories called $dir/$version and $dir/$version/$archname
+exist and deletes these directories from @INC.
 
 =head2 Restoring original @INC
 
@@ -163,7 +165,7 @@ In order to keep lib.pm small and simple, it only works with Unix
 filepaths.  This doesn't mean it only works on Unix, but non-Unix
 users must first translate their file paths to Unix conventions.
 
-    # VMS users wanting to put [.stuff.moo] into
+    # VMS users wanting to put [.stuff.moo] into 
     # their @INC would write
     use lib 'stuff/moo';
 

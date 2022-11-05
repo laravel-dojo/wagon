@@ -1,9 +1,9 @@
 package Socket;
 
 use strict;
-{ use 5.006001; }
+{ use v5.6.1; }
 
-our $VERSION = '2.020_03'; # patched in perl5.git
+our $VERSION = '2.033';
 
 =head1 NAME
 
@@ -108,6 +108,10 @@ C<SOL_SOCKET> level.
 Socket option name constants for IPv4 socket options at the C<IPPROTO_IP>
 level.
 
+=head2 IP_PMTUDISC_WANT, IP_PMTUDISC_DONT, ...
+
+Socket option value constants for C<IP_MTU_DISCOVER> socket option.
+
 =head2 IPTOS_LOWDELAY, IPTOS_THROUGHPUT, IPTOS_RELIABILITY, ...
 
 Socket option value constants for C<IP_TOS> socket option.
@@ -180,6 +184,9 @@ arguments packed in and C<AF_INET> filled in. For Internet domain sockets,
 this structure is normally what you need for the arguments in bind(),
 connect(), and send().
 
+An undefined $port argument is taken as zero; an undefined $ip_address is
+considered a fatal error.
+
 =head2 ($port, $ip_address) = unpack_sockaddr_in $sockaddr
 
 Takes a C<sockaddr_in> structure (as returned by pack_sockaddr_in(),
@@ -208,6 +215,9 @@ Takes two to four arguments, a port number, an opaque string (as returned by
 inet_pton()), optionally a scope ID number, and optionally a flow label
 number. Returns the C<sockaddr_in6> structure with those arguments packed in
 and C<AF_INET6> filled in. IPv6 equivalent of pack_sockaddr_in().
+
+An undefined $port argument is taken as zero; an undefined $ip6_address is
+considered a fatal error.
 
 =head2 ($port, $ip6_address, $scope_id, $flowinfo) = unpack_sockaddr_in6 $sockaddr
 
@@ -384,7 +394,7 @@ Restrict to only generating addresses for this protocol
 The return value will be a list; the first value being an error indication,
 followed by a list of address structures (if no error occurred).
 
-The error value will be a dualvar; comparable to the C<EI_*> error constants,
+The error value will be a dualvar; comparable to the C<EAI_*> error constants,
 or printable as a human-readable error message string. If no error occurred it
 will be zero numerically and an empty string.
 
@@ -452,7 +462,7 @@ constants, or defaults to 0 if unspecified.
 The return value will be a list; the first value being an error condition,
 followed by the hostname and service name.
 
-The error value will be a dualvar; comparable to the C<EI_*> error constants,
+The error value will be a dualvar; comparable to the C<EAI_*> error constants,
 or printable as a human-readable error message string. The host and service
 names will be plain strings.
 
@@ -722,11 +732,11 @@ our @EXPORT = qw(
 	SO_SECURITY_ENCRYPTION_TRANSPORT SO_SNDBUF SO_SNDLOWAT SO_SNDTIMEO
 	SO_STATE SO_TYPE SO_USELOOPBACK SO_XOPEN SO_XSE
 
-	IP_OPTIONS IP_HDRINCL IP_TOS IP_TTL IP_RECVOPTS IP_RECVRETOPTS
-	IP_RETOPTS
+	IP_HDRINCL IP_OPTIONS IP_RECVOPTS IP_RECVRETOPTS IP_RETOPTS IP_TOS
+	IP_TTL
 
 	MSG_BCAST MSG_BTAG MSG_CTLFLAGS MSG_CTLIGNORE MSG_CTRUNC MSG_DONTROUTE
-	MSG_DONTWAIT MSG_EOF MSG_EOR MSG_ERRQUEUE MSG_ETAG MSG_FIN
+	MSG_DONTWAIT MSG_EOF MSG_EOR MSG_ERRQUEUE MSG_ETAG MSG_FASTOPEN MSG_FIN
 	MSG_MAXIOVLEN MSG_MCAST MSG_NOSIGNAL MSG_OOB MSG_PEEK MSG_PROXY MSG_RST
 	MSG_SYN MSG_TRUNC MSG_URG MSG_WAITALL MSG_WIRE
 
@@ -744,7 +754,7 @@ our @EXPORT = qw(
 	sockaddr_family
 	pack_sockaddr_in  unpack_sockaddr_in  sockaddr_in
 	pack_sockaddr_in6 unpack_sockaddr_in6 sockaddr_in6
-	pack_sockaddr_un  unpack_sockaddr_un  sockaddr_un
+	pack_sockaddr_un  unpack_sockaddr_un  sockaddr_un 
 
 	inet_aton inet_ntoa
 );
@@ -756,27 +766,34 @@ our @EXPORT_OK = qw(
 
 	SOCK_NONBLOCK SOCK_CLOEXEC
 
-	IP_ADD_MEMBERSHIP IP_ADD_SOURCE_MEMBERSHIP IP_DROP_MEMBERSHIP
-	IP_DROP_SOURCE_MEMBERSHIP IP_MULTICAST_IF IP_MULTICAST_LOOP
-	IP_MULTICAST_TTL
+	IP_ADD_MEMBERSHIP IP_ADD_SOURCE_MEMBERSHIP IP_BIND_ADDRESS_NO_PORT
+	IP_DROP_MEMBERSHIP IP_DROP_SOURCE_MEMBERSHIP IP_FREEBIND
+	IP_MULTICAST_ALL IP_MULTICAST_IF IP_MULTICAST_LOOP IP_MULTICAST_TTL
+	IP_MTU IP_MTU_DISCOVER IP_NODEFRAG IP_RECVERR IP_TRANSPARENT
 
 	IPPROTO_IP IPPROTO_IPV6 IPPROTO_RAW IPPROTO_ICMP IPPROTO_IGMP
 	IPPROTO_TCP IPPROTO_UDP IPPROTO_GRE IPPROTO_ESP IPPROTO_AH
-	IPPROTO_SCTP
+	IPPROTO_ICMPV6 IPPROTO_SCTP
+
+	IP_PMTUDISC_DO IP_PMTUDISC_DONT IP_PMTUDISC_PROBE IP_PMTUDISC_WANT
 
 	IPTOS_LOWDELAY IPTOS_THROUGHPUT IPTOS_RELIABILITY IPTOS_MINCOST
 
-	TCP_CONGESTION TCP_CONNECTIONTIMEOUT TCP_CORK TCP_DEFER_ACCEPT TCP_INFO
-	TCP_INIT_CWND TCP_KEEPALIVE TCP_KEEPCNT TCP_KEEPIDLE TCP_KEEPINTVL
-	TCP_LINGER2 TCP_MAXRT TCP_MAXSEG TCP_MD5SIG TCP_NODELAY TCP_NOOPT
-	TCP_NOPUSH TCP_QUICKACK TCP_SACK_ENABLE TCP_STDURG TCP_SYNCNT
+	TCP_CONGESTION TCP_CONNECTIONTIMEOUT TCP_CORK TCP_DEFER_ACCEPT
+	TCP_FASTOPEN TCP_INFO TCP_INIT_CWND TCP_KEEPALIVE TCP_KEEPCNT
+	TCP_KEEPIDLE TCP_KEEPINTVL TCP_LINGER2 TCP_MAXRT TCP_MAXSEG
+	TCP_MD5SIG TCP_NODELAY TCP_NOOPT TCP_NOPUSH TCP_QUICKACK
+	TCP_SACK_ENABLE TCP_STDURG TCP_SYNCNT TCP_USER_TIMEOUT
 	TCP_WINDOW_CLAMP
 
 	IN6ADDR_ANY IN6ADDR_LOOPBACK
 
-	IPV6_ADD_MEMBERSHIP IPV6_DROP_MEMBERSHIP IPV6_JOIN_GROUP
+	IPV6_ADDRFROM IPV6_ADD_MEMBERSHIP IPV6_DROP_MEMBERSHIP IPV6_JOIN_GROUP
 	IPV6_LEAVE_GROUP IPV6_MTU IPV6_MTU_DISCOVER IPV6_MULTICAST_HOPS
-	IPV6_MULTICAST_IF IPV6_MULTICAST_LOOP IPV6_UNICAST_HOPS IPV6_V6ONLY
+	IPV6_MULTICAST_IF IPV6_MULTICAST_LOOP IPV6_RECVERR IPV6_ROUTER_ALERT
+	IPV6_UNICAST_HOPS IPV6_V6ONLY
+
+	SO_LOCK_FILTER SO_RCVBUFFORCE SO_SNDBUFFORCE
 
 	pack_ip_mreq unpack_ip_mreq pack_ip_mreq_source unpack_ip_mreq_source
 
@@ -820,10 +837,18 @@ BEGIN {
 *LF   = \LF();
 *CRLF = \CRLF();
 
+# The four deprecated addrinfo constants
+foreach my $name (qw( AI_IDN_ALLOW_UNASSIGNED AI_IDN_USE_STD3_ASCII_RULES NI_IDN_ALLOW_UNASSIGNED NI_IDN_USE_STD3_ASCII_RULES )) {
+    no strict 'refs';
+    *$name = sub {
+	croak "The addrinfo constant $name is deprecated";
+    };
+}
+
 sub sockaddr_in {
     if (@_ == 6 && !wantarray) { # perl5.001m compat; use this && die
 	my($af, $port, @quad) = @_;
-	warnings::warn "6-ARG sockaddr_in call is deprecated"
+	warnings::warn "6-ARG sockaddr_in call is deprecated" 
 	    if warnings::enabled();
 	pack_sockaddr_in($port, inet_aton(join('.', @quad)));
     } elsif (wantarray) {
@@ -899,13 +924,9 @@ if( defined &getaddrinfo ) {
 
 	# Constants we don't support. Export them, but croak if anyone tries to
 	# use them
-	AI_IDN                      => 64,
-	AI_CANONIDN                 => 128,
-	AI_IDN_ALLOW_UNASSIGNED     => 256,
-	AI_IDN_USE_STD3_ASCII_RULES => 512,
-	NI_IDN                      => 32,
-	NI_IDN_ALLOW_UNASSIGNED     => 64,
-	NI_IDN_USE_STD3_ASCII_RULES => 128,
+	AI_IDN      => 64,
+	AI_CANONIDN => 128,
+	NI_IDN      => 32,
 
 	# Error constants we'll never return, so it doesn't matter what value
 	# these have, nor that we don't provide strings for them
@@ -975,7 +996,7 @@ sub fake_getaddrinfo
     # to talk AF_INET. If not we'd have to return no addresses at all. :)
     $flags &= ~(AI_V4MAPPED()|AI_ALL()|AI_ADDRCONFIG());
 
-    $flags & (AI_IDN()|AI_CANONIDN()|AI_IDN_ALLOW_UNASSIGNED()|AI_IDN_USE_STD3_ASCII_RULES()) and
+    $flags & (AI_IDN()|AI_CANONIDN()) and
 	croak "Socket::getaddrinfo() does not support IDN";
 
     $flags == 0 or return fake_makeerr( EAI_BADFLAGS() );
@@ -1073,7 +1094,7 @@ sub fake_getnameinfo
     my $flag_namereqd    = $flags & NI_NAMEREQD();    $flags &= ~NI_NAMEREQD();
     my $flag_dgram       = $flags & NI_DGRAM()   ;    $flags &= ~NI_DGRAM();
 
-    $flags & (NI_IDN()|NI_IDN_ALLOW_UNASSIGNED()|NI_IDN_USE_STD3_ASCII_RULES()) and
+    $flags & NI_IDN() and
 	croak "Socket::getnameinfo() does not support IDN";
 
     $flags == 0 or return fake_makeerr( EAI_BADFLAGS() );

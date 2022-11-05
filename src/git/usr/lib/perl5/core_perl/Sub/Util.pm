@@ -15,8 +15,8 @@ our @EXPORT_OK = qw(
   subname set_subname
 );
 
-our $VERSION    = "1.46_02";
-$VERSION   = eval $VERSION;
+our $VERSION    = "1.62";
+$VERSION =~ tr/_//d;
 
 require List::Util; # as it has the XS
 List::Util->VERSION( $VERSION ); # Ensure we got the right XS version (RT#100863)
@@ -95,14 +95,16 @@ I<Since version 1.40.>
 Returns the name of the given C<$code> reference, if it has one. Normal named
 subs will give a fully-qualified name consisting of the package and the
 localname separated by C<::>. Anonymous code references will give C<__ANON__>
-as the localname. If a name has been set using L</set_subname>, this name will
-be returned instead.
+as the localname. If the package the code was compiled in has been deleted
+(e.g. using C<delete_package> from L<Symbol>), C<__ANON__> will be returned as
+the package name. If a name has been set using L</set_subname>, this name will be
+returned instead.
 
 This function was inspired by C<sub_fullname> from L<Sub::Identify>. The
 remaining functions that C<Sub::Identify> implements can easily be emulated
 using regexp operations, such as
 
- sub get_code_info { return (subname $_[0]) =~ m/^(.+)::(.+?)$/ }
+ sub get_code_info { return (subname $_[0]) =~ m/^(.+)::(.*?)$/ }
  sub sub_name      { return (get_code_info $_[0])[0] }
  sub stash_name    { return (get_code_info $_[0])[1] }
 

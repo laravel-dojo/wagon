@@ -1,4 +1,7 @@
-## Here is an example for nftables.
+## Syntax highlighting for the packet-filtering rules of Netfilter.
+
+## Original author:  Arturo Borrero González <arturo@debian.org>
+## License:  GPL version 3 or newer
 
 syntax nftables "\.(nft|nftables)$"
 header "^#!.*(nft|nftables)"
@@ -17,14 +20,16 @@ color red "\<(drop|reject)\>"
 color brightblue "\<(accept|continue|(d|s)nat|goto|jump|masquerade|return)\>"
 
 # Comments
-color cyan "(^|[[:space:]])#.*"
+color cyan "(^|[[:blank:]])#.*"
 
 # Trailing whitespace
 color ,green "[[:space:]]+$"
 
-# Strings and others
-color yellow ""(\\.|[^"])*"" "'(\\.|[^'])*'"
-color green "[{}():;|`$<>!=&\\]" "(\]|\[)"
+# Strings
+color yellow ""([^"\]|\\.)*"|'([^'\]|\\.)*'"
+
+# Syntactic symbols
+color green "[][{}():;|`$<>!=&\]"
 
 # Basic variable names
 color brightred "(\$|@)[[:alpha:]_-][[:alnum:]_.-]*"

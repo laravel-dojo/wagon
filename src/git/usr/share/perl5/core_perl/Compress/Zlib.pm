@@ -7,17 +7,17 @@ use Carp ;
 use IO::Handle ;
 use Scalar::Util qw(dualvar);
 
-use IO::Compress::Base::Common 2.074 ;
-use Compress::Raw::Zlib 2.074 ;
-use IO::Compress::Gzip 2.074 ;
-use IO::Uncompress::Gunzip 2.074 ;
+use IO::Compress::Base::Common 2.106 ;
+use Compress::Raw::Zlib 2.103 ;
+use IO::Compress::Gzip 2.106 ;
+use IO::Uncompress::Gunzip 2.106 ;
 
 use strict ;
 use warnings ;
 use bytes ;
 our ($VERSION, $XS_VERSION, @ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS);
 
-$VERSION = '2.074';
+$VERSION = '2.106';
 $XS_VERSION = $VERSION;
 $VERSION = eval $VERSION;
 
@@ -134,12 +134,12 @@ sub gzopen($$)
     _set_gzerr(0) ;
 
     if ($writing) {
-        $gz = new IO::Compress::Gzip($file, Minimal => 1, AutoClose => 1,
+        $gz = IO::Compress::Gzip->new($file, Minimal => 1, AutoClose => 1,
                                      %defOpts)
             or $Compress::Zlib::gzerrno = $IO::Compress::Gzip::GzipError;
     }
     else {
-        $gz = new IO::Uncompress::Gunzip($file,
+        $gz = IO::Uncompress::Gunzip->new($file,
                                          Transparent => 1,
                                          Append => 0,
                                          AutoClose => 1,
@@ -224,7 +224,7 @@ sub Compress::Zlib::gzFile::gzseek
 
     my $gz = $self->[0] ;
     my $status ;
-    eval { $status = $gz->seek($offset, $whence) ; };
+    eval { local $SIG{__DIE__}; $status = $gz->seek($offset, $whence) ; };
     if ($@)
     {
         my $error = $@;
@@ -461,7 +461,7 @@ sub inflate
 
 package Compress::Zlib ;
 
-use IO::Compress::Gzip::Constants 2.074 ;
+use IO::Compress::Gzip::Constants 2.106 ;
 
 sub memGzip($)
 {
@@ -1161,7 +1161,7 @@ The default is Z_DEFAULT_STRATEGY.
 When a dictionary is specified I<Compress::Zlib> will automatically
 call C<deflateSetDictionary> directly after calling C<deflateInit>. The
 Adler32 value for the dictionary can be obtained by calling the method
-C<$d->dict_adler()>.
+C<< $d->dict_adler() >>.
 
 The default is no dictionary.
 
@@ -1467,9 +1467,15 @@ Returns the version of the zlib library.
 All the I<zlib> constants are automatically imported when you make use
 of I<Compress::Zlib>.
 
+=head1 SUPPORT
+
+General feedback/questions/bug reports should be sent to
+L<https://github.com/pmqs/IO-Compress/issues> (preferred) or
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=IO-Compress>.
+
 =head1 SEE ALSO
 
-L<IO::Compress::Gzip>, L<IO::Uncompress::Gunzip>, L<IO::Compress::Deflate>, L<IO::Uncompress::Inflate>, L<IO::Compress::RawDeflate>, L<IO::Uncompress::RawInflate>, L<IO::Compress::Bzip2>, L<IO::Uncompress::Bunzip2>, L<IO::Compress::Lzma>, L<IO::Uncompress::UnLzma>, L<IO::Compress::Xz>, L<IO::Uncompress::UnXz>, L<IO::Compress::Lzop>, L<IO::Uncompress::UnLzop>, L<IO::Compress::Lzf>, L<IO::Uncompress::UnLzf>, L<IO::Uncompress::AnyInflate>, L<IO::Uncompress::AnyUncompress>
+L<IO::Compress::Gzip>, L<IO::Uncompress::Gunzip>, L<IO::Compress::Deflate>, L<IO::Uncompress::Inflate>, L<IO::Compress::RawDeflate>, L<IO::Uncompress::RawInflate>, L<IO::Compress::Bzip2>, L<IO::Uncompress::Bunzip2>, L<IO::Compress::Lzma>, L<IO::Uncompress::UnLzma>, L<IO::Compress::Xz>, L<IO::Uncompress::UnXz>, L<IO::Compress::Lzip>, L<IO::Uncompress::UnLzip>, L<IO::Compress::Lzop>, L<IO::Uncompress::UnLzop>, L<IO::Compress::Lzf>, L<IO::Uncompress::UnLzf>, L<IO::Compress::Zstd>, L<IO::Uncompress::UnZstd>, L<IO::Uncompress::AnyInflate>, L<IO::Uncompress::AnyUncompress>
 
 L<IO::Compress::FAQ|IO::Compress::FAQ>
 
@@ -1478,9 +1484,9 @@ L<Archive::Tar|Archive::Tar>,
 L<IO::Zlib|IO::Zlib>
 
 For RFC 1950, 1951 and 1952 see
-L<http://www.faqs.org/rfcs/rfc1950.html>,
-L<http://www.faqs.org/rfcs/rfc1951.html> and
-L<http://www.faqs.org/rfcs/rfc1952.html>
+L<https://datatracker.ietf.org/doc/html/rfc1950>,
+L<https://datatracker.ietf.org/doc/html/rfc1951> and
+L<https://datatracker.ietf.org/doc/html/rfc1952>
 
 The I<zlib> compression library was written by Jean-loup Gailly
 C<gzip@prep.ai.mit.edu> and Mark Adler C<madler@alumni.caltech.edu>.
@@ -1500,8 +1506,7 @@ See the Changes file.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 1995-2017 Paul Marquess. All rights reserved.
+Copyright (c) 1995-2022 Paul Marquess. All rights reserved.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
-

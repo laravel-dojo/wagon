@@ -2,7 +2,7 @@ package Test2::Event::Ok;
 use strict;
 use warnings;
 
-our $VERSION = '1.302073';
+our $VERSION = '1.302190';
 
 
 BEGIN { require Test2::Event; our @ISA = qw(Test2::Event) }
@@ -46,6 +46,40 @@ sub summary {
     }
 
     return $name;
+}
+
+sub extra_amnesty {
+    my $self = shift;
+    return unless defined($self->{+TODO}) || ($self->{+EFFECTIVE_PASS} && !$self->{+PASS});
+    return {
+        tag       => 'TODO',
+        details   => $self->{+TODO},
+    };
+}
+
+sub facet_data {
+    my $self = shift;
+
+    my $out = $self->common_facet_data;
+
+    $out->{assert}  = {
+        no_debug => 1,                # Legacy behavior
+        pass     => $self->{+PASS},
+        details  => $self->{+NAME},
+    };
+
+    if (my @exra_amnesty = $self->extra_amnesty) {
+        my %seen;
+
+        # It is possible the extra amnesty can be a duplicate, so filter it.
+        $out->{amnesty} = [
+            grep { !$seen{defined($_->{tag}) ? $_->{tag} : ''}->{defined($_->{details}) ? $_->{details} : ''}++ }
+                @exra_amnesty,
+                @{$out->{amnesty}},
+        ];
+    }
+
+    return $out;
 }
 
 1;
@@ -100,11 +134,6 @@ Name of the test.
 This is the true/false value of the test after TODO and similar modifiers are
 taken into account.
 
-=item $b = $e->allow_bad_name
-
-This relaxes the test name checks such that they allow characters that can
-confuse a TAP parser.
-
 =back
 
 =head1 SOURCE
@@ -130,7 +159,7 @@ F<http://github.com/Test-More/test-more/>.
 
 =head1 COPYRIGHT
 
-Copyright 2016 Chad Granum E<lt>exodist@cpan.orgE<gt>.
+Copyright 2020 Chad Granum E<lt>exodist@cpan.orgE<gt>.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

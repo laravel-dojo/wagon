@@ -10,19 +10,18 @@ package IO::Poll;
 use strict;
 use IO::Handle;
 use Exporter ();
-our(@ISA, @EXPORT_OK, @EXPORT, $VERSION);
 
-@ISA = qw(Exporter);
-$VERSION = "0.10";
+our @ISA = qw(Exporter);
+our $VERSION = "1.49";
 
-@EXPORT = qw( POLLIN
+our @EXPORT = qw( POLLIN
 	      POLLOUT
 	      POLLERR
 	      POLLHUP
 	      POLLNVAL
 	    );
 
-@EXPORT_OK = qw(
+our @EXPORT_OK = qw(
  POLLPRI
  POLLRDNORM
  POLLWRNORM
@@ -63,7 +62,7 @@ sub mask {
           delete $self->[2]{$io};
 	}
     }
-
+    
     return unless exists $self->[0]{$fd} and exists $self->[0]{$fd}{$io};
 	return $self->[0]{$fd}{$io};
 }
@@ -93,14 +92,14 @@ sub poll {
 	$self->[1]{$fd} = $got if $got;
     }
 
-    return $ret;
+    return $ret;  
 }
 
 sub events {
     my $self = shift;
     my $io = shift;
     my $fd = fileno($io);
-    exists $self->[1]{$fd} and exists $self->[0]{$fd}{$io}
+    exists $self->[1]{$fd} and exists $self->[0]{$fd}{$io} 
                 ? $self->[1]{$fd} & ($self->[0]{$fd}{$io}|POLLHUP|POLLERR|POLLNVAL)
 	: 0;
 }
@@ -198,7 +197,7 @@ L<poll(2)>, L<IO::Handle>, L<IO::Select>
 =head1 AUTHOR
 
 Graham Barr. Currently maintained by the Perl Porters.  Please report all
-bugs to <perlbug@perl.org>.
+bugs at L<https://github.com/Perl/perl5/issues>.
 
 =head1 COPYRIGHT
 

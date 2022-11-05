@@ -6,15 +6,14 @@
 
 package IO::Pipe;
 
-use 5.006_001;
+use 5.008_001;
 
 use IO::Handle;
 use strict;
-our($VERSION);
 use Carp;
 use Symbol;
 
-$VERSION = "1.15";
+our $VERSION = "1.49";
 
 sub new {
     my $type = shift;
@@ -73,7 +72,7 @@ sub _doit {
         if ($do_spawn) {
           $pid = eval { system 1, @_ }; # 1 == P_NOWAIT
           my $err = $!;
-
+    
           $io->fdopen($save, $mode);
           $save->close or croak "Cannot close $!";
           croak "IO::Pipe: Cannot spawn-NOWAIT: $err" if not $pid or $pid < 0;
@@ -246,7 +245,7 @@ L<IO::Handle>
 =head1 AUTHOR
 
 Graham Barr. Currently maintained by the Perl Porters.  Please report all
-bugs to <perlbug@perl.org>.
+bugs at L<https://github.com/Perl/perl5/issues>.
 
 =head1 COPYRIGHT
 

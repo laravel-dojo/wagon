@@ -6,7 +6,7 @@ require 5.006 ;
 use strict ;
 use warnings;
 
-use IO::Compress::Base::Common 2.074 ;
+use IO::Compress::Base::Common 2.106 ;
 
 use IO::File (); ;
 use Scalar::Util ();
@@ -20,7 +20,7 @@ use Symbol();
 our (@ISA, $VERSION);
 @ISA    = qw(IO::File Exporter);
 
-$VERSION = '2.074';
+$VERSION = '2.106';
 
 #Can't locate object method "SWASHNEW" via package "utf8" (perhaps you forgot to load "utf8"?) at .../ext/Compress-Zlib/Gzip/blib/lib/Compress/Zlib/Common.pm line 16.
 
@@ -254,8 +254,8 @@ sub _create
         *$obj->{Compress} = $obj->mkComp($got)
             or return undef;
 
-        *$obj->{UnCompSize} = new U64 ;
-        *$obj->{CompSize} = new U64 ;
+        *$obj->{UnCompSize} = U64->new;
+        *$obj->{CompSize} = U64->new;
 
         if ( $outType eq 'buffer') {
             ${ *$obj->{Buffer} }  = ''
@@ -279,7 +279,7 @@ sub _create
                 my $mode = '>' ;
                 $mode = '>>'
                     if $appendOutput;
-                *$obj->{FH} = new IO::File "$mode $outValue"
+                *$obj->{FH} = IO::File->new( "$mode $outValue" )
                     or return $obj->saveErrorString(undef, "cannot open file '$outValue': $!", $!) ;
                 *$obj->{StdIO} = ($outValue eq '-');
                 setBinModeOutput(*$obj->{FH}) ;
@@ -340,7 +340,7 @@ sub _def
     my $haveOut = @_ ;
     my $output = shift ;
 
-    my $x = new IO::Compress::Base::Validator($class, *$obj->{Error}, $name, $input, $output)
+    my $x = IO::Compress::Base::Validator->new($class, *$obj->{Error}, $name, $input, $output)
         or return undef ;
 
     push @_, $output if $haveOut && $x->{Hash};
@@ -493,10 +493,10 @@ sub _wr2
 
         if ( ! $isFilehandle )
         {
-            $fh = new IO::File "<$input"
+            $fh = IO::File->new( "<$input" )
                 or return $self->saveErrorString(undef, "cannot open file '$input': $!", $!) ;
         }
-        binmode $fh if *$self->{Got}->valueOrDefault('binmodein') ;
+        binmode $fh ;
 
         my $status ;
         my $buff ;
@@ -797,6 +797,7 @@ sub _writeTrailer
     my $trailer = '';
 
     my $status = *$self->{Compress}->close($trailer) ;
+
     return $self->saveErrorString(0, *$self->{Compress}{Error}, *$self->{Compress}{ErrorNo})
         if $status == STATUS_ERROR;
 
@@ -805,7 +806,6 @@ sub _writeTrailer
     $trailer .= $self->mkTrailer();
     defined $trailer
       or return 0;
-
     return $self->output($trailer);
 }
 
@@ -983,23 +983,27 @@ sub _notAvailable
     return sub { Carp::croak "$name Not Available: File opened only for output" ; } ;
 }
 
-*read     = _notAvailable('read');
-*READ     = _notAvailable('read');
-*readline = _notAvailable('readline');
-*READLINE = _notAvailable('readline');
-*getc     = _notAvailable('getc');
-*GETC     = _notAvailable('getc');
+{
+    no warnings 'once';
 
-*FILENO   = \&fileno;
-*PRINT    = \&print;
-*PRINTF   = \&printf;
-*WRITE    = \&syswrite;
-*write    = \&syswrite;
-*SEEK     = \&seek;
-*TELL     = \&tell;
-*EOF      = \&eof;
-*CLOSE    = \&close;
-*BINMODE  = \&binmode;
+    *read     = _notAvailable('read');
+    *READ     = _notAvailable('read');
+    *readline = _notAvailable('readline');
+    *READLINE = _notAvailable('readline');
+    *getc     = _notAvailable('getc');
+    *GETC     = _notAvailable('getc');
+
+    *FILENO   = \&fileno;
+    *PRINT    = \&print;
+    *PRINTF   = \&printf;
+    *WRITE    = \&syswrite;
+    *write    = \&syswrite;
+    *SEEK     = \&seek;
+    *TELL     = \&tell;
+    *EOF      = \&eof;
+    *CLOSE    = \&close;
+    *BINMODE  = \&binmode;
+}
 
 #*sysread  = \&_notAvailable;
 #*syswrite = \&_write;
@@ -1021,9 +1025,15 @@ IO::Compress::Base - Base Class for IO::Compress modules
 This module is not intended for direct use in application code. Its sole
 purpose is to be sub-classed by IO::Compress modules.
 
+=head1 SUPPORT
+
+General feedback/questions/bug reports should be sent to
+L<https://github.com/pmqs/IO-Compress/issues> (preferred) or
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=IO-Compress>.
+
 =head1 SEE ALSO
 
-L<Compress::Zlib>, L<IO::Compress::Gzip>, L<IO::Uncompress::Gunzip>, L<IO::Compress::Deflate>, L<IO::Uncompress::Inflate>, L<IO::Compress::RawDeflate>, L<IO::Uncompress::RawInflate>, L<IO::Compress::Bzip2>, L<IO::Uncompress::Bunzip2>, L<IO::Compress::Lzma>, L<IO::Uncompress::UnLzma>, L<IO::Compress::Xz>, L<IO::Uncompress::UnXz>, L<IO::Compress::Lzop>, L<IO::Uncompress::UnLzop>, L<IO::Compress::Lzf>, L<IO::Uncompress::UnLzf>, L<IO::Uncompress::AnyInflate>, L<IO::Uncompress::AnyUncompress>
+L<Compress::Zlib>, L<IO::Compress::Gzip>, L<IO::Uncompress::Gunzip>, L<IO::Compress::Deflate>, L<IO::Uncompress::Inflate>, L<IO::Compress::RawDeflate>, L<IO::Uncompress::RawInflate>, L<IO::Compress::Bzip2>, L<IO::Uncompress::Bunzip2>, L<IO::Compress::Lzma>, L<IO::Uncompress::UnLzma>, L<IO::Compress::Xz>, L<IO::Uncompress::UnXz>, L<IO::Compress::Lzip>, L<IO::Uncompress::UnLzip>, L<IO::Compress::Lzop>, L<IO::Uncompress::UnLzop>, L<IO::Compress::Lzf>, L<IO::Uncompress::UnLzf>, L<IO::Compress::Zstd>, L<IO::Uncompress::UnZstd>, L<IO::Uncompress::AnyInflate>, L<IO::Uncompress::AnyUncompress>
 
 L<IO::Compress::FAQ|IO::Compress::FAQ>
 
@@ -1041,8 +1051,7 @@ See the Changes file.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2005-2017 Paul Marquess. All rights reserved.
+Copyright (c) 2005-2022 Paul Marquess. All rights reserved.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
-

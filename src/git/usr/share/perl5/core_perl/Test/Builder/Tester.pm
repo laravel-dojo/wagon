@@ -1,7 +1,7 @@
 package Test::Builder::Tester;
 
 use strict;
-our $VERSION = '1.302073';
+our $VERSION = '1.302190';
 
 use Test::Builder;
 use Symbol;
@@ -117,7 +117,7 @@ sub _start_testing {
     $original_harness_env = $ENV{HARNESS_ACTIVE} || 0;
     $ENV{HARNESS_ACTIVE} = 0;
 
-    my $hub = $t->{Hub} || Test2::API::test2_stack->top;
+    my $hub = $t->{Hub} || ($t->{Stack} ? $t->{Stack}->top : Test2::API::test2_stack->top);
     $original_formatter = $hub->format;
     unless ($original_formatter && $original_formatter->isa('Test::Builder::Formatter')) {
         my $fmt = Test::Builder::Formatter->new;
@@ -352,7 +352,7 @@ sub test_test {
 
     # check the output we've stashed
     unless( $t->ok( ( $args{skip_out} || $out->check ) &&
-                    ( $args{skip_err} || $err->check ), $mess )
+                    ( $args{skip_err} || $err->check ), $mess ) 
     )
     {
         # print out the diagnostic information about why this

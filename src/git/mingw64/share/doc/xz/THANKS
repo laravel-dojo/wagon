@@ -8,26 +8,33 @@ has been important. :-) In alphabetical order:
   - H. Peter Anvin
   - Jeff Bastian
   - Nelson H. F. Beebe
+  - Karl Beldan
   - Karl Berry
   - Anders F. Björklund
   - Emmanuel Blot
   - Melanie Blower
+  - Alexander Bluhm
   - Martin Blumenstingl
   - Ben Boeckel
   - Jakub Bogusz
+  - Adam Borowski
   - Maarten Bosmans
   - Trent W. Buck
+  - Kevin R. Bulgrien
   - James Buren
   - David Burklund
   - Daniel Mealha Cabrita
   - Milo Casagrande
   - Marek Černocký
   - Tomer Chachamu
+  - Vitaly Chikunov
+  - Antoine Cœur
   - Gabi Davar
   - Chris Donawa
   - Andrew Dudman
   - Markus Duft
   - İsmail Dönmez
+  - Paul Eggert
   - Robert Elz
   - Gilles Espinasse
   - Denis Excoffier
@@ -35,6 +42,7 @@ has been important. :-) In alphabetical order:
   - Michael Fox
   - Mike Frysinger
   - Daniel Richard G.
+  - Bjarni Ingi Gislason
   - Bill Glessner
   - Jason Gorski
   - Juan Manuel Guerrero
@@ -45,6 +53,7 @@ has been important. :-) In alphabetical order:
   - Peter Ivanov
   - Jouk Jansen
   - Jun I Jin
+  - Kiyoshi Kanazawa
   - Per Øyvind Karlsen
   - Thomas Klausner
   - Richard Koch
@@ -58,10 +67,16 @@ has been important. :-) In alphabetical order:
   - Andraž 'ruskie' Levstik
   - Cary Lewis
   - Wim Lewis
+  - Xin Li
   - Eric Lindblad
   - Lorenzo De Liso
+  - H.J. Lu
   - Bela Lubkin
   - Gregory Margo
+  - Julien Marrec
+  - Ed Maste
+  - Martin Matuška
+  - Ivan A. Melnikov
   - Jim Meyering
   - Arkadiusz Miskiewicz
   - Conley Moorhous
@@ -72,6 +87,8 @@ has been important. :-) In alphabetical order:
   - Jonathan Nieder
   - Andre Noll
   - Peter O'Gorman
+  - Daniel Packard
+  - Filip Palian
   - Peter Pallinger
   - Rui Paulo
   - Igor Pavlov
@@ -82,31 +99,40 @@ has been important. :-) In alphabetical order:
   - Trần Ngọc Quân
   - Pavel Raiskup
   - Ole André Vadla Ravnås
+  - Eric S. Raymond
   - Robert Readman
   - Bernhard Reutner-Fischer
-  - Eric S. Raymond
+  - Markus Rickert
   - Cristian Rodríguez
   - Christian von Roques
+  - Boud Roukema
   - Torsten Rupp
   - Jukka Salmi
   - Alexandre Sauvé
   - Benno Schulenberg
   - Andreas Schwab
+  - Bhargava Shastry
   - Dan Shechter
   - Stuart Shelton
   - Sebastian Andrzej Siewior
+  - Ville Skyttä
   - Brad Smith
+  - Bruce Stark
   - Pippijn van Steenhoven
   - Jonathan Stott
   - Dan Stromberg
+  - Jia Tan
   - Vincent Torri
   - Paul Townsend
   - Mohammed Adnène Trojette
   - Alexey Tourbin
+  - Loganaden Velvindron
   - Patrick J. Volkerding
   - Martin Väth
   - Adam Walling
+  - Jeffrey Walton
   - Christian Weisgerber
+  - Dan Weiss
   - Bert Wesarg
   - Fredrik Wikstrom
   - Jim Wilcoxson

@@ -1,13 +1,18 @@
 #!/usr/bin/perl
     eval 'exec /usr/bin/perl -S $0 ${1+"$@"}'
-	if $running_under_some_shell;
+	if 0; # ^ Run only under a shell
 #!/usr/local/bin/perl
 
 BEGIN { pop @INC if $INC[-1] eq '.' }
 use strict;
 use vars qw($VERSION);
 
-use App::Cpan '1.64';
+use App::Cpan;
+use CPAN::Version;
+my $minver = '1.64';
+if ( CPAN::Version->vlt($App::Cpan::VERSION, $minver) ) {
+    warn "WARNING: your version of App::Cpan is $App::Cpan::VERSION while we would expect at least $minver";
+}
 $VERSION = '1.64';
 
 my $rc = App::Cpan->run( @ARGV );
@@ -249,9 +254,9 @@ The build tools, L<ExtUtils::MakeMaker> and L<Module::Build> use some,
 while others matter to the levels above them. Some of these are specified
 by the Perl Toolchain Gang:
 
-Lancaster Concensus: L<https://github.com/Perl-Toolchain-Gang/toolchain-site/blob/master/lancaster-consensus.md>
+Lancaster Consensus: L<https://github.com/Perl-Toolchain-Gang/toolchain-site/blob/master/lancaster-consensus.md>
 
-Oslo Concensus: L<https://github.com/Perl-Toolchain-Gang/toolchain-site/blob/master/oslo-consensus.md>
+Oslo Consensus: L<https://github.com/Perl-Toolchain-Gang/toolchain-site/blob/master/oslo-consensus.md>
 
 =over 4
 
@@ -268,7 +273,7 @@ to C<1> unless it already has a value (even if that value is false).
 
 =item CPAN_OPTS
 
-As with C<PERL5OPTS>, a string of additional C<cpan(1)> options to
+As with C<PERL5OPT>, a string of additional C<cpan(1)> options to
 add to those you specify on the command line.
 
 =item CPANSCRIPT_LOGLEVEL

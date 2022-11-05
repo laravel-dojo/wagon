@@ -15,6 +15,7 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
+
 #SET_PATH - This line is a placeholder to ease patching this script.
 
 # Instead of unsetting XZ_OPT, just make sure that xz will use file format
@@ -22,7 +23,7 @@
 # specified via XZ_OPT.
 xz='xz --format=auto'
 
-version='xzmore (XZ Utils) 5.2.4'
+version='xzmore (XZ Utils) 5.2.7'
 
 usage="Usage: ${0##*/} [OPTION]... [FILE]...
 Like 'more', but operate on the uncompressed contents of xz compressed FILEs.
@@ -30,8 +31,8 @@ Like 'more', but operate on the uncompressed contents of xz compressed FILEs.
 Report bugs to <lasse.collin@tukaani.org>."
 
 case $1 in
-	--help)    echo "$usage" || exit 2; exit;;
-	--version) echo "$version" || exit 2; exit;;
+	--help)    printf '%s\n' "$usage" || exit 2; exit;;
+	--version) printf '%s\n' "$version" || exit 2; exit;;
 esac
 
 oldtty=`stty -g 2>/dev/null`
@@ -49,7 +50,7 @@ fi
 
 if test $# = 0; then
 	if test -t 0; then
-		echo "$usage"; exit 1
+		printf '%s\n' "$usage"; exit 1
 	else
 		$xz -cdfq | eval "${PAGER:-more}"
 	fi
@@ -68,7 +69,7 @@ else
 			esac
 		fi
 		if test "$ANS" != 's'; then
-			echo "------> $FILE <------"
+			printf '%s\n' "------> $FILE <------"
 			$xz -cdfq -- "$FILE" | eval "${PAGER:-more}"
 		fi
 		if test -t 1; then

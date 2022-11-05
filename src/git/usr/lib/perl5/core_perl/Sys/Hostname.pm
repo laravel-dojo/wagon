@@ -4,17 +4,18 @@ use strict;
 
 use Carp;
 
-require Exporter;
+use Exporter 'import';
 
-our @ISA     = qw/ Exporter /;
 our @EXPORT  = qw/ hostname /;
 
 our $VERSION;
 
+use warnings ();
+
 our $host;
 
 BEGIN {
-    $VERSION = '1.20';
+    $VERSION = '1.24';
     {
 	local $SIG{__DIE__};
 	eval {
@@ -27,6 +28,7 @@ BEGIN {
 
 
 sub hostname {
+  @_ and croak("hostname() does not accepts arguments (it used to silently discard any provided)");
 
   # method 1 - we already know it
   return $host if defined $host;
@@ -56,7 +58,7 @@ sub hostname {
 
     # rats!
     $host = '';
-    croak "Cannot get host name of local machine";
+    croak "Cannot get host name of local machine";  
 
   }
   elsif ($^O eq 'MSWin32') {
@@ -110,9 +112,9 @@ sub hostname {
     }
 
     # bummer
-    || croak "Cannot get host name of local machine";
+    || croak "Cannot get host name of local machine";  
 
-    # remove garbage
+    # remove garbage 
     $host =~ tr/\0\r\n//d;
     $host;
   }

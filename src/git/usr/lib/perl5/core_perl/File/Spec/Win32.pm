@@ -2,13 +2,13 @@ package File::Spec::Win32;
 
 use strict;
 
-use vars qw(@ISA $VERSION);
+use Cwd ();
 require File::Spec::Unix;
 
-$VERSION = '3.67';
+our $VERSION = '3.84';
 $VERSION =~ tr/_//d;
 
-@ISA = qw(File::Spec::Unix);
+our @ISA = qw(File::Spec::Unix);
 
 # Some regexes we use for path splitting
 my $DRIVE_RX = '[a-zA-Z]:';
@@ -84,7 +84,7 @@ sub tmpdir {
 MSWin32 case-tolerance depends on GetVolumeInformation() $ouFsFlags == FS_CASE_SENSITIVE,
 indicating the case significance when comparing file specifications.
 Since XP FS_CASE_SENSITIVE is effectively disabled for the NT subsubsystem.
-See http://cygwin.com/ml/cygwin/2007-07/msg00891.html
+See L<http://cygwin.com/ml/cygwin/2007-07/msg00891.html>
 Default: 1
 
 =cut
@@ -137,7 +137,7 @@ sub catfile {
     # Legacy / compatibility support
     #
     shift, return _canon_cat( "/", @_ )
-	if $_[0] eq "";
+	if !@_ || $_[0] eq "";
 
     # Compatibility with File::Spec <= 3.26:
     #     catfile('A:', 'foo') should return 'A:\foo'.
@@ -177,7 +177,7 @@ sub path {
 
 No physical check on the filesystem, but a logical cleanup of a
 path. On UNIX eliminated successive slashes and successive "/.".
-On Win32 makes
+On Win32 makes 
 
 	dir1\dir2\dir3\..\..\dir4 -> \dir\dir4 and even
 	dir1\dir2\dir3\...\dir4   -> \dir\dir4
@@ -197,9 +197,9 @@ sub canonpath {
    ($volume,$directories,$file) = File::Spec->splitpath( $path,
                                                          $no_file );
 
-Splits a path into volume, directory, and filename portions. Assumes that
+Splits a path into volume, directory, and filename portions. Assumes that 
 the last file is a path unless the path ends in '\\', '\\.', '\\..'
-or $no_file is true.  On Win32 this means that $no_file true makes this return
+or $no_file is true.  On Win32 this means that $no_file true makes this return 
 ( $volume, $path, '' ).
 
 Separators accepted are \ and /.
@@ -215,13 +215,13 @@ sub splitpath {
     my ($self,$path, $nofile) = @_;
     my ($volume,$directory,$file) = ('','','');
     if ( $nofile ) {
-        $path =~
+        $path =~ 
             m{^ ( $VOL_RX ? ) (.*) }sox;
         $volume    = $1;
         $directory = $2;
     }
     else {
-        $path =~
+        $path =~ 
             m{^ ( $VOL_RX ? )
                 ( (?:.*[\\/](?:\.\.?\Z(?!\n))?)? )
                 (.*)
@@ -241,11 +241,11 @@ The opposite of L<catdir()|File::Spec/catdir>.
 
     @dirs = File::Spec->splitdir( $directories );
 
-$directories must be only the directory portion of the path on systems
+$directories must be only the directory portion of the path on systems 
 that have the concept of a volume or that have path syntax that differentiates
 files from directories.
 
-Unlike just splitting the directories on the separator, leading empty and
+Unlike just splitting the directories on the separator, leading empty and 
 trailing directory entries can be returned, because these are significant
 on some OSs. So,
 
@@ -269,7 +269,7 @@ sub splitdir {
     }
     else {
         #
-        # since there was a trailing separator, add a file name to the end,
+        # since there was a trailing separator, add a file name to the end, 
         # then do the split, then replace it with ''.
         #
         my( @directories )= split( m|[\\/]|, "${directories}dummy" ) ;
@@ -300,7 +300,7 @@ sub catpath {
 
     $volume .= $directory ;
 
-    # If the volume is not just A:, make sure the glue separator is
+    # If the volume is not just A:, make sure the glue separator is 
     # there, reusing whatever separator is first in the $volume if possible.
     if ( $volume !~ m@^[a-zA-Z]:\Z(?!\n)@s &&
          $volume =~ m@[^\\/]\Z(?!\n)@      &&
@@ -330,14 +330,13 @@ sub rel2abs {
 
     if ($is_abs) {
       # It's missing a volume, add one
-      my $vol = ($self->splitpath( $self->_cwd() ))[0];
+      my $vol = ($self->splitpath( Cwd::getcwd() ))[0];
       return $self->canonpath( $vol . $path );
     }
 
     if ( !defined( $base ) || $base eq '' ) {
-      require Cwd ;
       $base = Cwd::getdcwd( ($self->splitpath( $path ))[0] ) if defined &Cwd::getdcwd ;
-      $base = $self->_cwd() unless defined $base ;
+      $base = Cwd::getcwd() unless defined $base ;
     }
     elsif ( ! $self->file_name_is_absolute( $base ) ) {
       $base = $self->rel2abs( $base ) ;
@@ -352,9 +351,9 @@ sub rel2abs {
     my ( $base_volume, $base_directories ) =
       $self->splitpath( $base, 1 ) ;
 
-    $path = $self->catpath(
-			   $base_volume,
-			   $self->catdir( $base_directories, $path_directories ),
+    $path = $self->catpath( 
+			   $base_volume, 
+			   $self->catdir( $base_directories, $path_directories ), 
 			   $path_file
 			  ) ;
 
@@ -408,16 +407,6 @@ sub _canon_cat				# @path -> path
 	       )+			# performance boost -- I do not know why
 	     }{\\}gx;
 
-    # XXX I do not know whether more dots are supported by the OS supporting
-    #     this ... annotation (NetWare or symbian but not MSWin32).
-    #     Then .... could easily become ../../.. etc:
-    # Replace \.\.\. by (\.\.\.+)  and substitute with
-    # { $1 . ".." . "\\.." x (length($2)-2) }gex
-	     				# ... --> ../..
-    $path =~ s{ (\A|\\)			# at begin or after a slash
-    		\.\.\.
-		(?=\\|\z) 		# at end or followed by slash
-	     }{$1..\\..}gx;
     					# xx\yy\..\zz --> xx\zz
     while ( $path =~ s{(?:
 		(?:\A|\\)		# at begin or after a slash

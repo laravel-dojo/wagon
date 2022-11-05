@@ -2,9 +2,8 @@ package Encode::Unicode;
 
 use strict;
 use warnings;
-no warnings 'redefine';
 
-our $VERSION = do { my @r = ( q$Revision: 2.15_01 $ =~ /\d+/g ); sprintf "%d." . "%02d" x $#r, @r };
+our $VERSION = do { my @r = ( q$Revision: 2.20 $ =~ /\d+/g ); sprintf "%d." . "%02d" x $#r, @r };
 
 use XSLoader;
 XSLoader::load( __PACKAGE__, $VERSION );
@@ -13,7 +12,7 @@ XSLoader::load( __PACKAGE__, $VERSION );
 # Object Generator 8 transcoders all at once!
 #
 
-require Encode;
+use Encode ();
 
 our %BOM_Unknown = map { $_ => 1 } qw(UTF-16 UTF-32);
 
@@ -34,12 +33,13 @@ for my $name (
     $endian = ( $3 eq 'BE' ) ? 'n' : ( $3 eq 'LE' ) ? 'v' : '';
     $size == 4 and $endian = uc($endian);
 
-    $Encode::Encoding{$name} = bless {
+    my $obj = bless {
         Name   => $name,
         size   => $size,
         endian => $endian,
         ucs2   => $ucs2,
     } => __PACKAGE__;
+    Encode::define_encoding($obj, $name);
 }
 
 use parent qw(Encode::Encoding);
@@ -51,12 +51,6 @@ sub renew {
     $clone->{renewed}++;    # so the caller knows it is renewed.
     return $clone;
 }
-
-# There used to be a perl implementation of (en|de)code but with
-# XS version is ripe, perl version is zapped for optimal speed
-
-*decode = \&decode_xs;
-*encode = \&encode_xs;
 
 1;
 __END__
@@ -264,15 +258,15 @@ Consider that "division by zero" of Encode :)
 
 =head1 SEE ALSO
 
-L<Encode>, L<Encode::Unicode::UTF7>, L<http://www.unicode.org/glossary/>,
-L<http://www.unicode.org/unicode/faq/utf_bom.html>,
+L<Encode>, L<Encode::Unicode::UTF7>, L<https://www.unicode.org/glossary/>,
+L<https://www.unicode.org/faq/utf_bom.html>,
 
 RFC 2781 L<http://www.ietf.org/rfc/rfc2781.txt>,
 
-The whole Unicode standard L<http://www.unicode.org/unicode/uni2book/u2.html>
+The whole Unicode standard L<https://www.unicode.org/standard/standard.html>
 
-Ch. 15, pp. 403 of C<Programming Perl (3rd Edition)>
-by Larry Wall, Tom Christiansen, Jon Orwant;
-O'Reilly & Associates; ISBN 0-596-00027-8
+Ch. 6 pp. 275 of C<Programming Perl (3rd Edition)>
+by Tom Christiansen, brian d foy & Larry Wall;
+O'Reilly & Associates; ISBN 978-0-596-00492-7
 
 =cut

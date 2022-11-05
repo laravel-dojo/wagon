@@ -1,25 +1,10 @@
 package File::Spec::Unix;
 
 use strict;
-use vars qw($VERSION);
+use Cwd ();
 
-$VERSION = '3.67';
-my $xs_version = $VERSION;
+our $VERSION = '3.84';
 $VERSION =~ tr/_//d;
-
-#dont try to load XSLoader and DynaLoader only to ultimately fail on miniperl
-if(!defined &canonpath && defined &DynaLoader::boot_DynaLoader) {
-  eval {#eval is questionable since we are handling potential errors like
-        #"Cwd object version 3.48 does not match bootstrap parameter 3.50
-        #at lib/DynaLoader.pm line 216." by having this eval
-    if ( $] >= 5.006 ) {
-	require XSLoader;
-	XSLoader::load("Cwd", $xs_version);
-    } else {
-	require Cwd;
-    }
-  };
-}
 
 =head1 NAME
 
@@ -58,7 +43,7 @@ actually traverse the filesystem cleaning up paths like this.
 sub _pp_canonpath {
     my ($self,$path) = @_;
     return unless defined $path;
-
+    
     # Handle POSIX-style node names beginning with double slash (qnx, nto)
     # (POSIX says: "a pathname that begins with two successive slashes
     # may be interpreted in an implementation-defined manner, although
@@ -185,9 +170,10 @@ sub _tmpdir {
 	@dirlist = grep { ! Scalar::Util::tainted($_) } @dirlist;
     }
     elsif ($] < 5.007) { # No ${^TAINT} before 5.8
-	@dirlist = grep { eval { eval('1'.substr $_,0,0) } } @dirlist;
+	@dirlist = grep { !defined($_) || eval { eval('1'.substr $_,0,0) } }
+			@dirlist;
     }
-
+    
     foreach (@dirlist) {
 	next unless defined && -d && -w _;
 	$tmpdir = $_;
@@ -248,7 +234,7 @@ use constant _fn_case_tolerant => 0;
 
 Takes as argument a path and returns true if it is an absolute path.
 
-This does not consult the local filesystem on Unix, Win32, OS/2 or Mac
+This does not consult the local filesystem on Unix, Win32, OS/2 or Mac 
 OS (Classic).  It does consult the working environment for VMS (see
 L<File::Spec::VMS/file_name_is_absolute>).
 
@@ -290,10 +276,10 @@ sub join {
                                                           $no_file );
 
 Splits a path into volume, directory, and filename portions. On systems
-with no concept of volume, returns '' for volume.
+with no concept of volume, returns '' for volume. 
 
-For systems with no syntax differentiating filenames from directories,
-assumes that the last file is a path unless $no_file is true or a
+For systems with no syntax differentiating filenames from directories, 
+assumes that the last file is a path unless $no_file is true or a 
 trailing separator or /. or /.. is present. On Unix this means that $no_file
 true makes this return ( '', $path, '' ).
 
@@ -328,7 +314,7 @@ The opposite of L</catdir()>.
 
     @dirs = File::Spec->splitdir( $directories );
 
-$directories must be only the directory portion of the path on systems
+$directories must be only the directory portion of the path on systems 
 that have the concept of a volume or that have path syntax that differentiates
 files from directories.
 
@@ -363,10 +349,10 @@ inserted if needed (though if the directory portion doesn't start with
 sub catpath {
     my ($self,$volume,$directory,$file) = @_;
 
-    if ( $directory ne ''                &&
-         $file ne ''                     &&
-         substr( $directory, -1 ) ne '/' &&
-         substr( $file, 0, 1 ) ne '/'
+    if ( $directory ne ''                && 
+         $file ne ''                     && 
+         substr( $directory, -1 ) ne '/' && 
+         substr( $file, 0, 1 ) ne '/' 
     ) {
         $directory .= "/$file" ;
     }
@@ -390,7 +376,7 @@ relative, then it is converted to absolute form using
 L</rel2abs()>. This means that it is taken to be relative to
 L<cwd()|Cwd>.
 
-On systems that have a grammar that indicates filenames, this ignores the
+On systems that have a grammar that indicates filenames, this ignores the 
 $base filename. Otherwise all path components are assumed to be
 directories.
 
@@ -409,7 +395,7 @@ Based on code written by Shigio Yamaguchi.
 
 sub abs2rel {
     my($self,$path,$base) = @_;
-    $base = $self->_cwd() unless defined $base and length $base;
+    $base = Cwd::getcwd() unless defined $base and length $base;
 
     ($path, $base) = map $self->canonpath($_), $path, $base;
 
@@ -436,7 +422,7 @@ sub abs2rel {
 	}
     }
     else {
-	my $wd= ($self->splitpath($self->_cwd(), 1))[1];
+	my $wd= ($self->splitpath(Cwd::getcwd(), 1))[1];
 	$path_directories = $self->catdir($wd, $path);
 	$base_directories = $self->catdir($wd, $base);
     }
@@ -458,7 +444,7 @@ sub abs2rel {
     }
     return $self->curdir unless @pathchunks || @basechunks;
 
-    # @basechunks now contains the directories the resulting relative path
+    # @basechunks now contains the directories the resulting relative path 
     # must ascend out of before it can descend to $path_directory.  If there
     # are updir components, we must descend into the corresponding directories
     # (this only works if they are no symlinks).
@@ -488,7 +474,7 @@ sub _same {
 
 =item rel2abs()
 
-Converts a relative path to an absolute path.
+Converts a relative path to an absolute path. 
 
     $abs_path = File::Spec->rel2abs( $path ) ;
     $abs_path = File::Spec->rel2abs( $path, $base ) ;
@@ -519,7 +505,7 @@ sub rel2abs {
     if ( ! $self->file_name_is_absolute( $path ) ) {
         # Figure out the effective $base and clean it up.
         if ( !defined( $base ) || $base eq '' ) {
-	    $base = $self->_cwd();
+	    $base = Cwd::getcwd();
         }
         elsif ( ! $self->file_name_is_absolute( $base ) ) {
             $base = $self->rel2abs( $base ) ;
@@ -544,22 +530,13 @@ Copyright (c) 2004 by the Perl 5 Porters.  All rights reserved.
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
-Please submit bug reports and patches to perlbug@perl.org.
+Please submit bug reports at L<https://github.com/Perl/perl5/issues>.
 
 =head1 SEE ALSO
 
 L<File::Spec>
 
 =cut
-
-# Internal routine to File::Spec, no point in making this public since
-# it is the standard Cwd interface.  Most of the platform-specific
-# File::Spec subclasses use this.
-sub _cwd {
-    require Cwd;
-    Cwd::getcwd();
-}
-
 
 # Internal method to reduce xx\..\yy -> yy
 sub _collapse {
@@ -579,7 +556,7 @@ sub _collapse {
             length $collapsed[-1]       and   # and its not the rootdir
             $collapsed[-1] ne $updir    and   # nor another updir
             $collapsed[-1] ne $curdir         # nor the curdir
-          )
+          ) 
         {                                     # then
             pop @collapsed;                   # collapse
         }

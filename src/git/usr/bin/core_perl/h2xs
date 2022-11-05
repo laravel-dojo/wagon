@@ -1,6 +1,6 @@
 #!/usr/bin/perl
     eval 'exec /usr/bin/perl -S $0 ${1+"$@"}'
-	if $running_under_some_shell;
+	if 0; # ^ Run only under a shell
 
 BEGIN { pop @INC if $INC[-1] eq '.' }
 
@@ -250,7 +250,7 @@ Note that some types of arguments/return-values for functions may
 result in XSUB-declarations/typemap-entries which need
 hand-editing. Such may be objects which cannot be converted from/to a
 pointer (like C<long long>), pointers to functions, or arrays.  See
-also the section on L<LIMITATIONS of B<-x>>.
+also the section on L</LIMITATIONS of B<-x>>.
 
 =back
 
@@ -1054,7 +1054,7 @@ my (@const_specs, @const_names);
 
 for (sort(keys(%const_names))) {
     my $v = $const_names{$_};
-
+    
     push(@const_specs, ref($v) ? $v : $_);
     push(@const_names, $_);
 }
@@ -1904,7 +1904,7 @@ WriteMakefile(
     AUTHOR            => '$author <$email>',
     #LICENSE           => 'perl',
     #Value must be from legacy list of licenses here
-    #http://search.cpan.org/perldoc?Module%3A%3ABuild%3A%3AAPI
+    #https://metacpan.org/pod/Module::Build::API
 END
 if (!$opt_X) { # print C stuff, unless XS is disabled
   $opt_F = '' unless defined $opt_F;
@@ -1966,7 +1966,7 @@ $generate_code
 __END__
 gave unexpected error $@
 Please report the circumstances of this bug in h2xs version $H2XS_VERSION
-using the perlbug script.
+using the issue tracker at https://github.com/Perl/perl5/issues.
 EOM
   } else {
     my $fail;
@@ -1987,7 +1987,7 @@ the files $ext$modpname/$constscfname and $ext$modpname/$constsxsfname
 correctly.
 
 Please report the circumstances of this bug in h2xs version $H2XS_VERSION
-using the perlbug script.
+using the issue tracker at https://github.com/Perl/perl5/issues.
 EOM
     } else {
       unlink $constscfname, $constsxsfname;

@@ -5,6 +5,6 @@ use warnings;
 
 use parent 'URI::_generic';
 
-our $VERSION = '1.76';
+our $VERSION = '5.10';
 
 1;

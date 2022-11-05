@@ -6,14 +6,13 @@ use strict;
 
 our($VERSION, @ISA, @EXPORT_OK);
 
-$VERSION = "1.39";
+$VERSION = "1.57";
 
 use Carp;
-use Exporter ();
+use Exporter 'import';
 use XSLoader;
 
 BEGIN {
-    @ISA = qw(Exporter);
     @EXPORT_OK = qw(
 	opset ops_to_opset
 	opset_to_ops opset_to_hex invert_opset
@@ -116,6 +115,13 @@ The Opcode module is not usually used directly. See the ops pragma and
 Safe modules for more typical uses.
 
 =head1 WARNING
+
+The Opcode module does not implement an effective sandbox for
+evaluating untrusted code with the perl interpreter.
+
+Bugs in the perl interpreter that could be abused to bypass
+Opcode restrictions are not treated as vulnerabilities. See
+L<perlsecpolicy> for additional information.
 
 The authors make B<no warranty>, implied or otherwise, about the
 suitability of this software for safety or security purposes.
@@ -324,6 +330,7 @@ invert_opset function.
 
     lt i_lt gt i_gt le i_le ge i_ge eq i_eq ne i_ne ncmp i_ncmp
     slt sgt sle sge seq sne scmp
+    isa
 
     substr vec stringify study pos length index rindex ord chr
 
@@ -344,6 +351,11 @@ invert_opset function.
     method_super method_redir method_redir_super
      -- XXX loops via recursion?
 
+    cmpchain_and cmpchain_dup
+
+    is_bool
+    is_weak weaken unweaken
+
     leaveeval -- needed for Safe to operate, is safe
 		 without entereval
 
@@ -353,7 +365,7 @@ These memory related ops are not included in :base_core because they
 can easily be used to implement a resource attack (e.g., consume all
 available memory).
 
-    concat repeat join range
+    concat multiconcat repeat join range
 
     anonlist anonhash
 
@@ -405,6 +417,7 @@ These are a hotchpotch of opcodes still waiting to be considered
     once
 
     rv2gv refgen srefgen ref refassign lvref lvrefslice lvavref
+    blessed refaddr reftype
 
     bless -- could be used to change ownership of objects
 	     (reblessing)
@@ -425,13 +438,18 @@ These are a hotchpotch of opcodes still waiting to be considered
     localtime gmtime
 
     entertry leavetry -- can be used to 'hide' fatal errors
+    entertrycatch poptry catch leavetrycatch -- similar
 
     entergiven leavegiven
     enterwhen leavewhen
     break continue
     smartmatch
 
+    pushdefer
+
     custom -- where should this go
+
+    ceil floor
 
 =item :base_math
 
@@ -493,7 +511,7 @@ A handy tag name for a I<reasonable> default set of ops beyond the
 :default optag.  Like :default (and indeed all the other optags) its
 current definition is unstable while development continues. It will change.
 
-The :browse tag represents the next step beyond :default. It it a
+The :browse tag represents the next step beyond :default. It is a
 superset of the :default ops and adds :filesys_read the :sys_db.
 The intent being that scripts can access more (possibly sensitive)
 information about your system but not be able to change it.
@@ -552,7 +570,7 @@ SystemV Interprocess Communications:
 This tag holds opcodes related to loading modules and getting information
 about calling environment and args.
 
-    require dofile
+    require dofile 
     caller runcv
 
 =item :still_to_be_decided
@@ -600,4 +618,3 @@ Split out from Safe module version 1, named opcode tags and other
 changes added by Tim Bunce.
 
 =cut
-

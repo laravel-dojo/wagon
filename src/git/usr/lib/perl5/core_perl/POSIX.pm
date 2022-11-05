@@ -4,7 +4,7 @@ use warnings;
 
 our ($AUTOLOAD, %SIGRT);
 
-our $VERSION = '1.76';
+our $VERSION = '2.03';
 
 require XSLoader;
 
@@ -176,7 +176,7 @@ sub import {
 
     load_imports() unless $loaded++;
 
-    # Grandfather old foo_h form to new :foo_h form
+    # Rewrite legacy foo_h form to new :foo_h form
     s/^(?=\w+_h$)/:/ for my @list = @_;
 
     my @unimpl = sort grep { exists $replacement{$_} } @list;
@@ -306,7 +306,9 @@ my %default_export_tags = ( # cf. exports policy below
 		_POSIX_STREAM_MAX _POSIX_TZNAME_MAX)],
 
     locale_h =>	[qw(LC_ALL LC_COLLATE LC_CTYPE LC_MESSAGES
-		    LC_MONETARY LC_NUMERIC LC_TIME NULL
+		    LC_MONETARY LC_NUMERIC LC_TIME LC_IDENTIFICATION
+                    LC_MEASUREMENT LC_PAPER LC_TELEPHONE LC_ADDRESS
+                    LC_SYNTAX LC_TOD NULL
 		    localeconv setlocale)],
 
     math_h =>   [qw(FP_ILOGB0 FP_ILOGBNAN FP_INFINITE FP_NAN FP_NORMAL
@@ -437,6 +439,8 @@ my %other_export_tags = ( # cf. exports policy below
 
     stdlib_h_c99 => [ @{$default_export_tags{stdlib_h}}, 'strtold' ],
 
+    sys_resource_h => [qw(PRIO_PROCESS PRIO_PGRP PRIO_USER)],
+
     sys_socket_h => [qw(
         MSG_CTRUNC MSG_DONTROUTE MSG_EOR MSG_OOB MSG_PEEK MSG_TRUNC MSG_WAITALL
     )],
@@ -462,7 +466,7 @@ my %other_export_tags = ( # cf. exports policy below
 # - new SHOUTYCONSTANTS are OK to add to @EXPORT
 
 {
-  # De-duplicate the export list:
+  # De-duplicate the export list: 
   my ( %export, %export_ok );
   @export   {map {@$_} values %default_export_tags} = ();
   @export_ok{map {@$_} values   %other_export_tags} = ();

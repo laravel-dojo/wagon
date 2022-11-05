@@ -1,46 +1,58 @@
-README - Net::SSLeay Perl module for using OpenSSL
-$Id: README 472 2016-07-28 09:14:26Z mikem-guest $
+Net-SSLeay - Perl bindings for OpenSSL and LibreSSL
 
 By popular demand...
 --------------------
 
    perl -MNet::SSLeay -e '($p)=Net::SSLeay::get_https("www.openssl.org", 443, "/"); print $p'
 
-for the latest and possibly unstable version from SVN:
 
-   svn co svn://svn.debian.org/svn/net-ssleay
+for the released versions:
+   https://metacpan.org/release/Net-SSLeay
+
+for the latest and possibly unstable version from git:
+
+   https://github.com/radiator-software/p5-net-ssleay
 
 
 Prerequisites
 -------------
 
-perl-5.6.1     though anything starting from perl5.003 probably works. Later
-	       versions are OK.
+Perl 5.8.1 or higher.
 
-OpenSSL-0.9.6j through to at least OpenSSL-1.1 and probably later
-	       http://www.openssl.org/ - On Linux, you can either build and
-	       install OpenSSL from scratch (its very portable) or you can
-	       install the appropriate OpenSSL 'devel' package for your Linux
-	       distribution: (rpm openssl-devel, deb libssl-dev).
+One of the following libssl implementations:
 
+* Any stable release of OpenSSL (https://www.openssl.org) in the
+  0.9.8 - 3.0 branches, except for OpenSSL 0.9.8 - 0.9.8b.
+* Any stable release of LibreSSL (https://www.libressl.org) in the
+  2.0 - 3.4 series, except for LibreSSL 3.2.2 and 3.2.3.
 
-Note: SSLeay is no longer supported. If you want to use Net::SSLeay with
-      SSLeay or early versions of OpenSSL, use version 1.03. The support
-      for SSLeay was dropped due to nobody maintaining it (all active
-      work goes on with OpenSSL) and due to incompatible API changes
-      in OpenSSL-0.9.2b. OpenSSL-0.9.1c support has also been dropped,
-      version 1.03 was the last one to support that.
+Net-SSLeay may not compile or pass its tests against releases other
+than the ones listed above due to libssl API incompatibilities, or, in
+the case of LibreSSL, because of deviations from the libssl API.
 
-LibreSSL is also supported.
+If you are using a version of OpenSSL or LibreSSL distributed by your
+operating system vendor, you may also need to install a "development"
+package containing the header files that correspond to the OpenSSL or
+LibreSSL library package. Examples include:
 
-You should use the same C compiler and options to compile OpenSSL,
-perl, and Net::SSLeay. This is the only supported configuration.
-If you insist on using different compilers (perhaps because you
-obtained either OpenSSL or perl as binaries from a vendor and they
-used a compiler that you do not have) then all requests for support
-will be ignored. If the only way for you to use the same compiler
-for all three components is to recompile your openssl or perl, then
-that is exactly what I expect you to do before asking for support.
+* libssl-dev for OpenSSL on Debian and Ubuntu;
+* openssl-devel for OpenSSL on Red Hat Enterprise Linux and Fedora.
+
+On Linux, zlib is also required, even when libssl is built without
+support for TLS compression. zlib is probably also available via your
+Linux distribution's package manager, e.g.:
+
+* zlib1g-dev on Debian and Ubuntu;
+* zlib-devel on Red Hat Enterprise Linux and Fedora.
+
+A future version of Net-SSLeay will remove this requirement when
+building against a libssl without support for TLS compression.
+
+The same C compiler and options should be used to compile all of Perl,
+OpenSSL/LibreSSL, and Net-SSLeay. Mixing compilers and options often
+leads to build errors or run-time malfunctions that are difficult to
+debug.
+
 
 Installing
 ----------
@@ -90,25 +102,7 @@ OS X:
 ---------------------------------	
 You should also be able to use CPAN.pm to install this module if you like.
 
-Linking with RSAref is no longer supported (the patent issue is moot
-due to patent expiring). If you want to try it, you are on your own,
-but here's how it used to work...
-
-  For linking against RSAref the the OPENSSL_RSAREF environment variable like this:
-
-	OPENSSL_RSAREF=1 ./Makefile.PL -t  # builds and tests it, link against RSAref
-
-  You must previously have built OpenSSL with RSAref support (which
-  implies first building rsaref itself), I use the RSAglue method. File
-  librsaref.a must be found in one of the locations searched by linker
-  (-L switches). Usually this means that you have to rename rsaref.a to
-  librsaref.a and copy it to suitable directory, e.g. /usr/local/ssl/lib.
-
-  N.B. AFAIK the patent that made using RSAref necessary has expired, so
-  this should be nonissue by now.
-
-
-Problems (read this before sending mail)
+Problems (read this before filing a bug)
 ----------------------------------------
 
 Please, do not send bug report before you have
@@ -144,9 +138,6 @@ If build fails,
     but as I have not yet sorted it out, you'll simply have to ignore it
   - if you installed OpenSSL from some distribution, try getting a fresh
     copy from www.openssl.org and recompiling and installing it yourself
-  - make sure you are not being confused by the fact that OpenSSL-0.9.3
-    changed the location of include files to /usr/local/ssl/include/openssl/*
-    Consider deleting all old bogus headers
   - if using newer than supported OpenSSL, please downgrade to supported
     version to see if it makes difference
   - you must compile the module, perl, and openssl with the same C compiler
@@ -215,9 +206,6 @@ I have a report (schinder@@pobox._com) of make test segfaulting on
 Linux-PPC. This still needs to be investigated. No recent information
 has been received.
 
-It seems perl5.004 (at least some versions) has bad xsub compiler which
-can make builds sometimes fail. Try upgrading to perl-5.6.1 first.
-
 "Random number generator not seeded!!!" This warning indicates that
     randomize() was not able to read /dev/random or /dev/urandom, possibly
     because your system does not have them or they are differently
@@ -229,20 +217,6 @@ is, just say `perldoc Net::SSLeay' or `more SSLeay.pm')?
 
 Are you sure you didn't confuse `Net::SSLeay' with `SSLeay' that
 comes with OpenSSL?
-
-My development environments used to be
-
-  i686,   Linux-2.4.3,  gcc-2.92.2,   glibc-2.2,   perl-5.6.0,   openssl-0.9.6a
-  i686,   Linux-2.4.3,  gcc-2.92.2,   glibc-2.2,   perl5.005_02, openssl-0.9.6a
-  i686,   Linux-2.0.35, gcc-2.7.2.3,  glibc-2.0.6, perl5.005_02, openssl-0.9.5a
-  i586,   Linux-2.4.3,  gcc-2.92.2.1, glibc-2.2.2, perl-5.6.0,   openssl-0.9.6a
-  i586,   Linux-2.4.3,  gcc-2.92.2.1, glibc-2.2.2, perl5.005_03, openssl-0.9.6
-  i586,   Linux-2.4.3,  gcc-2.92.2.1, glibc-2.2.2, perl5.005_03, openssl-0.9.6a
-  Sun-U1, SunOS-5.6,    gcc-2.92.2,   libc2        perl-5.6.1,   openssl-0.9.6c
-
-Unfortunately I do not have access to other systems so you are
-somewhat on your own. Everything compiles without a warning (except
-those mentioned above) on my systems.
 
 Check that perl is finding your OpenSSL.
 
@@ -290,26 +264,23 @@ threads. Try not using the PerlIO abstraction.
 If you need to tweak build for some platform, please let me know
 so I can fix it. Patches and gdb session dumps are also welcome.
 
-License and Copying
--------------------
+Copyright
+---------
 
-Copyright (c) 1996-2002 Sampo Kellomaki <sampo@symlabs.com>
-Copyright (c) 2005 Florian Ragwitz <rafl@debian.org>
-Copyright (c) 2005 Mike McCauley <mikem@airspayce.com>
+Copyright (c) 1996-2003 Sampo Kellomäki <sampo@iki.fi>
+Copyright (c) 2005-2010 Florian Ragwitz <rafl@debian.org>
+Copyright (c) 2005-2018 Mike McCauley <mikem@airspayce.com>
+Copyright (c) 2018- Chris Novakovic <chris@chrisn.me.uk>
+Copyright (c) 2018- Tuure Vartiainen <vartiait@radiatorsoftware.com>
+Copyright (c) 2018- Heikki Vatiainen <hvn@radiatorsoftware.com>
 
+All rights reserved.
 
-All Rights Reserved.
+License
+-------
 
-From version
-1.66 onwards, this Net-SSLeay package is issued under the "Perl Artistic
-License 2.0", the same license as Perl itself.
-
-The Authors credit Eric Young and the OpenSSL team with the development of the
-excellent OpenSSL library, which this Perl package uses.
-
-And remember, you, and nobody else but you, are responsible for
-auditing this module and OpenSSL library for security problems,
-backdoors, and general suitability for your application.
+Net-SSLeay is released under the terms of the Artistic License 2.0. For
+details, see the LICENSE file.
 
 Recommended reading
 -------------------
@@ -338,15 +309,10 @@ which gives excellent tutorial of the build process of XSUBs.
 
 Say `perldoc Net::SSLeay' _NOW_!
 
-To download OpenSSL, try URL http://www.openssl.org/
+To download OpenSSL, see https://www.openssl.org/
 
-Of related interest may be `http://www.symlabs.com/Net_SSLeay/smime.html'
+Bug reports, patch submission, feature requests and git access to the
+latest source code etc., can be obtained at
+https://github.com/radiator-software/p5-net-ssleay
 
-Bug reports, patch submission, feature requests, subversion access to the latest 
-source code etc can be obtained at 
-http://alioth.debian.org/projects/net-ssleay
-
-The developer mailing list (for people interested in contributin to the source code)
-can be found at 
-http://lists.alioth.debian.org/mailman/listinfo/net-ssleay-devel
 

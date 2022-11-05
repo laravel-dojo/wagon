@@ -12,7 +12,10 @@ use warnings;
 
 # mro.pm versions < 1.00 reserved for MRO::Compat
 #  for partial back-compat to 5.[68].x
-our $VERSION = '1.20';
+our $VERSION = '1.26';
+
+require XSLoader;
+XSLoader::load('mro');
 
 sub import {
     mro::set_mro(scalar(caller), $_[1]) if $_[1];
@@ -36,9 +39,6 @@ sub method {
     goto &$method if defined $method;
     return;
 }
-
-require XSLoader;
-XSLoader::load('mro');
 
 1;
 
@@ -89,8 +89,7 @@ resolution order under multiple inheritance. It was first introduced in
 the language Dylan (see links in the L</"SEE ALSO"> section), and then
 later adopted as the preferred MRO (Method Resolution Order) for the
 new-style classes in Python 2.3. Most recently it has been adopted as the
-"canonical" MRO for Perl 6 classes, and the default MRO for Parrot objects
-as well.
+"canonical" MRO for Raku classes.
 
 =head2 How does C3 work
 
@@ -308,31 +307,15 @@ works (like C<goto &maybe::next::method>);
 
 =over 4
 
-=item L<http://haahr.tempdomainname.com/dylan/linearization-oopsla96.html>
+=item L<http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.19.3910&rep=rep1&type=pdf>
 
 =back
 
-=head2 Pugs
-
-The Pugs prototype Perl 6 Object Model uses C3
-
-=head2 Parrot
-
-Parrot now uses C3
+=head2 Python 2.3 MRO
 
 =over 4
 
-=item L<http://use.perl.org/~autrijus/journal/25768>
-
-=back
-
-=head2 Python 2.3 MRO related links
-
-=over 4
-
-=item L<http://www.python.org/2.3/mro.html>
-
-=item L<http://www.python.org/2.2.2/descrintro.html#mro>
+=item L<https://www.python.org/download/releases/2.3/mro/>
 
 =back
 

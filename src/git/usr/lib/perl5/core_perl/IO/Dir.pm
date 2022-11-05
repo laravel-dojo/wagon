@@ -6,22 +6,21 @@
 
 package IO::Dir;
 
-use 5.006;
+use 5.008_001;
 
 use strict;
 use Carp;
 use Symbol;
 use Exporter;
 use IO::File;
-our(@ISA, $VERSION, @EXPORT_OK);
 use Tie::Hash;
 use File::stat;
 use File::Spec;
 
-@ISA = qw(Tie::Hash Exporter);
-$VERSION = "1.10";
-$VERSION = eval $VERSION;
-@EXPORT_OK = qw(DIR_UNLINK);
+our @ISA = qw(Tie::Hash Exporter);
+our $VERSION = "1.49";
+
+our @EXPORT_OK = qw(DIR_UNLINK);
 
 sub DIR_UNLINK () { 1 }
 
@@ -147,7 +146,7 @@ sub DELETE {
 
 __END__
 
-=head1 NAME
+=head1 NAME 
 
 IO::Dir - supply object methods for directory handles
 
@@ -216,15 +215,15 @@ C<unlink>, C<rmdir> and C<utime>.
 
 =back
 
-The keys of the hash will be the names of the entries in the directory.
+The keys of the hash will be the names of the entries in the directory. 
 Reading a value from the hash will be the result of calling
-C<File::stat::lstat>.  Deleting an element from the hash will
+C<File::stat::lstat>.  Deleting an element from the hash will 
 delete the corresponding file or subdirectory,
 provided that C<DIR_UNLINK> is included in the C<OPTIONS>.
 
 Assigning to an entry in the hash will cause the time stamps of the file
 to be modified. If the file does not exist then it will be created. Assigning
-a single integer to a hash element will cause both the access and
+a single integer to a hash element will cause both the access and 
 modification times to be changed to that value. Alternatively a reference to
 an array of two values can be passed. The first array element will be used to
 set the access time and the second element will be used to set the modification
@@ -237,7 +236,7 @@ L<File::stat>
 =head1 AUTHOR
 
 Graham Barr. Currently maintained by the Perl Porters.  Please report all
-bugs to <perlbug@perl.org>.
+bugs at L<https://github.com/Perl/perl5/issues>.
 
 =head1 COPYRIGHT
 

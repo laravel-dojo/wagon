@@ -187,7 +187,7 @@ If called with an argument C<blocking> will turn on non-blocking IO if
 C<BOOL> is false, and turn it off if C<BOOL> is true.
 
 C<blocking> will return the value of the previous setting, or the
-current setting if C<BOOL> is not given.
+current setting if C<BOOL> is not given. 
 
 If an error occurs C<blocking> will return undef and C<$!> will be set.
 
@@ -243,7 +243,7 @@ module keeps a C<timeout> variable in 'io_socket_timeout'.
 
 =head1 SEE ALSO
 
-L<perlfunc>,
+L<perlfunc>, 
 L<perlop/"I/O Operators">,
 L<IO::File>
 
@@ -251,7 +251,7 @@ L<IO::File>
 
 Due to backwards compatibility, all filehandles resemble objects
 of class C<IO::Handle>, or actually classes derived from that class.
-They actually aren't.  Which means you can't derive your own
+They actually aren't.  Which means you can't derive your own 
 class from C<IO::Handle> and inherit those methods.
 
 =head1 HISTORY
@@ -260,21 +260,19 @@ Derived from FileHandle.pm by Graham Barr E<lt>F<gbarr@pobox.com>E<gt>
 
 =cut
 
-use 5.006_001;
+use 5.008_001;
 use strict;
-our($VERSION, @EXPORT_OK, @ISA);
 use Carp;
 use Symbol;
 use SelectSaver;
 use IO ();	# Load the XS module
 
 require Exporter;
-@ISA = qw(Exporter);
+our @ISA = qw(Exporter);
 
-$VERSION = "1.36";
-$VERSION = eval $VERSION;
+our $VERSION = "1.48";
 
-@EXPORT_OK = qw(
+our @EXPORT_OK = qw(
     autoflush
     output_field_separator
     output_record_separator
@@ -366,7 +364,7 @@ sub fdopen {
     my ($io, $fd, $mode) = @_;
     local(*GLOB);
 
-    if (ref($fd) && "".$fd =~ /GLOB\(/o) {
+    if (ref($fd) && "$fd" =~ /GLOB\(/o) {
 	# It's a glob reference; Alias it as we cannot get name of anon GLOBs
 	my $n = qualify(*GLOB);
 	*GLOB = *{*$fd};
@@ -433,26 +431,6 @@ sub say {
     print $this @_;
 }
 
-# Special XS wrapper to make them inherit lexical hints from the caller.
-_create_getline_subs( <<'END' ) or die $@;
-sub getline {
-    @_ == 1 or croak 'usage: $io->getline()';
-    my $this = shift;
-    return scalar <$this>;
-}
-
-sub getlines {
-    @_ == 1 or croak 'usage: $io->getlines()';
-    wantarray or
-	croak 'Can\'t call $io->getlines in a scalar context, use $io->getline';
-    my $this = shift;
-    return <$this>;
-}
-1; # return true for error checking
-END
-
-*gets = \&getline;  # deprecated
-
 sub truncate {
     @_ == 2 or croak 'usage: $io->truncate(LEN)';
     truncate($_[0], $_[1]);
@@ -494,7 +472,7 @@ sub stat {
 ##
 
 sub autoflush {
-    my $old = new SelectSaver qualify($_[0], caller);
+    my $old = SelectSaver->new(qualify($_[0], caller));
     my $prev = $|;
     $| = @_ > 1 ? $_[1] : 1;
     $prev;
@@ -534,7 +512,7 @@ sub input_line_number {
 
 sub format_page_number {
     my $old;
-    $old = new SelectSaver qualify($_[0], caller) if ref($_[0]);
+    $old = SelectSaver->new(qualify($_[0], caller)) if ref($_[0]);
     my $prev = $%;
     $% = $_[1] if @_ > 1;
     $prev;
@@ -542,7 +520,7 @@ sub format_page_number {
 
 sub format_lines_per_page {
     my $old;
-    $old = new SelectSaver qualify($_[0], caller) if ref($_[0]);
+    $old = SelectSaver->new(qualify($_[0], caller)) if ref($_[0]);
     my $prev = $=;
     $= = $_[1] if @_ > 1;
     $prev;
@@ -550,7 +528,7 @@ sub format_lines_per_page {
 
 sub format_lines_left {
     my $old;
-    $old = new SelectSaver qualify($_[0], caller) if ref($_[0]);
+    $old = SelectSaver->new(qualify($_[0], caller)) if ref($_[0]);
     my $prev = $-;
     $- = $_[1] if @_ > 1;
     $prev;
@@ -558,7 +536,7 @@ sub format_lines_left {
 
 sub format_name {
     my $old;
-    $old = new SelectSaver qualify($_[0], caller) if ref($_[0]);
+    $old = SelectSaver->new(qualify($_[0], caller)) if ref($_[0]);
     my $prev = $~;
     $~ = qualify($_[1], caller) if @_ > 1;
     $prev;
@@ -566,7 +544,7 @@ sub format_name {
 
 sub format_top_name {
     my $old;
-    $old = new SelectSaver qualify($_[0], caller) if ref($_[0]);
+    $old = SelectSaver->new(qualify($_[0], caller)) if ref($_[0]);
     my $prev = $^;
     $^ = qualify($_[1], caller) if @_ > 1;
     $prev;
@@ -640,7 +618,7 @@ sub constant {
 sub printflush {
     my $io = shift;
     my $old;
-    $old = new SelectSaver qualify($io, caller) if ref($io);
+    $old = SelectSaver->new(qualify($io, caller)) if ref($io);
     local $| = 1;
     if(ref($io)) {
         print $io @_;
