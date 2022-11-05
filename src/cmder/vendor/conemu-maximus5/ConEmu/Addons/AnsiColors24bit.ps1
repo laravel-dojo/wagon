@@ -6,13 +6,17 @@ $w = [Console]::BufferWidth
 $y = ([Console]::BufferHeight-$h)
 
 # Clean console contents (this will clean TrueColor attributes)
-Write-Host (([char]27)+"[9999S")
+Write-Host (([char]27)+"[32766S")
 # Apply default powershell console attributes
 cls
 
 # Ensure that we are in the bottom of the buffer
-[Console]::SetWindowPosition(0,$y)
-[Console]::SetCursorPosition(0,$y)
+try{
+  [Console]::SetWindowPosition(0,$y)
+  [Console]::SetCursorPosition(0,$y)
+}catch{
+  Write-Host (([char]27)+"[32766H")
+}
 
 # Header
 $title = " Printing 24bit gradient with ANSI sequences using powershell"
@@ -32,7 +36,7 @@ while ($l -lt $h) {
     Write-Host -NoNewLine (([char]27)+"[48;2;"+$r+";255;"+$b+"m ")
     $c++
   }
-  Write-Host -NoNewLine (([char]27)+"[m ")
+  Write-Host (([char]27)+"[m ")
   $l++
 }
 

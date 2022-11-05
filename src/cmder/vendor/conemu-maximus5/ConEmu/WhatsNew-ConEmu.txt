@@ -20,6 +20,1048 @@ https://conemu.github.io/en/Whats_New.html
 -------------------------------------------
 
 
+2022.8.7
+* gh-2458: Preliminary support of Far3 experimental feature 'Fullwidth-aware rendering'.
+* l10n: translations were updated
+
+
+2022.4.18
+* gh-2404, gh-2420, gh-2429: Fix line-wrapping regression.
+* GuiMacro: Let `Tab 7 -2` activate the console where command is executed.
+* Fix StatusBar column ‘Cursor information’ description.
+
+
+2022.3.8
+* gh-2385: Call `C:\Users\conemu\.conemu\CmdInit.cmd` if it exists during `{cmd}` initialization.
+* gh-2323: Fix Far inactivity tracking while its waiting on console input.
+* Internal warning fixes (Mikhail Lukashov).
+* gh-2404: Fix line wrapping on Win11 with by-one-char output.
+* Link to Fonts documentation page was incorrect.
+* l10n: translations were updated
+
+
+2021.9.12
+* gh-2363: Fix tasks file parser.
+* If temp file deletion fails register it to delete on reboot.
+* Default update channel for stable builds should be Stable.
+* l10n: translations were updated
+
+
+2021.9.5
+* Add hotkey to move focus from ConEmu to parent window during ConEmu Inside mode.
+* gh-2362: When ‘Process 'start'’ is enabled support starting .bat files from Far Manager by Shift+Enter in new tab automatically.
+
+
+2021.8.22
+* gh-2356: fix crash when running jom.exe.
+
+
+2021.8.16
+* gh-2343: Add VS2022 command line tools detection.
+* Improve between monitor jumps. When two monitors have different dpi
+  ConEmu tries to preserve size in console cells for non-maximized window.
+* gh-2351: Fix crash while searching in settings dialog.
+
+
+2021.7.18
+* gh-2330: Fix crash on startup.
+* gh-2328: Fix 100% CPU load during `lua:far.Message(",)`.
+* l10n: translations were updated
+
+
+2021.6.27
+* gh-2261: Far executor fix.
+* gh-2329: Support GuiMacro run from PseudoConsoles.
+  For proper work of ConEmu environment variables ConEmuPID and ConEmuServerPID
+  should be set properly. Variables are set by ConEmuC (console server)
+  but they also have to be inherited by processes running in the
+  PseudoConsole (Windows 10 feature).
+
+
+2021.6.24
+* gh-2323: Fix 'busy' cursor in Far Manager 3.0 build 5817+.
+* gh-2323: Edit box for Far hourglass timeout (ms).
+* gh-2324: Path containing `%DOCKER_TOOLBOX_INSTALL_PATH%` have to be quoted (by trolzen).
+* gh-2261: Far executor fix.
+* l10n: translations were updated
+
+
+2021.6.20
+* New code signing certificate is used! Windows SmartScreen could show warnings until reputation level is back.
+* Disable taskbar overlay icon by default.
+* gh-2327: Disable integral size for '100%' width or height.
+* gh-2296: Fix `vagrant up` commmand execution (5a5a84200 regression fix).
+
+
+2021.4.22
+* gh-2212: Fix running `set path` from Far Manager 1.75.
+* gh-2302: Fix terminal mode returning to Far Manager from xterm commands.
+* Pixel-hint the icons.
+* Visibility improvements for some long string in settings dialogs.
+* l10n: translations were updated
+
+
+2021.3.14
+* gh-327: Allow expand selection after DblClick.
+
+
+2021.3.12
+* gh-2280: Let's tripple click select long lines wrapped on several rows (same AI as in copying selected text).
+* Correct double-click selection condition (was unselected unexpectedly in some cases, e.g. dblclick over comma).
+* Let's triple click select last line trimming trailing spaces.
+* gh-2292: Programs failed to run with `-new_console:i` switch from existing consoles.
+* gh-2212: Fix command execution from Far Manager (files with commas, unquoted batches).
+* gh-2279: Allow commands like `-run "cmd /k echo Hello world"`.
+* Executor: choose ConEmuC bitness according to ComSpec settings.
+* l10n: translations were updated
+
+
+2021.3.4
+* gh-2212: Fix executer in Far 1.75 (commands with redirections).
+* gh-2249, gh-2248: ANSI: Fix new line processing (screen issues).
+* Fix logging during `ConEmuC -echo` or `ConEmuC -type`.
+* gh-2251: Restore WindowsXP 32-bit support.
+* Executor: Fix empty output of console app started from Far 3.0 on Windows XP.
+* Fix Far 1.75 default task name.
+* gh-2246: Xterm child process fix.
+* Don't try to substitute `C:\` with env.vars in default tasks.
+* Remove RealConsole flickering while starting elevated tab.
+* Support `|||` delimiter in single instance mode. E.g. run from .cmd file (^-escaped):
+  `start ConEmu64.exe -single -runlist ping -t 8.8.8.8 ^|^|^| ping -t google.com`.
+* Stop selecting with mouse on LBtnUp when cursor is out of the ConEmu window rect.
+* gh-1413: Improve scrolling during selection text with mouse.
+* l10n: translations were updated.
+
+
+2021.2.6
+* gh-2259, gh-2269: Fix Far Manager crash using `ConEmu.Editor.lua`.
+* gh-2262: Fix executing batch scripts from Far if command contains quotes.
+* gh-2271: Fix single-char lines output in python.
+* gh-2272: Prefix console error messages with `ConEmuC:`.
+* gh-2212, gh-2262, gh-2267, gh-2270: Fix run commands from Far Manager (ErrCode=0x00000057).
+* Fix `ConEmuC -echo ...` and `ConEmuC -type ...` commands.
+* l10n: translations were updated
+
+
+2021.2.2
+* gh-2212: Fix executer in Far 3.0.
+* gh-2220: Fix default task generation for VsDevCmd.bat.
+* gh-2256: Fix run `cmd /k ...` with `-new_console` switch.
+* gh-2257: Fix exception 0xC0000005 on fresh run.
+* gh-2249: Fix newline mode change using connector.
+* Hyperlinks: Allow use tasks in ‘goto editor’ command. E.g. `{Far} /e%1:%2 %3`.
+* DefTerm: Fix injects error -113:0x00000018 which could occurs during infiltrating program initialization.
+* l10n: translations were updated
+
+
+2021.1.28
+* gh-2212: Far 1.75 executor - fix run cmd scripts with space in the path, redirections
+  or asFile specified in CreateProcess.
+* Create default tasks for all found WSL distributions.
+* Support loading tab icons for 64-bit system32 apps in 32-bit ConEmu (e.g. wsl.exe).
+* gh-2253: Fix 'Run as current user' radio box l10n.
+* DefTerm: Support manual attach of the VsDebugConsole.exe console.
+  If VsDebugConsole.exe was started outside of ConEmu without DefTerm,
+  the process does not have ConEmuHk injected and after manual attach
+  it could behave incorrectly on debugging program termination.
+* gh-2250: Fix sequence `ESC[3J` to clear backscroll buffer.
+* l10n: translations were updated
+* DefTerm: Activate VsDebugConsole tab when new session (run/debug) is starting.
+* Reset dynamic scroll range after `cls` command.
+
+
+2021.1.12
+* gh-2243: Fix arrow key issue in cygwin pseudo console. (#2245)
+* Add `ConEmuC -verbose` switch to force called functions printing to stdout (debugging purposes).
+* Don't show MessageBox on injects failures in ConEmuC.exe, print error to stdout instead. May be suppressed by `-silent` switch.
+* Workaround for Win10 bug leading to invisible leading 4 characters in prompt after exit from `cmd.exe /k wsl.exe`.
+
+
+2021.1.11
+* gh-2212: Fix run batch from Far Manager from paths containing space and `@`.
+* Fix running from cmd prompt: `ConEmuC -c {bash}`.
+
+
+2021.1.9
+* gh-2231: Validate shared memory on use.
+* gh-2220: Add VsDevCmd.bat to VisualStudio default task creation search.
+* gh-2228: return `ANSICON_VER` environment variable value as `189`.
+* Fix save 'Sync dir' option of ConEmu Inside mode. Support empty (default) CD format.
+* Fix GuiMacro assertion could appear in Inside mode during startup.
+* Internal changes in ConEmuHk Inject routine (error codes -113, -115).
+* gh-1691: Buffer keyboard sequences before writing to pty input (Connector version 1.2.9).
+* DefTerm: Prefer ConEmu inside instance when console app is running from parent window, e.g. VS debugging and ConEmu in a VS pane.
+* Ensure bitness is checked properly while injecting hooks (error -710).
+* DefTerm: fix starting python.exe from GUI idle.
+* DefTerm: Avoid RealConsole flickering while starting console app from VS without debugging.
+* DefTerm: Remove RealConsole flickering while starting debugger.
+* gh-1952: DefTerm. Modifications were made to support VS 2019 debugging and running of console applications (native and .net).
+  With "ConEmu Integration 2019" VS extension it's possible now to run and debug console applications using embedded terminal.
+* gh-2228: Implement `ConEmuFeatures` environment variable.
+  It's available only on direct requests, e.g. `echo %ConEmuFeatures%`
+  but does not exist in the environment (`set ConEmuFeatures` will not show it).
+  Returns a set of ConEmu::ConsoleFlags flags from ConEmu settings, e.g. "0x000082A6".
+* gh-947: Don't show `rcCon.right && rcCon.bottom` assertion in release.
+* Change clink URL to maintained fork
+* l10n: Translations were updated, Italian translation was started.
+
+
+2020.11.24
+* gh-2201: Support new executor in Far 3 build 5709.
+* l10n: German translations were updated
+* Minimum required Windows version was updated in Readme.
+
+
+2020.11.23a
+* Fix crash on paste (2020.11.23 regression).
+
+
+2020.11.23
+* gh-2206: Fix distorted output (no automatic CR after LF).
+* gh-2205: Fix installer (didn't run because of incorrect side-by-side configuration).
+* gh-2194: Convert tabs to spaces when pasting in single-line mode.
+  https://conemu.github.io/en/SettingsPaste.html#id2166
+
+
+2020.11.22
+* gh-2188: Fix processing of ANSI sequence to change text cursor shape.
+  E.g. in cmd.exe prompt: `call SetEscChar.cmd && echo %ESC%[1 q`.
+* gh-2159: Fix ANSI scrolling issues (Git for Windows 2.28.0-rc2 less and others).
+* Speed up git paged scrolling up.
+* ANSI: Enable XTerm output mode with `ENABLE_VIRTUAL_TERMINAL_PROCESSING` flag.
+  More info: https://conemu.github.io/en/TerminalModes.html
+* Show ‘Terminal modes’ status bar column by default.
+* gh-2130: Let installer run again on Windows XP.
+* gh-2195: fix unexpected set of buffer height in alternative screen buffers.
+* Add full command line to output of `ConEmuC /args ...`.
+* gh-2199: Fix executor - extra quotation mark running commands (with trailing space) from Far Manager.
+* l10n: Polish and Russian translations were updated.
+
+
+2020.11.1
+* Fixes for compilation with mingw64 on Linux.
+* Add sample cmd script to `git push --set-upstream ...` using current local branch.
+* gh-2191: Alt+Space - show System Menu on key down.
+* Update icon for nuget/choco packages.
+* GuiMacro: WindowMode(TWidth) maximizes window width.
+* Let `Win+Left/Right`, `Win+Shift+Left/Right` process by OS if window title/frame aren't hidden.
+  This allows to use FancyZones from Windows PowerToys.
+* Let's position by default ConEmu window in a normal position, slightly away from {0,0} screen corner.
+  If window is started at {0,0} position, than Win+Left (on Windows 10) tiles window only on height-half.
+* Fix ConEmu restore after snapping window to zone on the other monitor.
+  If ConEmu was moved to different monitor during spanned (tiled) mode,
+  minimize/restore moved the window to the monitor where ConEmu was in
+  the normal mode previously.
+* gh-2135: Try to fix dpi assertion on computer wake.
+* Fix assertion dialog and memory dump creation.
+  Only two buttons left - Retry (creates a dump for report) and Cancel (skip the assertion).
+  Retry button does not kill ConEmu process anymore.
+* l10n: translations were updated
+* Fix excessive resize on restore to maximized state after moving between monitors.
+* ANSI and GuiMacro: Support paused progress state (yellow indicator on Windows TaskBar).
+  ANSI sequence `ESC ] 9 ; 4 ; 4 ; pr ST` or GuiMacro `Progress(4, pr)` where `pr` is a percentage 0 .. 100.
+  ref: microsoft/terminal#3004
+* Don't use connector/wslbridge for Wsl by default.
+
+
+2020.10.11
+* gh-2158: Replace control characters `\x01`..`\x1F` with unicode glyphs only for drawing.
+* gh-2183: Let reopened `CONOUT$` handle be inheritable. (Fix `shell returned 1` vim message.)
+* Support default tasks generation for Visual Studio 2019 (via search in Program Files).
+* Add default hotkey `Shift+RClick` for new configs to open Edit menu.
+* New icon design.
+
+
+2020.9.28
+* Internal global hotkeys refactoring + logging (ref gh-2143).
+* Fix localized labels for hotkey related settings checkboxes, e.g. ‘Ctrl+Numbers - activate console’.
+* Fix not working AppDistinct cursor related options.
+* Show console buffer size on the Settings/Info page.
+* Show console left/top on the Settings/Info page.
+* Don't try to run automatic update check if update error message was not closed yet.
+* gh-2151: Don't show injection errors if ConEmuHk was deleted.
+* gh-2135: Fix wrong assert condition.
+* gh-2177: Fix spare console resize on restore previously maximized window.
+* gh-2173: Support menu localization.
+* l10n: translations were updated.
+* gh-2118: Clink readme fix.
+* gh-977: Add option to show Edit Menu on Right/Middle mouse button click.
+* A lot of internal changes, refactoring, unit tests.
+* Add ‘Reset terminal’ confirmation.
+* Fix 'set var=value & {Task}' expansion in ConEmuC.
+
+
+2020.7.13
+* gh-2009: Autoload font files from ConEmuDir/ConEmuBaseDir (fix).
+* gh-2130: Use v141_xp toolset to build Release|x86.
+* Fix 'Settings/Debug/Exec' monitoring: files weren't loaded after '@'.
+* Button 'Register ConEmu autorun' didn't work in some cases.
+* Fix console lags and size during ConEmu cmd autoattach initialization.
+* gh-2145: Fix crash (read access violation).
+* l10n: translations were updated
+* gh-468: Fix for environment reload from registry (expand variables in PATH).
+  The problem was with `PATH` variable, it contains substitutes `%SystemRoot%`,
+  but they were not expanded during environment refresh.
+* Code refactoring.
+
+
+2020.6.15
+* gh-2127: Fix broken `-FontDir` command line option.
+* gh-2087: Fix unbalanced CoUninitialize call in ConEmu Panel Views plugin.
+* l10n: updated translations.
+
+
+2020.6.4
+* gh-2009: Don't register ttf files in the working directory.
+* StatusBar: Show negative (lesser than -255) process exit codes as hex. E.g. `example.exe:1234 exit code 0xC0000409`.
+* Hyperlinks: support one slash after `protocol:`. Powershell example: `https:/go.microsoft.com/fwlink/?LinkID=135170`.
+* gh-2095: Fix escaping of postponed GuiMacro scripts.
+* gh-1994: Fix pane orders while saving opened tabs.
+* Prefer to activate during startup the console marked by '>'.
+* Fix opened tabs save: foregroud/background cur_console switches weren't dropped.
+* gh-1844: Status was not cleared after window drag in some cases.
+* gh-2112: Polish translation in progress.
+* Fix wrong tab- and statusbar placement after dpi change.
+* gh-275: Fix cropped scrollbar on high-dpi second monitor.
+* Warnings and UB fixes by FrankHB.
+* Set up CI with Azure Pipelines
+* Update build system to VS2019.
+
+
+2019.10.12
+* gh-1984: Add SetFocus macro which sets keyboard focus to ConEmu ghWnd handle (by stevium).
+  Useful for ConEmu Inside scenario, where focus needs to be set programatically.
+* gh-1984: Complete SetParentHWND macro by adding corresponding calls to gpConEmu (by stevium).
+  Useful for ConEmu Inside scenario in case when there's a need for switching ConEmu parent to different HWND.
+* gh-1072, gh-1973: Use 32-bit color in the tab headers (by ForNeVeR).
+* gh-1072, gh-1973: Set up tab overlays using ImageList_SetOverlayImage (by ForNeVeR).
+* gh-1949: Add Keyboard Input Grouping status item (by tkatz77).
+* ConEmu.l10n: Improved Japanese translation.
+* gh-1994: Fix panes order on saving active tabs.
+* ConEmu.l10n: Update Chinese translations.
+
+
+2019.7.14
+* gh-1948: Don't reset scroll position on Multimedia keypresses.
+* gh-1943: Fix background bug for 10x10 image.
+
+
+2019.6.23
+* gh-1889: GuiMacro `Tabs 12` returns list of opened tabs: `1: tab1\n2: tab2\n...`.
+* Let's `ConEmu.exe -nor` force start ConEmu in normal window mode.
+* Don't start root process under local security token, use inherited instead.
+* l10n: Implement upload translation to Transifex.
+* l10n: Español translations updated.
+
+
+2019.5.26
+* gh-1906: Add missed 'ru' l10n strings.
+* L10N: Add Español translation, pull translations from Transifex.
+* gh-468: Auto update environment variables, changes are applied to new consoles only.
+  * GuiMacro functions `EnvironmentReload` and `EnvironmentList`.
+  * Switch `-NoAutoEnvReload` disables env.reloading for session.
+
+
+2019.3.31
+* gh-1877: Option 'Snap to desktop edges' was broken (regression 663a216).
+* gh-1878: Enable log in `ConEmuC /c` when started from Far.exe.
+* gh-1838: Log start/stop command from Far.exe.
+* gh-1871: Add some logs to WindowPosChaning.
+* gh-1870: Add switch `/t:<temp dir>` to Setupper.
+  Ability to specify temparary directory for msi files.
+  So, you may specify on the ‘Update’ settings page special
+  installer command, e.g.: `"%1" /t:"C:\Temp\ConEmuFiles"` /p:%3,adm /qn`.
+  If the switch `/t:...` is not specified, Setupper uses:
+  * `TEMP` environment variable;
+  * `GetTempPath` API function if variable is not defined.
+* gh-1851: Restore contents after return from Alternative screen was broken.
+
+
+2019.3.26
+* gh-1849: SystemMenu does not appear if ConEmu is maximized.
+* gh-1838: Log times in CmdOutputStore/CmdOutputRestore.
+
+
+2019.3.24
+* gh-1857: Fix regression in `-cur_console` processing.
+* gh-1860: Support new clink dll names.
+* ANSI: Mouse mode for URXVT was not working.
+* ANSI: Implement `ESC [ ! p` sequence to reset terminal.
+* gh-1852, gh-1855: Fix 'Show last command output' in Far Manager (regression).
+* gh-1851: Fix alternative buffer for OpenSSH.
+* gh-1866: l10n: Add Japanese translation.
+* gh-622: Unexpected left/right margins in quake mode with `100%` width.
+* gh-622: Fix window size on minimize/restore.
+* ANSI: Use \x7 as our specials terminator in logs.
+* gh-1492: AnsiLog-s location may be specified as a folder or file with `-new_console:L:"Path"`.
+  Write all ANSI logs to specified file:
+  `cmd.exe -new_console:L:"C:\Logs\cmd.log"`.
+  Create log files by format `ConEmu-<YYYY-MM-DD>-p<SrvPid>.log`:
+  `cmd.exe -new_console:L:"C:\Logs\"`.
+* AnsiLogs: log current system time each 500ms.
+* Hooks: Support FillConsoleOutputCharacter and FillConsoleOutputAttribute.
+* gh-1825: Add option to enable/disable ANSI calls to WinApi functions.
+
+
+2019.3.10
+* Update ChocolateyAbout.cmd to latest installation cmd.
+* gh-1323, gh-1385, gh-1841: Speed up alternative buffer operations (connector).
+* gh-1323, gh-1385, gh-1841: Let ‘Alternative mode’ toolbar button works with console buffers.
+* Connector: When `--log` is used, log current system time each 500ms.
+* gh-463: ConEmu.exe switch `-NoHooksWarn` disabled external hooks checks.
+* Log duration of external hooks checks.
+* gh-1733: Enable dark theme scrollbars with `ConEmu.exe -Theme DarkMode_Explorer`.
+* ANSI: Visual Bell for `ESC g`.
+
+
+2019.3.3
+* gh-1840: Fix hung during startup if Environment contains `echo -x ...`.
+* The `-FontSize` is better name to change font size switch.
+* Allow to do `Copy all` from load dump screen.
+* gh-1833: Fix border rendering issues (bar placement).
+* Icon was not autoloaded for some tabs (e.g. `pwsh.exe`).
+* Add default tasks for ‘PowerShell Core’.
+* Some internal changes in default tasks generation.
+
+
+2019.3.1
+* gh-1795: Unexpected ConEmu activation on monitor change.
+* Paste hotkeys `Ctrl+V`/`Shift+Ins` didn't work in Far Manager if selection was present.
+* Eliminate copying delay on Paste if mouse selection is present.
+
+
+2019.2.25
+* gh-1835: Connector failed to start (regression).
+
+
+2019.2.24
+* gh-1159, gh-1775: ANSI, tmux, compatibility issues.
+* Connector v1.2.6: Pass ConEmuServerPID environment variable to wslbridge.
+* Add to log start/end time of default tasks populating.
+* Preliminary implementation of PTY in Connector.
+* AnsiDbg: better switch checking.
+
+
+2019.2.17
+* gh-1795: Unexpected ConEmu activation on monitor change.
+* gh-1159, gh-1775: ANSI, tmux, compatibility issues.
+
+
+2019.1.8
+* Start word selection with Ctrl+Shift+Left/Right.
+* Settings/Size & Pos: Apply button ignored invisible part of Win10 frame while setting coordinates.
+* gh-861: Support RAlt the same way as Alt+Numbers (keypad).
+* Predefined palettes were not initialized in some cases.
+* gh-1620: Fade colors were wrong if ConEmu was started with `-Palette` switch.
+* gh-1623: Let `Ctrl+0` and GuiMacro `Tab(7,-1)` activate *last* tab.
+* gh-1637: Show message about absent DosBox required files.
+* Fix unexpected pane-1 activation on mouse hover when pane-2 ChildGui popup dialog is over pane-1.
+* gh-1662: Escape Char not working for passwords with trailing quote.
+* gh-1573: Interface language setting was not saved.
+* Add a new option to auto-trim single lines.
+  When pasting a single line ending in newline, the user is presented with a
+  warning about pasting multi-line strings. This enables a new option to
+  automatically strip trailing newlines whenever we detect that a single line
+  string has been pasted. This prevents the warning and allows the user to more
+  conveniently edit single lines pasted into the console.
+* Add German translation to ConEmu.l10n.
+* Add icon ID number for VS2019 in CreateVCTask.
+* GitShowBranch: Case insensitive check for no branch.
+
+
+2018.6.26
+* gh-1606: Don't show assertion on start if we can't determine HKL name, just write info to log.
+* gh-1613: In some cases first four CJK cells were displayed using wrong attributes (inverse, underline).
+* gh-1560: Try to support high-precision mouse wheels and trackpads.
+* gh-1614: Fix long running session performance issues (CreateToolhelp32Snapshot).
+* gh-1615: Workaroung for Win10 insider cursor position bug after writing `\b \b` to console.
+* Reset prompt-start position after newline to avoid unexpected behavior of `Shift+Home`.
+* Avoid rapid window flashing initialized from console applications, log FlashWindow requests.
+
+
+2018.6.17
+* gh-1590: Quake activation (up/down) did not work properly with ChildGui in tab.
+* Show `-switch` style in ConEmuC help.
+* gh-1240: For those who want to run WinAPI console applications from POSIX layer: `ConEmuC -std -c your-command`.
+  When you run connector (or wslbridge) console handles are set into POSIX mode,
+  and only applications directly compiled for this mode will behave as they are in tty.
+  In other words, if you run ‘ConEmu/cygwin-connector/bash’ and try to start Python
+  outside of cygwin folder (e.g. downloaded from https://www.python.org/downloads/),
+  the Python will not think it was started in terminal, because it was not linked
+  with cygwin1.dll!
+  The command `ConEmuC -std -c python` tries to reinitialize console to work
+  like python was started from cmd.
+* gh-1567: Fixing ANSI scrolling issues.
+* Slightly expand Settings/Environment editor area.
+* Set default console pad size to `4`.
+* gh-728, gh-1570: Easy way to configure cmd prompt in default `{cmd}` task.
+  When you run `{cmd}` task or any other task utilizing `CmdInit.cmd`
+  you may set configuration variables on the Environment settings page:
+  * `set ConEmuPromptNL=NO` - use one-line prompt;
+  * `set ConEmuPromptNames=NO` - don't print `user@pc`.
+* Let configure `csudo` from Environment settings page.
+  * `set ConEmuSudoSplit=NO` - run elevated console in new tab instead of split;
+  * `set ConEmuSudoConfirm=NO` - disable ‘Press Enter or Esc to close console…’ confirmation.
+  * Read more in docs: https://conemu.github.io/en/csudo.html
+* Fix selection artefacts when selected region goes out of the screen.
+* gh-1585: Don't reset search mode by clicking on scrollbar.
+* Support ‘Dynamic scrollbar range’ in search mode.
+* gh-1604, gh-393: Allow users enter buffer height values larger than 9999 to revert to maximum allowed 32766 (by Shawn Presser).
+* gh-1259, gh-1557: ANSI: Some characters disappear by moving cursor with right arrow key.
+* gh-1601: Add logging for keyboard indicators CAPS/NUM/SCRL.
+* Support additional batch init scripts in form of `{cmd} script.cmd <arguments>`.
+  The script.cmd may be surrounded by `"`, but in that case, due to cmd parsing rules,
+  you should append some script arguments without quotes.
+  In other words, the tail of `{cmd}` **should not** end with `"`.
+
+
+2018.5.28
+* gh-1583: Let `-new_console` work in WSL.
+  Note: `ConEmuC.exe` or `ConEmuC64.exe` are required to run commands,
+  for example: `ConEmuC64.exe -c powershell -new_console`.
+* Switch `ConEmuC -ConInfo` was not working on redirected handles (mintty, connector, wsl).
+* gh-1444: ANSI. Fix irssi rendering under tmux.
+* ANSI. Sequence `\e[Nb` repeats output of last written character N times.
+* ANSI: `ESC ] 9 ; 10 ; 0 ST` stops xterm mode emulation.
+* ANSI. Reports for `ESC [ 6 n` cursor position relative to viewport (1-based).
+* gh-1569: True color mode with powershell doesn't scroll correctly.
+* gh-1579: Changes in escaping rules on pasting POSIX paths (exclamation `!` mark).
+  * if path contains special characters, strong quoting (single-quote) is used
+  * it's still possible to paste without quotation via GuiMacro
+* In some cases 32-bit ConEmuHk caused access violation on true-color buffer scrolling.
+
+
+2018.5.6
+* gh-884: In some cases Far panels directory were not updated (Tab title, etc.)
+* gh-1082, gh-1546: Env.var ConEmuCfgDir was shorter by one char.
+* gh-1503: Save on timer (every 5 minutes) only startup task if it was changed.
+* gh-1538: Support user-defined drives mount point in WSL.
+* gh-1539: Add workaround for 2 pixels cut off client area by autohidden taskbar.
+* Far working directory was not reloaded for `%f` macro (tab template).
+* Add TaskBar location to LogFile.
+
+
+2018.5.3
+* gh-1539: Resize fixes for auto-hidden Taskbar and caption-less mode.
+* gh-1545: Fix paste problems in Windows 10 1803 on texts with spaces or CR/LF.
+* Maximized ConEmu was not sized properly after display changes.
+* Default Task: create `{bash}` if either `bash.exe` or `wsl.exe` are found.
+* Improve Windows version detection in dlls.
+
+
+2018.4.29
+* gh-1532: Fix ‘splitting windows crashes ConEmu’ (01107bd regression).
+* gh-1534: Unable to select text with always-shown scrollbar (0493ff5 regression).
+
+
+2018.4.27
+* gh-934: Fix assertion `nNewWidth>0 && nNewHeight>0` appeared sometimes after console resize in Windows 10.
+* gh-1503: Save size/pos/startup-task every minute.
+* gh-1527: Fix auto-hidden scrollbar, was not revealed on mouse-over (regression 1fd7b5b2).
+* gh-1526: Improve ‘Duplicate root...’ function.
+* Allow to stop ‘Paused’ mode by `Esc` key.
+
+
+2018.4.22
+* Allow import of xml files without reset of current settings.
+  Example with Dracula color theme:
+  https://gist.github.com/Maximus5/3205332bbc45c8300763157f0fdbe884
+* gh-1522: Exchange **default** behavior of `Ctrl+V` and `Shift+Ins`.
+  Both hotkeys actions may be configured in Settings/Paste.
+  * `Ctrl+V` inserts multiple lines from clipboard with `\n` inside;
+  * `Shift+Ins inserts all lines as single line replacing `\n` with spaces.
+* gh-1492: AnsiLog may be enabled on per-console basis via `-new_console:L:"<path>"`,
+  where `<path>` is a folder to store AnsiLog files, e.g. `C:\Logs`.
+  https://conemu.github.io/en/AnsiLogFiles.html
+* Change default folder for AnsiLog files to `%UserProfile%\Desktop\ConEmuLogs`.
+
+
+2018.4.18
+* gh-880: Show the name of selected shell task for `Win+X` hotkey.
+* gh-1517: After postponing update the ‘Confirm closing’ dialog stucks.
+* Compact paths (%ConEmuDir%, %ConEmuCfgDir%, etc) by removing `\..\` elements.
+  E.g. `C:\ConEmu\src\..\Debug\ConEmu.xml` will be processed now as `C:\ConEmu\Debug\ConEmu.xml`.
+* gh-1046: Don't take into account path to xml settings storage in AppID generation if it's a default xml.
+  If configuration file was set by argument `-LoadCfgFile "%ConEmuDir%\ConEmu.xml"`
+  and it is *already* the default settings location (the same without `-LoadCfgFile` switch),
+  than xml path is not used in AppID generation.
+  Note: AppID is utilized during search for appropriate ConEmu instance
+  when `-single` or `-reuse` switch were specified.
+* By default add commented `LANG` variable and some aliases to ‘Environment’ settings page.
+* Hidden cursor may be displayed as inactive (option for debug purposes).
+* Add hotkey for ‘Check for updates’.
+* Add helper `git-log.cmd` to distro.
+
+
+2018.4.16
+* Add description for `-new_console:t:"title"` switch.
+* Disable automatic update in `-basic` mode unless the `-update` is specified.
+* gh-629: Don't imply ‘AppKeys’ mode (DECCKM) by `-cur_console:p` or `ENABLE_VIRTUAL_TERMINAL_INPUT`.
+* gh-1513: Fix erroneously trimmed leading `"` in commands `cmd /c "-new_console script.bat argument"`.
+* gh-242: Fix hidden scrollbar glitch on mouseover.
+
+
+2018.4.15
+* gh-172: Disable scrolling (mouse wheel and hotkeys) past lowest line.
+* gh-1509: Previous focused window is incorrectly restored to focus after ‘quake’ minimization.
+* gh-1511: ANSI: fix `\n` processing in emacs.
+* gh-1510: Fix for git hangs when Inject ConEmuHk.dll option is enabled (9bce8f14e regression).
+* gh-1512: Option ‘Restore to active monitor’ shall not override unchecked ‘Restore inactive window by hotkey’.
+* Show options ‘Restore inactive window by hotkey’ and ‘Restore to active monitor’ on the ‘Quake style’ page.
+* When ScrollBar is always shown (in settings) don't hide it in alternative (xterm) mode.
+* Improve OS information in About/SysInfo and log.
+
+
+2018.4.11
+* gh-1402: Workaround for \u23CE ⏎ character preceding every prompt in fish on CJK versions of Win10.
+* gh-1449: DefTerm: Support VS 2017 changes in debugging C# console applications.
+* DefTerm: Do several attempts to attach started console (alternative mode).
+* For new installations automatic updates by default are enabled (same channel as downloaded release).
+* Fix icon path for WSL Bash task.
+
+
+2018.4.9
+* gh-1501: One more fix for cursor position after CJK (and other `COMMON_LVB_*_BYTE`) glyphs on Windows 10.
+* Fix custom startup command in ‘Fast configuration’ dialog (44b40e6 regression).
+* Add ConEmu.l10n (localization file) to portable and installer.
+
+
+2018.4.8
+* Add ‘Interface language’ field to ‘Fast configuration’ dialog.
+* New first page ‘General’ in the ‘Settings’ dialog contains several most used options and language selection.
+* Default update channel now is the same as downloaded release (stable/preview/alpha).
+* gh-1404: Update Far Manager panels dragging cursor hotspot.
+* gh-1484, gh-701: Menu item ‘New console dialog...’ in the tab and system menus.
+* gh-1402: Add debug assertions for troubleshooting.
+* gh-1420: Option ‘Restore inactive window by hotkey’ to change Minimize/Restore behavior,
+  new default is ‘if out of focus, minimize instead of focus’.
+* gh-751: Minimizing ConEmu (Quake animation) should return focus to the previous window.
+* gh-1502: Text cursor disappear when use default `{Bash::MinGW bash}` task.
+* gh-1501: Add cursor position test to `ConEmuC -CheckUnicode`.
+* gh-1494: Add `<Babun>` color scheme.
+* Update Connector modules to v1.2.5.
+
+
+2018.3.18
+* Feature ‘Extend foreground colors’ was removed.
+* Don't be CPU consuming in background.
+* gh-1456: VS Extension fails to start ConEmu with error ‘Can't create new virtual console!’.
+* gh-1467: Let hotkey ‘Create new window’ take into account confirmation setting.
+* gh-1478: Fix for unexpected error during `ConEmu -UpdateJumpList -Exit`.
+* gh-1402: Add some more tricks to find WinAPI problems: `ConEmuC -CheckUnicode`.
+* gh-1480: Update wslbridge to version 0.2.4.
+
+
+2018.3.9
+* Tab tooltip was not shown for Far editor/viewer tabs.
+* Ellipsis was not shown for long tab titles.
+* gh-1440: Fix error dialog when toggling ‘Show buttons (toolbar) in tab bar’.
+* Workaround for unexpected WINDOW_BUFFER_SIZE_EVENT appeared after console scrolling.
+* Installer: readme.txt in the `ConEmu\Scripts` folder.
+* gh-1466: ANSI FG/BG reset codes did not reset bright intensity.
+* Settings/Environment was not saved properly (last new line was stripped).
+* Write to ANSI Log calls to certain console WinAPI functions.
+  Example: `^[]9;11;"cmd.exe: SetConsoleCursorPosition(0,0)"^[\`.
+* In some cases output of certain tools was printed as ‘black on black’.
+  Ref: https://superuser.com/q/1198421/139371   Related?: gh-1342
+* gh-1393, gh-1469: Fix jumbled output from git log/diff, reverse scrolling speed.
+* gh-1366: Mouse cursor was not updated while hovering over ChildGui.
+
+
+2018.2.6
+* gh-1430: Toolbar buttons Min/Max/Close dissapears after toggling ‘Show buttons in tab bar’.
+* gh-1431: Lines were not erased properly from multiline xml entries (Environment variables, aliases, cp).
+* gh-1436: TitleBar was not painted properly if theming was disabled.
+* gh-1338: Error message was not displayed if 7-zip was not found.
+* Write to log Theming and DWM flags.
+
+
+2018.1.31
+* Environment settings (and other multiline values) were not loaded from xml properly (xmlparser regression).
+* gh-1427, gh-1428: Fix TitleBar glitches whith option ‘Hide caption when maximized’.
+
+
+2018.1.30
+* Use internal XML parser instead of msxml3.dll.
+* gh-1369, gh-1406: Resize refactoring; refactoring of ideal/stored normal rect.
+* gh-1426: Fix resize glitches if TabBar was set to ‘Auto show’.
+* gh-1410: Correct TabBar height if system DPI was set to custom value.
+* gh-1404: Resize Far Manager panels separately.
+  If mouse cursor is over panels bottom edge at center - resize panels heights simultaneously,
+  otherwise - resize panels separately.
+* Rename option to ‘Adjust font size for monitor DPI’.
+* Don't print download progress: `ConEmuC.exe -download -nolog ...`.
+* Erase deleted Tasks/Palettes/AppDistinct options from xml file on save.
+
+
+2018.1.14
+* Fix frame gaps when maximizing caption-less window on Windows 10.
+* Drag window by frame top if caption is hidden and TabBar is hidden or shown at the bottom.
+* Fix wrong TabBar position when ‘Tabs on bottom’ is checked.
+* gh-1369: Fixes for unexpected unthemed title bar appeared in some cases.
+* gh-1400: Allow resize Far panels with mouse if border fore color match back 4bit color.
+
+
+2018.1.11
+* Resize fixes for quake mode in Windows 10.
+* Don't turn on ‘self-resizable’ frame on mouse-hover if the frame is already resizable.
+* Settings/Integration: If the ‘Command’ field contains only `-nosingle` and no `-run`,
+  don't add `-run` BEFORE `-nosingle`.
+* gh-1395: Settings/Integration: Force Explorer to use hotkey if '&' is specified.
+* gh-1369: Some more logging on changing window style.
+* gh-1355, gh-1393: Fix backscrolling with pager (git bash started from connector).
+* New image-base for ConEmuHk64: 0x7E1100000000.
+
+
+2018.1.8
+* A lot of resize fixes.
+* Fix snap to desktop edges on Win8 when caption is not hidden and ‘Frame width’ set to non-negative value.
+* Fix wrong StatusBar size (it was greater) when caption is hidden.
+* Proper ‘OriginalFilename’ in version info.
+* Proper sizing cursor for caption-less window with positive Frame width.
+* During text selection IBeam cursor was set for many superflous areas.
+* Fix wrong Aero peek position for caption-less window with positive ‘Frame width’.
+* Fix window size and TabBar/StatusBar/Workspace position when caption is hidden and ‘frame width’ is zero.
+* Don't force show frame during dragging the ConEmu window.
+* Fix GDI resources leak (564d6449 regression).
+
+
+2017.12.26
+* Resize fixes.
+* gh-1364: Fix missed slash in the installer temp directory for `%TEMP%\ConEmuYYMMDD`.
+* gh-348, gh-1231, gh-1372: Let background image cover VCon pad areas too.
+* gh-1373: Fix `NestedCallLevel <= 2` assertion in ConEmu-Inside when parent window has zero size.
+* gh-1374: Explorer context menu integration didn't start console in the folder, if starting task has `/dir %CD%` in the task parameters.
+* gh-1269: Special keys were applied multiple times for GroupInput in xterm mode.
+* Add GetConsoleKeyboardLayoutName result to `ConEmuC -checkunicode`.
+
+
+2017.12.17
+* gh-1349: When reopening Settings dialog, show last selected section.
+* gh-165: Allow to move Quake console between monitors by hotkeys.
+* gh-275, gh-1345: Resize changes in caption-less mode.
+* gh-1350, gh-1351: Fix wrong VCon position and gaps colors in split-screen mode.
+* A lot of internal changes fixing deprecated string functions warnings.
+* Use BASE addresses above 4GB for better ASLR optimization (ConEmuCD64, ConEmuHk64).
+
+
+2017.12.5
+* gh-1345: Hide visible frame under TaskBar in maximized mode.
+* gh-1347: Fix crash when setting hotkey for a task (per-mon-dpi regression).
+* gh-1346: Tabs didn't appear when ‘Tabs on bottom’ is set.
+* gh-1346: Refresh Tabs position after ‘Tabs on bottom’ change.
+* gh-935: Workaround for injection failure in Windows 7 on some processes (in progress).
+* StatusBar: show current window and tile modes for debug purposes - column ‘ConEmu window mode’.
+* StatusBar: fix wrong painting position during resize with mouse in some cases.
+
+
+2017.12.3
+* Hotkey `Apps+C` didn't update ‘Hide caption always’ checkbox.
+* gh-1329: Fix progress detection in console window title.
+* gh-1206: correct position after `こんばんはGood Evening`.
+* gh-1321: Close tabs to the right (menu, hotkey, macro).
+* gh-1236: Proper fix for 1638b9b5 (kernel debug log to fill on Win10).
+* gh-275, gh-1226: Resize refactoring: dialogs, per-monitor dpi, caption-less mode etc.
+* Fix yanking while dragging the window by its contents with ‘Snap to desktop edges’ enabled.
+* Connector: Fix infinite waiting on shell exit.
+* gh-1331: Delay in response to any keypress on connector shells.
+
+
+2017.11.17
+* Option ‘Dynamic scrollbar range’ was not working for not-hooked console applications (e.g. wsl.exe).
+* gh-1306, gh-460: Perhaps this fixes unexpected ‘Tool window’.
+* In some cases ‘underline’ and ‘reverse’ had no effect.
+* Switch `-cur_console:hXXX` was ignored on console restart.
+* Connector: Enable log input to file `connector-XXXX-in.log` with `--log`.
+* gh-1317: GuiMacro `SetOption("bgImage", "C:\background.jpg")`.
+* gh-1051, gh-1111, gh-1138: Cursor position fix for Win10 after CJK glyphs.
+* gh-1311: Connector: Input may entirely stop functioning over time.
+* gh-1318: If checkbox ‘Support UNC paths in cmd.exe’ is not checked, rely on real registry value.
+* gh-1271: Fix for caret position when our dialog is active.
+* gh-1204: Get mount root prefix from connector automatically.
+   It is used on paste paths to cygwin/msys consoles, e.g. when you
+   paste `C:\My Sources` you'll get `/cygdrive/c/My\ Sources`.
+* gh-275: Fix dialog glitches moving between monitors.
+* gh-275: Fix GUI glitches while moving ConEmu window to monitor with different DPI.
+
+
+2017.11.9
+* XLat from Far didn't change keyboard layout in ConEmu.
+* GuiMacro: Select(2) cancels active selection.
+* gh-1307: Turn on ‘Long console output’ when user runs `script.py` associated with `py.exe`
+  The script is executed by Far3 via ShellExecuteEx(script.py),
+  which in turn runs CreateProcess(py.exe, script.py) in background thread
+* gh-1236, gh-1303: When GetConsoleKeyboardLayoutName not implemented stop calling it
+* gh-275, gh-1102: Support PerMonitorV2 DPI awareness for Windows 10 Creators Update.
+* gh-1304: Use ‘Bold’ ANSI sequence (`\e[1m`) to bright text color (partial revert of gh-1288).
+* `ConEmuBaseDirShort` environment variable had wrong path if `ConEmuBaseDir` contained relative parts.
+* gh-1312: Don't autoquote cygwin/msys paths on paste/drop.
+
+
+2017.10.25
+* connector#15: Support graphics output in some versions of mc.
+* gh-1265: Fix crash in Windows 7 on starting elevated console.
+* gh-1271: Update caret position to help accessibilty tools (e.g. Magnifier).
+* gh-661: Disable ‘Close ConEmu with last tab’ if it's prohibited.
+  Some switches (`-MinTSA`, `-NoAutoClose`, ...) tells ConEmu
+  to stay or minimize (into TaskBar status area) instead of
+  termination ConEmu process when all its consoles goes out.
+* gh-1284: Globally registered (WinAPI) hotkeys may use only general modifiers (e.g. Ctrl instead of RCtrl/LCtrl).
+* Add ‘swap’ to hotkey description (Split: Exchange (swap) with ...)
+* Change button name to ‘Add/refresh default tasks...’
+* gh-1261: Improve gh-1164 workaround (Win10 conhost bug with cleared contents on resize).
+* gh-1288: Use ANSI to underline text.
+  Since now, ambiguous sequences like `ESC[1m`, `ESC[3m`, `ESC[4m`, `ESC[5m`
+  are not used to increase the brightness of background/foreground colors,
+  instead they are used to set ‘bold’, ‘inverse’ and ‘underline’ attributes.
+  To set bright text or background colors one may use sequences `ESC [ 90…97 m`
+  or `ESC [ 100…107 m` accordingly.
+* Let `ConEmuC -CheckUnicode` output samples with extended attributes.
+* New option ‘Dynamic scrollbar range’ on ‘Appearance’ settings page.
+  When enabled, ConEmu tries to determine filled area in RealConsole.
+* Improve `-new_console` description.
+* gh-1293: LastError was erased on `printf`.
+* gh-1298: Force to load `.profile` in WSL.
+* gh-1291: Support wsl.exe and ubuntu.exe - turn on/off XA modes automatically.
+
+
+2017.9.10
+* gh-1227: Let ‘Context help’ button open corresponding page on conemu.github.io.
+* gh-1213, gh-1246: Clicking anywere below the prompt line caused prolonged cursor blinking.
+  ConEmu tried to move text cursor to the clicked position, which caused numerous ‘Right arrow’ clicks.
+  Since now ConEmu would not try to advance text cursor forward, if user clicks on the empty
+  space (line) below the prompt.
+* gh-1247: Button `Startup dir...` on Tasks settings page didn't insert space-separator.
+* gh-1243: GroupInput blocked input on terminals.
+* gh-1245: When user runs `ConEmu -reuse -min -run ...` don't restore existing window, but minimize it.
+* ConEmu content was erased on decreasing window height or splitting.
+* gh-1249: Fix the gap on the right of the child GUI window, when scrollbar is set to be always shown.
+* gh-1241: Fix crash on text selection (mouse double click).
+* gh-1244: GuiMacro: Use SetOption to change color palettes.
+  * `SetOption("Scheme", "<SchemeName>")` changes color palette for the whole ConEmu window
+  * `SetOption("VConScheme", "<SchemeName>")` changes color palette for the active console
+  For example, user may execute from the active shell prompt:
+  ConEmuC -GuiMacro SetOption Scheme "<Tomorrow>"
+
+
+2017.8.19
+* gh-1164, gh-1216, gh-1219: Workaround for Window 10 conhost bug when content is erased on resize.
+* gh-1212: After ‘Unfasten’, unfastened console loses arrow key capability.
+
+
+2017.8.14
+* gh-1224: Process dead chars AltGr+~ and AltGr+` in XTerm emulation.
+* Settings\Debug: Show XTerm keyboard and mouse sequences in ‘Input’ mode.
+
+
+2017.8.7
+* Switch `-fork` was not working (e.g. `ConEmuC -fork -c powershell`).
+* gh-1220: Fix AltGr+Key sent with XTerm keyboard emulation (e.g. tilde and square brackets on german keyboard).
+* gh-740: Flexible config allowing or disallowing POSIX paths conversion.
+  * If mount prefix is disabled with `-new_console:p:-` switch than autoconversion is disabled.
+  * GuiMacro `Paste` doesn't do autoconversion with exception of mode `Paste(8)` which does.
+  * Checkboxes ‘Allow Windows to POSIX path conversion’ on ‘Paste’ and ‘App distinct’ setting pages.
+* Add `-settings` switch to ConEmu.exe.
+* Escape special symbols in POSIX path autoconversion on paste (e.g. `/c/Program\ Files \(x86\)/Adobe/`).
+* Add wiki link to each settings page.
+
+
+2017.8.5
+* gh-1211: Pressing `Enter` in nano editor didn't insert new line.
+* Fix missed icon for `{Bash::bash}` task.
+* gh-1209: Node and `undefined` in the `process.env.foobar`.
+* Show proper terminal modes in Settings/Info dialog page.
+* Conversion from POSIX to native paths improved.
+  * Proper prefix is used (autodetected or specified via `-new_console:p:/mnt` switch).
+  * Paths `~` and subpaths are ignored for now, we can't even map `~` from WSL to native.
+* XTerm mouse wheel emulation changes.
+  * VIM emulation `\e[62~` .. `[65~` is removed.
+  * If console application has not requested mouse events, ConEmu
+    sends Wheel events as Up/Down arrow key presses, and Shift+Wheel
+    events as PgUp/PgDn key presses.
+* In come cases when using Connector ANSI sequences were not processed by ConEmu.
+* gh-999: Fix ‘RuntimeError: Failed to beep’ when running Python in ConEmu.
+
+
+2017.7.30
+* Unchecked option ‘Use credentials for network resources only’ was ignored (f9805dccf regression).
+  Entered credentials were used only for network resources regardless of the option value.
+* gh-811, gh-1199: Fix race while starting applications requesting XTerm emulation (WSL, cygwin, msys).
+* gh-1194: Button ‘Clone’ in Settings/Tasks.
+* Use conemu-cyg-64.exe with wslbridge.exe to run WSL bash.
+  This concerns to {Bash::bash} task created by default,
+  if cygwin's wslbridge files exist in `%ConEmuBaseDir%/wsl`.
+  Connector version 1.2 is required. wslbridge added to ConEmu distro.
+* gh-648, gh-1117: Support xterm mouse emulation (mc, WSL, etc.) Connector is required!
+* Try to find all installations of cygwin (32bit and 64bit) to create default tasks.
+* Find MSYS2 installations to create default tasks {Bash::Msys2-32} and {Bash::Msys2-64}.
+
+
+2017.7.23
+* gh-1198, gh-1136, gh-1009: XTerm keyboard emulation for Ctrl+key.
+* gh-1200: 'Sync dir' feature was broken for bash.
+
+
+2017.7.9
+* gh-1175: Take into account modifier keys (Ctrl,Alt,Shift) pressed in the hotkey settings field.
+* New environment variable `ConEmuBaseDirShort` contains short path like `C:\PROGRA~1\ConEmu\ConEmu`.
+* gh-1082: New environment variable `ConEmuCfgDir` contains directory where xml file was loaded from.
+* gh-1178: Use short path to connector for launching from git-cmd. Recreate defult tasks to obtain changes
+  or edit task command manually (change `%ConEmuBaseDir%` to `%ConEmuBaseDirShort%`).
+
+
+2017.7.5
+* Cygwin/Msys connector is updated to version 1.0 (https://conemu.github.io/en/CygwinMsysConnector.html).
+  Hooks are not injected into cygwin/msys applications if they were runned from connector.
+  As a result some speed up execution and elimination of any BLODA conditions is expected.
+  If one needs ConEmuHk to be loaded into some process, e.g. while starting
+  non-cygwin application like cmd.exe from cygwin shell, they may use ConEmuC.exe
+  as loader. For example, run "ConEmuC.exe -c cmd.exe" instead of "cmd.exe".
+* Use connector in new default cygwin/msys/git-for-windows tasks.
+* gh-1008: Add hotkey `Apps+Alt+G` to group input for selected panes.
+  So one may add or remove console to input group by activating it
+  and pressing the `Apps+Alt+G` (configurable). Consoles may belong
+  to different splits/tabs.
+* Far Macro: ConEmu.CtrlNumber.lua to switch panel modes by `Ctrl+Shift+Numbers`.
+* Use `Shift+LClick` or `Alt+LClick` to mark the end of selection.
+  User may start selection (by `Shift+LClick`, `Shift+Arrow` or any other way)
+  and after that extend it by `Shift+LClick` to clicked postion.
+  To create block selection use `Alt+LClick` to mark one selection corner
+  and second `Alt+LClick` to mark opposite corner.
+  Inspired by https://superuser.com/q/1218047/139371
+* Option ‘Use credentials for network resources only’ in ‘Create new console’ dialog (from Peter.Maksimov).
+  Switch `-new_console:e` is available in Tasks and command lines.
+* Create/restart console dialog redesign.
+
+
+2017.6.22
+* gh-136: Swap nearest panes with `Apps+Alt+X`, swap in direction with `Apps+Alt+Arrow`.
+* Let `Apps+Shift+G` group input for all consoles (instead of only visible panes like `Apps+G` does).
+* Use by default `LCtrl+Numbers` to switch consoles (instead of `Win+Numbers`).
+* Use by default `Win+Shift+Q` for ‘Switch next console’ by default. Leave hotkey `Win+Q` to Windows.
+  The `Win+Shift+Q` may be useful to switch Tabs when ChildGui is active.
+
+
+2017.6.5
+* gh-1149: Fix crash in wide consoles, when the cursor goes over 200 col (f8907a1 regression).
+
+
+2017.5.17
+* gh-1039: Use `Win+Shift+G` as default hotkey for ‘Attach to...’ action.
+* Add option ‘Leave opened’ in the ‘Attach to...’ dialog (Win+Shift+G).
+  Would be useful to examine output of some long running script after it finishes.
+* gh-1098: Add ‘Rename tab’ option for ‘Double click on tab’.
+* Use ‘Rename tab’ as default option for ‘Double click on tab’.
+* gh-1097: Don't count ‘System’ process as running process (close confirmation).
+* Cross-click closing confirmation was not shown if ‘Confirm tab’=Off and ‘Confirm window’=On.
+* Detach improvements:
+  * GuiMacro: Detach(3) for seamless updating from Chocolatey
+  * Try to set the console font to same size as ConEmu uses
+  * No debug assertions
+* GuiMacro: Close(2) is asynchronous now.
+  This is because of GuiServer thread waiting for synchronous macro completion,
+  but this thread is required to be terminated when ConEmu window is closing...
+* Use Win7 TaskDialog for ‘Add default tasks’ confirmation.
+* DefTerm: Take into account xml file specified by -loadcfgfile switch.
+  Default Terminal options have to be saved by ‘Apply’ button on the settings page.
+* gh-661: When ConEmu started with ‘-Detached’ switch (implied by DefTerm in some cases) option ‘Close ConEmu with last tab’ was unchecked.
+  If old behavior is required, the switch ‘-NoAutoClose’ may be used.
+* Admin shield was not shown on TabBar if ConEmu was started under Admin.
+* Real console font size dialog: show hint if created font height differs.
+* gh-1012, gh-1121: Dirty workaround for AVDefender/Bitdefender bug raising a crash in the RegQueryValueEx.
+  Warning! ConEmu physically can't fix 3rd-paty bugs!
+  This commit just skips process bitness detection if we already may be sure about it.
+  But the bug/crash may appear in some other situations,
+  so it's better to report the problem to the authors.
+* gh-156, gh-805: Detach powershell console during Chocolatey's update ConEmu package.
+* gh-1135, gh-1021: Create default tasks for Visual Studio 2017 and x64 targets.
+* gh-1051, gh-1111, gh-1138: Workaround for Windows 10 bug with cursor position after CJK glyphs (Also: gh-1083, gh-1096).
+* gh-1051, gh-1111, gh-1138: More Win10 bug workarounds (cursor position after CJK).
+
+
+2017.4.2
+* gh-1085, gh-1087: Git 1.9.5 had failed to rebase (regression: 597d81f; ref: gh-688, gh-1063).
+
+
+2017.3.26
+* Move window to active monitor by ‘Minimize/Restore’ hotkey if ‘Restore to active monitor’ is checked (ref gh-255).
+* Don't force ConEmu window to ‘active monitor’ unless `-monitor XXX` switch or ‘Restore to active monitor’ are specified.
+* Minor fix in startup pos/size adjustment (Win10, FixWindowRect).
+* Run as ‘System’ failed when session was opened via RDP.
+
+
+2017.3.16
+* gh-787: Improve scroll by prompts by skipping empty lines above prompts.
+* gh-1058: Apply button was not auto-enabled on entering negative X coord in the Settings dialog.
+* gh-1061: Fix GUI crash if Far panels has no column titles.
+* Make magnetic snap to edges friendly for Windows Aero Snap feature.
+* gh-1047: Display ampersands (&) in tab titles.
+* gh-688, gh-1063: Fix ‘Long console output’ in Far 1.x and 2.x.
+* gh-1067: Log errors in GetConsoleScreenBufferInfo.
+
+
+2017.3.5
+* Microsoft/BashOnWindows#1668: Fix wrong ANSI processing from Vim started in tmux.
+* gh-1055: Fix ‘Delete word lefward to the cursor’ at the bottom of the screen.
+* gh-787: Keyboard shortcut to scroll by prompts.
+  Ctrl+Alt+PgUp/PgDn will jump between commands entered in the shell prompt.
+  Take into account that prompt must pass to ConEmu the code
+  `ESC]9;12ESC\` (ConEmu default) or `ESC[?7711h` (mintty implementation).
+
+
+2017.2.27
+* gh-284, gh-472, gh-1000: Fix gaps in Windows 10 on snapping. Halt window size changing on show/hide the frame.
+* gh-945: Temporary fix for doubled CJK on non-CJK Win10 14959+.
+* Due to invisible part of the frame in Windows 10 (ref broken coordinate system)
+  the ‘physical’ coordinates do not match ‘visual’ ones anymore.
+  Let show ‘virtual’ 0x0 coordinate in the settings, if the window
+  is docked to the upper-left corner of the screen without gaps.
+* Improve default pos/size if the window exceeds monitor's working area on startup.
+* gh-988: Alternative font unicode range was not parsed properly without 'prefix: '.
+* gh-988: Hints for alternative font's controls were updated.
+* Update AnsiColors24bit.ps1 for powershell in WSL
+  Powershell is available for linux and also woks in Bash on Windows (WSL), see https://github.com/PowerShell/PowerShell
+  [Console]::SetWindowPosition(0,$y) and [Console]::SetCursorPosition(0,$y) do not work there, so an escape sequence is used instead.
+* Fix crash on exporting some manually edited configurations.
+  ref: https://groups.google.com/d/msg/conemu_ml/yDzPaCnd_5U/2AgUZEazCAAJ
+* gh-1044: Don't move the cursor by click above the line with prompt.
+* Prompt click position fix for multiline prompts.
+* gh-1000: Retain client size during changing window border on mouse hover.
+* Try to install injects in Wine without LdrGetDllHandleByName.
+  ref: https://groups.google.com/d/msg/conemu_ml/owVNAuQzC_s/xWnKfyysCwAJ
+* gh-318: Snap to desktop edges now works with magnetic effect.
+
+
+2017.1.18
+* Pasted paths to WSL bash were not converted to Unix style (/mnt/...).
+* connector#10: Unicode \u23CE ⏎ character preceding every prompt in ConEmu.
+  Ref: gh-586, Maximus5/connector#10, fish-shell/fish-shell#789
+  Check: Maximus5/connector#19
+* ConEmu's `echo` and `type` commands were cropped sometimes.
+  If RealConsole (conhost window) was created larger than expected by ConEmu GUI,
+  than `echo` and `type` printed text using this larger size and after shrinking
+  conhost window (up to Windows 8.1) part of data was cropped.
+* gh-451: Support multi-line (wrapped) hyperlinks (URLs) for Ctrl+Click.
+* gh-986: Don't change prompt text cursor position by LClick *above* the prompt.
+* gh-1007: Add more logging to mouse wheel processing.
+* Moving some prompt features to GUI (Click & CtrlBS).
+  Ref: gh-986, gh-317, gh-845
+  Now ‘Change prompt text cursor position with Left Click’
+  and ‘Ctrl+Backspace - delete word leftward to the text cursor’
+  are process by ConEmu GUI without posting command to ConEmuHk.
+  The feature requires properly reported by the shell prompt start pos.
+  For bare cmd.exe it's done automatically by ConEmuHk.
+  All other shells must report the start of the prompt with ANSI.
+  * https://conemu.github.io/en/AnsiEscapeCodes.html#ConEmu_specific_OSC
+  * https://conemu.github.io/en/CygwinMsysConnector.html
+  For example, while using bash and connector you may add to the end
+  of your `PS1` the following sequence: `\[\033]9;12\007\]`.
+* Improve hyperlink detector on 'git diff' outputs.
+* gh-1007: Disable ENABLE_QUICK_EDIT_MODE by default.
+* Add logging of console mode changes.
+* Improve hyperlink detector on #include-s with absolute paths.
+
+
 2016.12.6
 * gh-970: Pasting windows path in cygwin produces truncated result (77eb4e6 regression).
 * Allow to pass empty string via -cur_console:m:"" (set no mount prefix for Unix path conversion).

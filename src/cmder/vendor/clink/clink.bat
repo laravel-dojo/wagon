@@ -1,36 +1,28 @@
 :: Copyright (c) 2012 Martin Ridgers
-::
-:: Permission is hereby granted, free of charge, to any person obtaining a copy
-:: of this software and associated documentation files (the "Software"), to deal
-:: in the Software without restriction, including without limitation the rights
-:: to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-:: copies of the Software, and to permit persons to whom the Software is
-:: furnished to do so, subject to the following conditions:
-::
-:: The above copyright notice and this permission notice shall be included in
-:: all copies or substantial portions of the Software.
-::
-:: THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-:: IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-:: FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-:: AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-:: LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-:: OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-:: SOFTWARE.
+:: License: http://opensource.org/licenses/MIT
 
 @echo off
+setlocal enableextensions
+set clink_profile_arg=
+set clink_quiet_arg=
 
 :: Mimic cmd.exe's behaviour when starting from the start menu.
 if /i "%1"=="startmenu" (
     cd /d "%userprofile%"
-    shift /1
+    shift
 )
 
 :: Check for the --profile option.
 if /i "%1"=="--profile" (
     set clink_profile_arg=--profile "%~2"
-    shift /1
-    shift /1
+    shift
+    shift
+)
+
+:: Check for the --quiet option.
+if /i "%1"=="--quiet" (
+    set clink_quiet_arg= --quiet
+    shift
 )
 
 :: If the .bat is run without any arguments, then start a cmd.exe instance.
@@ -39,9 +31,17 @@ if "%1"=="" (
     goto :end
 )
 
+:: Test for autorun.
+if defined CLINK_NOAUTORUN if /i "%1"=="inject" if /i "%2"=="--autorun" goto :end
+
+:: Endlocal before inject tags the prompt.
+endlocal
+
 :: Pass through to appropriate loader.
 if /i "%processor_architecture%"=="x86" (
         "%~dp0\clink_x86.exe" %*
+) else if /i "%processor_architecture%"=="arm64" (
+        "%~dp0\clink_arm64.exe" %*
 ) else if /i "%processor_architecture%"=="amd64" (
     if defined processor_architew6432 (
         "%~dp0\clink_x86.exe" %*
@@ -51,10 +51,13 @@ if /i "%processor_architecture%"=="x86" (
 )
 
 :end
-set clink_profile_arg=
 goto :eof
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 :launch
-start "Clink" cmd.exe /s /k ""%~dpnx0" inject %clink_profile_arg%"
+setlocal
+set WT_PROFILE_ID=
+set WT_SESSION=
+start "Clink" cmd.exe /s /k ""%~dpnx0" inject %clink_profile_arg%%clink_quiet_arg%"
+endlocal
 exit /b 0
