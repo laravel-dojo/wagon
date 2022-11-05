@@ -74,7 +74,7 @@ class NamespacedItemResolver
      */
     protected function parseNamespacedSegments($key)
     {
-        list($namespace, $item) = explode('::', $key);
+        [$namespace, $item] = explode('::', $key);
 
         // First we'll just explode the first segment to get the namespace and group
         // since the item should be in the remaining segments. Once we have these
@@ -92,11 +92,21 @@ class NamespacedItemResolver
      * Set the parsed value of a key.
      *
      * @param  string  $key
-     * @param  array   $parsed
+     * @param  array  $parsed
      * @return void
      */
     public function setParsedKey($key, $parsed)
     {
         $this->parsed[$key] = $parsed;
+    }
+
+    /**
+     * Flush the cache of parsed keys.
+     *
+     * @return void
+     */
+    public function flushParsedKeys()
+    {
+        $this->parsed = [];
     }
 }

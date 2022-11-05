@@ -3,6 +3,7 @@
 namespace Laravel\Envoy;
 
 use Closure;
+use Exception;
 use Illuminate\Support\Arr;
 use InvalidArgumentException;
 
@@ -37,11 +38,25 @@ class TaskContainer
     protected $tasks = [];
 
     /**
+     * All of the "success" callbacks.
+     *
+     * @var array
+     */
+    protected $success = [];
+
+    /**
      * All of the "error" callbacks.
      *
      * @var array
      */
     protected $error = [];
+
+    /**
+     * All of the "before" callbacks.
+     *
+     * @var array
+     */
+    protected $before = [];
 
     /**
      * All of the "after" callbacks.
@@ -161,7 +176,9 @@ class TaskContainer
     protected function replaceSubTasks()
     {
         foreach ($this->tasks as $name => &$script) {
-            $callback = function ($m) { return $m[1].$this->tasks[$m[2]]; };
+            $callback = function ($m) {
+                return $m[1].$this->tasks[$m[2]];
+            };
 
             $script = $this->trimSpaces(
                 preg_replace_callback("/(\s*)@run\('(.*)'\)/", $callback, $script)
@@ -184,16 +201,17 @@ class TaskContainer
      * Get the IP address for a server.
      *
      * @param  string  $server
-     * @throws \Exception
      * @return string|null
+     *
+     * @throws \Exception
      */
     public function getServer($server)
     {
         if (! array_key_exists($server, $this->servers)) {
-            throw new \Exception('Server ['.$server.'] is not defined.');
+            throw new Exception('Server ['.$server.'] is not defined.');
         }
 
-        return array_get($this->servers, $server);
+        return Arr::get($this->servers, $server);
     }
 
     /**
@@ -288,7 +306,7 @@ class TaskContainer
      */
     public function getMacro($macro)
     {
-        return array_get($this->macros, $macro);
+        return Arr::get($this->macros, $macro);
     }
 
     /**
@@ -299,7 +317,7 @@ class TaskContainer
      */
     public function getMacroOptions($macro)
     {
-        return array_get($this->macroOptions, $macro, []);
+        return Arr::get($this->macroOptions, $macro, []);
     }
 
     /**
@@ -317,22 +335,23 @@ class TaskContainer
      *
      * @param  string  $task
      * @param  array  $macroOptions
-     * @throws \Exception
      * @return \Laravel\Envoy\Task
+     *
+     * @throws \Exception
      */
     public function getTask($task, array $macroOptions = [])
     {
-        $script = array_get($this->tasks, $task, '');
+        $script = Arr::get($this->tasks, $task, '');
 
         if ($script == '') {
-            throw new \Exception(sprintf('Task "%s" is not defined.', $task));
+            throw new Exception(sprintf('Task "%s" is not defined.', $task));
         }
 
         $options = array_merge($this->getTaskOptions($task), $macroOptions);
 
-        $parallel = array_get($options, 'parallel', false);
+        $parallel = Arr::get($options, 'parallel', false);
 
-        $confirm = array_get($options, 'confirm', null);
+        $confirm = Arr::get($options, 'confirm', null);
 
         return new Task($this->getServers($options), $options['as'], $script, $parallel, $confirm);
     }
@@ -345,7 +364,7 @@ class TaskContainer
      */
     public function getTaskOptions($task)
     {
-        return array_get($this->taskOptions, $task, []);
+        return Arr::get($this->taskOptions, $task, []);
     }
 
     /**
@@ -360,7 +379,7 @@ class TaskContainer
             $options['on'] = [];
         }
 
-        return array_flatten(array_map(function ($name) {
+        return Arr::flatten(array_map(function ($name) {
             return $this->getServer($name);
         }, (array) $options['on']));
     }
@@ -386,7 +405,7 @@ class TaskContainer
      */
     public function endMacro()
     {
-        $macro = explode(PHP_EOL, $this->trimSpaces(trim(ob_get_clean())));
+        $macro = array_map('trim', preg_split('/\n|\r\n?/', $this->trimSpaces(trim(ob_get_clean()))));
 
         $this->macros[array_pop($this->macroStack)] = $macro;
     }
@@ -435,6 +454,27 @@ class TaskContainer
     }
 
     /**
+     * Register a before-task callback.
+     *
+     * @param  \Closure  $callback
+     * @return void
+     */
+    public function before(Closure $callback)
+    {
+        $this->before[] = $callback;
+    }
+
+    /**
+     * Get all of the before-task callbacks.
+     *
+     * @return array
+     */
+    public function getBeforeCallbacks()
+    {
+        return $this->before;
+    }
+
+    /**
      * Register an after-task callback.
      *
      * @param  \Closure  $callback
@@ -474,6 +514,27 @@ class TaskContainer
     public function getFinishedCallbacks()
     {
         return $this->finished;
+    }
+
+    /**
+     * Register an success-task callback.
+     *
+     * @param  \Closure  $callback
+     * @return void
+     */
+    public function success(Closure $callback)
+    {
+        $this->success[] = $callback;
+    }
+
+    /**
+     * Get all of the success-task callbacks.
+     *
+     * @return array
+     */
+    public function getSuccessCallbacks()
+    {
+        return $this->success;
     }
 
     /**

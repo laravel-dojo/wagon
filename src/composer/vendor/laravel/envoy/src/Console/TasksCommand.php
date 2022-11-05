@@ -4,8 +4,9 @@ namespace Laravel\Envoy\Console;
 
 use Laravel\Envoy\Compiler;
 use Laravel\Envoy\TaskContainer;
+use Symfony\Component\Console\Command\Command as SymfonyCommand;
 
-class TasksCommand extends \Symfony\Component\Console\Command\Command
+class TasksCommand extends SymfonyCommand
 {
     use Command;
 
@@ -23,7 +24,7 @@ class TasksCommand extends \Symfony\Component\Console\Command\Command
     /**
      * Execute the command.
      *
-     * @return void
+     * @return int
      */
     protected function fire()
     {
@@ -34,6 +35,8 @@ class TasksCommand extends \Symfony\Component\Console\Command\Command
         $this->output->writeln('');
 
         $this->listMacros($container);
+
+        return 0;
     }
 
     /**

@@ -2,16 +2,18 @@
 
 namespace Laravel\Envoy\Console;
 
-use Laravel\Envoy\SSH;
-use Laravel\Envoy\Task;
+use Illuminate\Support\Str;
 use Laravel\Envoy\Compiler;
 use Laravel\Envoy\ParallelSSH;
+use Laravel\Envoy\SSH;
+use Laravel\Envoy\Task;
 use Laravel\Envoy\TaskContainer;
-use Symfony\Component\Process\Process;
-use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Process\Process;
 
-class RunCommand extends \Symfony\Component\Console\Command\Command
+class RunCommand extends SymfonyCommand
 {
     use Command;
 
@@ -33,6 +35,13 @@ class RunCommand extends \Symfony\Component\Console\Command\Command
     ];
 
     /**
+     * The hosts that have already been assigned a color for output.
+     *
+     * @var array
+     */
+    protected $hostsWithColor = [];
+
+    /**
      * Configure the command options.
      *
      * @return void
@@ -46,7 +55,8 @@ class RunCommand extends \Symfony\Component\Console\Command\Command
                 ->addArgument('task', InputArgument::REQUIRED)
                 ->addOption('continue', null, InputOption::VALUE_NONE, 'Continue running even if a task fails')
                 ->addOption('pretend', null, InputOption::VALUE_NONE, 'Dump Bash script for inspection')
-                ->addOption('path', null, InputOption::VALUE_REQUIRED, 'The path to the Envoy.blade.php file');
+                ->addOption('path', null, InputOption::VALUE_REQUIRED, 'The path to the Envoy.blade.php file')
+                ->addOption('conf', null, InputOption::VALUE_REQUIRED, 'The name of the Envoy file', 'Envoy.blade.php');
     }
 
     /**
@@ -74,8 +84,14 @@ class RunCommand extends \Symfony\Component\Console\Command\Command
             }
         }
 
+        if (! $thisCode) {
+            foreach ($container->getSuccessCallbacks() as $callback) {
+                call_user_func($callback);
+            }
+        }
+
         foreach ($container->getFinishedCallbacks() as $callback) {
-            call_user_func($callback);
+            call_user_func($callback, $exitCode);
         }
 
         return $exitCode;
@@ -85,7 +101,7 @@ class RunCommand extends \Symfony\Component\Console\Command\Command
      * Get the tasks from the container based on user input.
      *
      * @param  \Laravel\Envoy\TaskContainer  $container
-     * @return void
+     * @return array
      */
     protected function getTasks($container)
     {
@@ -113,6 +129,10 @@ class RunCommand extends \Symfony\Component\Console\Command\Command
 
         if ($confirm && ! $this->confirmTaskWithUser($task, $confirm)) {
             return;
+        }
+
+        foreach ($container->getBeforeCallbacks() as $callback) {
+            call_user_func($callback, $task);
         }
 
         if (($exitCode = $this->runTaskOverSSH($container->getTask($task, $macroOptions))) > 0) {
@@ -157,7 +177,7 @@ class RunCommand extends \Symfony\Component\Console\Command\Command
     protected function passToRemoteProcessor(Task $task)
     {
         return $this->getRemoteProcessor($task)->run($task, function ($type, $host, $line) {
-            if (starts_with($line, 'Warning: Permanently added ')) {
+            if (Str::startsWith($line, 'Warning: Permanently added ')) {
                 return;
             }
 
@@ -177,15 +197,17 @@ class RunCommand extends \Symfony\Component\Console\Command\Command
     {
         $lines = explode("\n", $line);
 
+        $hostColor = $this->getHostColor($host);
+
         foreach ($lines as $line) {
             if (strlen(trim($line)) === 0) {
                 continue;
             }
 
             if ($type == Process::OUT) {
-                $this->output->write('<comment>['.$host.']</comment>: '.trim($line).PHP_EOL);
+                $this->output->write($hostColor.': '.trim($line).PHP_EOL);
             } else {
-                $this->output->write('<comment>['.$host.']</comment>: <fg=red>'.trim($line).'</>'.PHP_EOL);
+                $this->output->write($hostColor.':  '.'<fg=red>'.trim($line).'</>'.PHP_EOL);
             }
         }
     }
@@ -197,19 +219,46 @@ class RunCommand extends \Symfony\Component\Console\Command\Command
      */
     protected function loadTaskContainer()
     {
-        $path = $this->input->getOption('path');
+        $path = $this->input->getOption('path', '');
 
-        if (! file_exists($envoyFile = $path) && ! file_exists($envoyFile = getcwd().'/Envoy.blade.php')) {
-            echo "Envoy.blade.php not found.\n";
+        $file = $this->input->getOption('conf');
+        $envoyFile = $path;
+
+        if (! file_exists($envoyFile ?? '')
+            && ! file_exists($envoyFile = getcwd().'/'.$file)
+            && ! file_exists($envoyFile .= '.blade.php')
+        ) {
+            echo "{$file} not found.\n";
 
             exit(1);
         }
 
         with($container = new TaskContainer)->load(
-            $envoyFile, new Compiler, $this->getOptions()
+            $envoyFile,
+            new Compiler,
+            array_merge($this->getOptions(), ['__task' => $this->argument('task')])
         );
 
         return $container;
+    }
+
+    /**
+     * Return the hostname wrapped in a color tag.
+     *
+     * @param  string  $host
+     * @return string
+     */
+    protected function getHostColor($host)
+    {
+        $colors = ['yellow', 'cyan', 'magenta', 'blue'];
+
+        if (! in_array($host, $this->hostsWithColor)) {
+            $this->hostsWithColor[] = $host;
+        }
+
+        $color = $colors[array_search($host, $this->hostsWithColor) % count($colors)];
+
+        return "<fg={$color}>[{$host}]</>";
     }
 
     /**
@@ -225,17 +274,20 @@ class RunCommand extends \Symfony\Component\Console\Command\Command
         // the double hyphens in front of their name. We will make these available to the
         // Blade task file so they can be used in echo statements and other structures.
         foreach ($_SERVER['argv'] as $argument) {
-            if (! starts_with($argument, '--') || in_array($argument, $this->ignoreOptions)) {
+            if (! Str::startsWith($argument, '--') || in_array($argument, $this->ignoreOptions)) {
                 continue;
             }
 
-            $option = explode('=', substr($argument, 2));
+            $option = explode('=', substr($argument, 2), 2);
 
             if (count($option) == 1) {
                 $option[1] = true;
             }
 
-            $options[$option[0]] = $option[1];
+            $optionKey = $option[0];
+
+            $options[Str::camel($optionKey)] = $option[1];
+            $options[Str::snake($optionKey)] = $option[1];
         }
 
         return $options;
