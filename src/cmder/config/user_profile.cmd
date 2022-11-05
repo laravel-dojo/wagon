@@ -33,11 +33,11 @@ FOR /F "tokens=*" %%A IN ('type "%WAGON_ROOT%\uwamp\uwamp.ini" ^| tr -d " "') DO
 :: Define PHP Composer SQLite variables
 set CMDER_START=%WAGON_ROOT%\uwamp\www
 set COMPOSER_HOME=%WAGON_ROOT%\composer
-set PHP_INSTSLL_ROOT=%WAGON_ROOT%\uwamp\bin\php\php-7.3.11
+set PHP_INSTALL_ROOT=%WAGON_ROOT%\uwamp\bin\php\php-8.1.12
 set SQLITE_ROOT=%CMDER_ROOT%\vendor\sqlite
 
 :: Set PHP Composer SQLite PATH
-set PATH=%PHP_INSTSLL_ROOT%;%COMPOSER_HOME%;%COMPOSER_HOME%\vendor\bin;%SQLITE_ROOT%;%CMDER_ROOT%\bin;%CMDER_ROOT%;%PATH%
+set PATH=%PHP_INSTALL_ROOT%;%COMPOSER_HOME%;%COMPOSER_HOME%\vendor\bin;%SQLITE_ROOT%;%CMDER_ROOT%\bin;%CMDER_ROOT%;%PATH%
 
 :: Change default working directory
 if defined CMDER_START (
