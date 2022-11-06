@@ -1,167 +1,118 @@
---
--- Copyright (c) 2014 Shengyou Fan
---
+local parser = clink.arg.new_parser
 
---------------------------------------------------------------------------------
-local function flags(...)
-    local p = clink.arg.new_parser()
-    p:set_flags(...)
-    return p
-end
-
-local artisan_basic_options = {
-	"--help", "-h",
-	"--quiet", "-q",
-	"--version", "-V",
-	"--ansi",
-	"--no-ansi",
-	"--no-interaction", "-n",
-	"--env",
-	"--verbose", "-v", "-vv", "-vvv",
-}
-
-local artisan_basic_parser = clink.arg.new_parser()
-artisan_basic_parser:set_flags(artisan_basic_options)
-artisan_basic_parser:set_arguments({
-	"clear-compiled",
-	"down",
-	"env",
-	"help",
-	"inspire",
-	"list",
-	"migrate",
-	"optimize",
-	"serve",
-	"tinker",
-	"up",
+local artisan_basic_parser = parser({
+  "-h", "--help",
+  "-q", "--quiet",
+  "-V", "--version",
+        "--ansi|--no-ansi",
+  "-n", "--no-interaction",
+        "--env",
+  "-v", "-vv", "-vvv", "--verbose"
 })
 
-local artisan_command_parser = clink.arg.new_parser()
-artisan_command_parser:set_arguments({
-	"app:name" .. flags(artisan_basic_options),
-	"auth:clear-resets" .. flags(artisan_basic_options),
-	"cache:clear" .. flags(artisan_basic_options),
-	"cache:table" .. flags(artisan_basic_options),
-	"config:cache" .. flags(artisan_basic_options),
-	"config:clear" .. flags(artisan_basic_options),
-	"db:seed" .. flags(
-						"--class",
-						"--database",
-						"--force",
-						artisan_basic_options
-						),
-	"event:generate" .. flags(artisan_basic_options),
-	"key:generate" .. flags(
-						"--show",
-						artisan_basic_options
-						),
-	"make:auth" .. flags(
-						"--views",
-						artisan_basic_options
-						),
-	"make:console" .. flags(
-						"--command",
-						artisan_basic_options
-						),
-	"make:controller" .. flags(
-						"--resource",
-						artisan_basic_options
-						),
-	"make:event" .. flags(artisan_basic_options),
-	"make:job" .. flags(
-						"--queued",
-						artisan_basic_options
-						),
-	"make:listener" .. flags(
-						"--event",
-						"--queued",
-						artisan_basic_options
-						),
-	"make:middleware" .. flags(artisan_basic_options),
-	"make:migration" .. flags(
-						"--create",
-						"--table",
-						artisan_basic_options
-						),
-	"make:model" .. flags(
-						"--migration", "-m",
-						"--table",
-						artisan_basic_options
-						),
-	"make:policy" .. flags(artisan_basic_options),
-	"make:provider" .. flags(artisan_basic_options),
-	"make:request" .. flags(artisan_basic_options),
-	"make:seeder" .. flags(artisan_basic_options),
-	"make:test" .. flags(artisan_basic_options),
-	"migrate:install" .. flags(
-						"--database",
-						artisan_basic_options
-						),
-	"migrate:refresh" .. flags(
-						"--database",
-						"--force",
-						"--seed",
-						"--seeder",
-						artisan_basic_options
-						),
-	"migrate:reset" .. flags(
-						"--database",
-						"--force",
-						"--pretend",
-						artisan_basic_options
-						),
-	"migrate:rollback" .. flags(
-						"--database",
-						"--force",
-						"--pretend",
-						artisan_basic_options
-						),
-	"migrate:status" .. flags(
-						"--database",
-						"--path",
-						artisan_basic_options
-						),
-	"queue:failed" .. flags(artisan_basic_options),
-	"queue:failed-table" .. flags(artisan_basic_options),
-	"queue:flush" .. flags(artisan_basic_options),
-	"queue:forget" .. flags(artisan_basic_options),
-	"queue:listen" .. flags(
-						"--queue",
-						"--delay",
-						"--memory",
-						"--timeout",
-						"--sleep",
-						"--tries",
-						artisan_basic_options),
-	"queue:restart" .. flags(artisan_basic_options),
-	"queue:retry" .. flags(artisan_basic_options),
-	"queue:table" .. flags(artisan_basic_options),
-	"queue:work" .. flags(
-						"--queue",
-						"--daemon",
-						"--delay",
-						"--force",
-						"--memory",
-						"--sleep",
-						"--tries",
-						artisan_basic_options),
-	"route:cache" .. flags(artisan_basic_options),
-	"route:clear" .. flags(artisan_basic_options),
-	"route:list" .. flags(
-						"--name",
-						"--path",
-						artisan_basic_options
-						),
-	"schedule:run" .. flags(artisan_basic_options),
-	"session:table" .. flags(artisan_basic_options),
-	"vendor:publish" .. flags(
-						"--force",
-						"--provider",
-						"--tag",
-						artisan_basic_options
-						),
-	"view:clear" .. flags(artisan_basic_options),
+local artisan_parser = parser({
+    "about"..artisan_basic_parser,
+    "clear-compiled"..artisan_basic_parser,
+    "completion"..artisan_basic_parser,
+    "db"..artisan_basic_parser,
+    "docs"..artisan_basic_parser,
+    "down"..artisan_basic_parser,
+    "env"..artisan_basic_parser,
+    "help"..artisan_basic_parser,
+    "inspire"..artisan_basic_parser,
+    "list"..artisan_basic_parser,
+    "migrate"..artisan_basic_parser,
+    "optimize"..artisan_basic_parser,
+    "serve"..artisan_basic_parser,
+    "test"..artisan_basic_parser,
+    "tinker"..artisan_basic_parser,
+    "up"..artisan_basic_parser,
+    "auth:clear-resets"..artisan_basic_parser,
+    "cache:clear"..artisan_basic_parser,
+    "cache:forget"..artisan_basic_parser,
+    "cache:table"..artisan_basic_parser,
+    "config:cache"..artisan_basic_parser,
+    "config:clear"..artisan_basic_parser,
+    "db:monitor"..artisan_basic_parser,
+    "db:seed"..artisan_basic_parser,
+    "db:show"..artisan_basic_parser,
+    "db:table"..artisan_basic_parser,
+    "db:wipe"..artisan_basic_parser,
+    "env:decrypt"..artisan_basic_parser,
+    "env:encrypt"..artisan_basic_parser,
+    "event:cache"..artisan_basic_parser,
+    "event:clear"..artisan_basic_parser,
+    "event:generate"..artisan_basic_parser,
+    "event:list"..artisan_basic_parser,
+    "key:generate"..artisan_basic_parser,
+    "make:cast"..artisan_basic_parser,
+    "make:channel"..artisan_basic_parser,
+    "make:command"..artisan_basic_parser,
+    "make:component"..artisan_basic_parser,
+    "make:controller"..artisan_basic_parser,
+    "make:event"..artisan_basic_parser,
+    "make:exception"..artisan_basic_parser,
+    "make:factory"..artisan_basic_parser,
+    "make:job"..artisan_basic_parser,
+    "make:listener"..artisan_basic_parser,
+    "make:mail"..artisan_basic_parser,
+    "make:middleware"..artisan_basic_parser,
+    "make:migration"..artisan_basic_parser,
+    "make:model"..artisan_basic_parser,
+    "make:notification"..artisan_basic_parser,
+    "make:observer"..artisan_basic_parser,
+    "make:policy"..artisan_basic_parser,
+    "make:provider"..artisan_basic_parser,
+    "make:request"..artisan_basic_parser,
+    "make:resource"..artisan_basic_parser,
+    "make:rule"..artisan_basic_parser,
+    "make:scope"..artisan_basic_parser,
+    "make:seeder"..artisan_basic_parser,
+    "make:test"..artisan_basic_parser,
+    "migrate:fresh"..artisan_basic_parser,
+    "migrate:install"..artisan_basic_parser,
+    "migrate:refresh"..artisan_basic_parser,
+    "migrate:reset"..artisan_basic_parser,
+    "migrate:rollback"..artisan_basic_parser,
+    "migrate:status"..artisan_basic_parser,
+    "model:prune"..artisan_basic_parser,
+    "model:show"..artisan_basic_parser,
+    "notifications:table"..artisan_basic_parser,
+    "optimize:clear"..artisan_basic_parser,
+    "package:discover"..artisan_basic_parser,
+    "queue:batches-table"..artisan_basic_parser,
+    "queue:clear"..artisan_basic_parser,
+    "queue:failed"..artisan_basic_parser,
+    "queue:failed-table"..artisan_basic_parser,
+    "queue:flush"..artisan_basic_parser,
+    "queue:forget"..artisan_basic_parser,
+    "queue:listen"..artisan_basic_parser,
+    "queue:monitor"..artisan_basic_parser,
+    "queue:prune-batches"..artisan_basic_parser,
+    "queue:prune-failed"..artisan_basic_parser,
+    "queue:restart"..artisan_basic_parser,
+    "queue:retry"..artisan_basic_parser,
+    "queue:retry-batch"..artisan_basic_parser,
+    "queue:table"..artisan_basic_parser,
+    "queue:work"..artisan_basic_parser,
+    "route:cache"..artisan_basic_parser,
+    "route:clear"..artisan_basic_parser,
+    "route:list"..artisan_basic_parser,
+    "sail:install"..artisan_basic_parser,
+    "sail:publish"..artisan_basic_parser,
+    "sanctum:prune-expired"..artisan_basic_parser,
+    "schedule:clear-cache"..artisan_basic_parser,
+    "schedule:list"..artisan_basic_parser,
+    "schedule:run"..artisan_basic_parser,
+    "schedule:test"..artisan_basic_parser,
+    "schedule:work"..artisan_basic_parser,
+    "schema:dump"..artisan_basic_parser,
+    "session:table"..artisan_basic_parser,
+    "storage:link"..artisan_basic_parser,
+    "stub:publish"..artisan_basic_parser,
+    "vendor:publish"..artisan_basic_parser,
+    "view:cache"..artisan_basic_parser,
+    "view:clear"..artisan_basic_parser,
 })
 
-clink.arg.register_parser("artisan", artisan_basic_parser)
-clink.arg.register_parser("artisan", artisan_command_parser)
+clink.arg.register_parser("artisan", artisan_parser)
